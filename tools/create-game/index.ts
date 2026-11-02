@@ -9,10 +9,18 @@ const opt = (n: string, d?: string) => (args.includes(n) ? args[args.indexOf(n) 
 const caseId = opt('--case');
 const profileId = opt('--profile');
 const name = opt('--name');
+const slug = opt('--slug');
 const envName = opt('--env', 'staging') as string;
-if (!caseId || !profileId || !name || !['family', 'friends'].includes(profileId)) {
+if (
+  !caseId ||
+  !profileId ||
+  !name ||
+  !slug ||
+  !/^[a-z0-9-]{2,40}$/.test(slug) ||
+  !['family', 'friends'].includes(profileId)
+) {
   console.error(
-    'usage: create-game --case <id> --profile <family|friends> --name <text> [--start YYYY-MM-DD] [--env staging|prod]',
+    'usage: create-game --case <id> --profile <family|friends> --name <text> --slug <a-z0-9-> [--start YYYY-MM-DD] [--env staging|prod]',
   );
   process.exit(2);
 }
@@ -30,8 +38,8 @@ try {
     profile: loadProfile(`config/profiles/${profileId}.yaml`),
     scoring: loadScoring('config/scoring.json'),
   };
-  const [g] = await sql`insert into games (name, profile, start_date, config, case_id)
-    values (${name}, ${profileId}, ${opt('--start', meta.start_date as string) as string}, ${sql.json(config as never)}, ${caseId}) returning id`;
+  const [g] = await sql`insert into games (name, slug, profile, start_date, config, case_id)
+    values (${name}, ${slug}, ${profileId}, ${opt('--start', meta.start_date as string) as string}, ${sql.json(config as never)}, ${caseId}) returning id`;
   console.log(`✓ game created in ${envName}: ${g?.id}`);
 } catch (e) {
   console.error('✗', (e as Error).message);

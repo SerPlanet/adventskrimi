@@ -13,6 +13,9 @@
 - Prolog-Begleiter „Page“ (Sprechblasen, abschaltbar).
 - Pro Screen die Barrierefreiheits-Checkliste aus `05`.
 
+## Umgesetzt (Stand)
+Route `#/<slug>/<tab>`, Namenskacheln pro Spiel, Zeitung mit Frage des Tages, Hotel, Akte (Funde, Gegenstände, Hotelbuch), Rangliste, Einstellungen, Page. Test-Uhr in Staging: `?now=2026-12-02T12:00:00+01:00`.
+
 ## Abnahme
 - Auf Staging mit `_test`: Durchlauf Namenswahl → Zeitung → Aktion → Akte → Tag beenden → nächster Tag (Zeitraffer).
 - Playwright-Smoke dafür grün.

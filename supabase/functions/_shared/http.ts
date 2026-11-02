@@ -1,6 +1,6 @@
 // HTTP glue for the edge functions: CORS, clock, store, error mapping. All logic lives in the engine bundle.
 import postgres from 'postgres';
-import { adminPlayers, ApiError, dispatch, resolveNow } from './engine.js';
+import { adminPlayers, ApiError, dispatch, lobby, resolveNow } from './engine.js';
 import { PgStore } from './pgstore.ts';
 
 declare const Deno: {
@@ -82,6 +82,22 @@ export function serveAdmin() {
       if (token.length < 16 || !same(req.headers.get('x-admin-token') ?? '', token))
         throw new ApiError('forbidden', 403);
       return json(200, { ok: true, ...(await adminPlayers(getStore(), await readBody(req))) });
+    } catch (e) {
+      if (e && typeof e === 'object' && 'issues' in e)
+        return json(400, { ok: false, error: 'bad_request' });
+      return fail(e);
+    }
+  });
+}
+
+/** Public: games and name tiles. */
+export function serveLobby() {
+  Deno.serve(async (req) => {
+    if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+    if (req.method !== 'POST') return json(405, { ok: false, error: 'method_not_allowed' });
+    try {
+      clock(req);
+      return json(200, { ok: true, ...(await lobby(getStore(), await readBody(req))) });
     } catch (e) {
       if (e && typeof e === 'object' && 'issues' in e)
         return json(400, { ok: false, error: 'bad_request' });

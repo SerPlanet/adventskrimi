@@ -89,6 +89,7 @@ async function loadCaseData(sql: Sql, caseId: string): Promise<LoadedCase> {
 
 const toGame = (r: any): GameRecord => ({
   id: r.g_id,
+  slug: r.slug,
   name: r.g_name,
   caseId: r.case_id,
   startDate: r.start_date,
@@ -106,7 +107,7 @@ const toPlayer = (r: any): PlayerRecord => ({
 });
 
 const PLAYER_SELECT = (q: Sql | Q) => q`
-  select p.*, g.id as g_id, g.name as g_name, g.case_id, g.config,
+  select p.*, g.id as g_id, g.name as g_name, g.slug, g.case_id, g.config,
          to_char(g.start_date, 'YYYY-MM-DD') as start_date
   from players p join games g on g.id = p.game_id`;
 
@@ -163,7 +164,7 @@ export class PgStore implements Store {
   async transaction<T>(
     playerId: string,
     fn: (tx: PlayerTx) => Promise<T>,
-    opts = { lock: true },
+    opts: { lock: boolean; slug?: string } = { lock: true },
   ): Promise<T> {
     if (!UUID.test(playerId)) throw new ApiError('player_not_found', 404);
     const base = this.sql;
@@ -173,6 +174,8 @@ export class PgStore implements Store {
         : await q`${PLAYER_SELECT(q)} where p.id = ${playerId}`;
       if (!row) throw new ApiError('player_not_found', 404);
       const game = toGame(row);
+      if (opts.slug !== undefined && opts.slug !== game.slug)
+        throw new ApiError('player_not_found', 404);
       let cur = toPlayer(row);
       const tx: PlayerTx = {
         ...gameTx(q, game, base),
@@ -212,9 +215,16 @@ export class PgStore implements Store {
   async game<T>(gameId: string, fn: (tx: GameTx) => Promise<T>): Promise<T> {
     if (!UUID.test(gameId)) throw new ApiError('game_not_found', 404);
     const [g] = await this
-      .sql`select id as g_id, name as g_name, case_id, config, to_char(start_date, 'YYYY-MM-DD') as start_date from games where id = ${gameId}`;
+      .sql`select id as g_id, name as g_name, slug, case_id, config, to_char(start_date, 'YYYY-MM-DD') as start_date from games where id = ${gameId}`;
     if (!g) throw new ApiError('game_not_found', 404);
     return fn(gameTx(this.sql, toGame(g), this.sql));
+  }
+
+  async gameBySlug(slug: string) {
+    const [r] = await this.sql`select id, name, profile from games where slug = ${slug}`;
+    return r
+      ? { id: r.id as string, name: r.name as string, profile: r.profile as string }
+      : undefined;
   }
 
   async listPlayers(gameId: string) {

@@ -1,7 +1,15 @@
 import { join } from 'node:path';
 import { beforeEach, describe, expect, test } from 'vitest';
 import { loadCase, loadProfile, loadScoring } from '../loader';
-import { adminPlayers, dispatch, MemoryStore, resolveNow, type HandlerName } from './index';
+import {
+  adminPlayers,
+  ApiError,
+  dispatch,
+  lobby,
+  MemoryStore,
+  resolveNow,
+  type HandlerName,
+} from './index';
 
 const ROOT = join(__dirname, '../../../..');
 const res = loadCase(join(ROOT, 'cases/_test'));
@@ -24,7 +32,15 @@ const bodyOf = (r: { body: unknown }): any => r.body;
 
 beforeEach(async () => {
   store = new MemoryStore(
-    { id: 'g1', name: 'Test', caseId: 'test', startDate: '2026-12-01', profile, scoring },
+    {
+      id: 'g1',
+      slug: 'test',
+      name: 'Test',
+      caseId: 'test',
+      startDate: '2026-12-01',
+      profile,
+      scoring,
+    },
     res.data,
   );
   const mk = async (name: string) => {
@@ -39,7 +55,7 @@ const talk = { type: 'talk', npc: 'anna', topic: 'nacht' };
 
 describe('safe views', () => {
   test('a fresh state shows nothing locked, no solution, no truth flags', async () => {
-    const r = await call('state', { player_id: a });
+    const r = await call('state', { slug: 'test', player_id: a });
     expect(r.status).toBe(200);
     const text = JSON.stringify(r.body);
     for (const secret of [
@@ -58,8 +74,8 @@ describe('safe views', () => {
   });
 
   test('found statements carry no truth flag; facts show their text only after being found', async () => {
-    await call('act', { player_id: a, request_id: rid(), action: talk });
-    const s = bodyOf(await call('state', { player_id: a })).state;
+    await call('act', { slug: 'test', player_id: a, request_id: rid(), action: talk });
+    const s = bodyOf(await call('state', { slug: 'test', player_id: a })).state;
     expect(s.finds.map((f: { id: string }) => f.id)).toEqual(['f_excl_ben']);
     expect(JSON.stringify(s)).not.toContain('truth');
   });
@@ -67,7 +83,7 @@ describe('safe views', () => {
 
 describe('idempotency and costs', () => {
   test('same request_id twice changes nothing and replays the answer', async () => {
-    const body = { player_id: a, request_id: rid(), action: talk };
+    const body = { slug: 'test', player_id: a, request_id: rid(), action: talk };
     const first = await call('act', body);
     const again = await call('act', body);
     expect(again.body).toEqual(first.body);
@@ -76,20 +92,22 @@ describe('idempotency and costs', () => {
   });
 
   test('repeating the action with a new request_id is known and free', async () => {
-    await call('act', { player_id: a, request_id: rid(), action: talk });
-    const r = await call('act', { player_id: a, request_id: rid(), action: talk });
+    await call('act', { slug: 'test', player_id: a, request_id: rid(), action: talk });
+    const r = await call('act', { slug: 'test', player_id: a, request_id: rid(), action: talk });
     expect(bodyOf(r).result.status).toBe('known');
     expect(bodyOf(r).state.actions.used).toBe(1);
   });
 
   test('empty action and foreign room cost nothing', async () => {
     const empty = await call('act', {
+      slug: 'test',
       player_id: a,
       request_id: rid(),
       action: { type: 'talk', npc: 'anna', topic: 'wetter' },
     });
     expect(bodyOf(empty).result.status).toBe('empty');
     const away = await call('act', {
+      slug: 'test',
       player_id: a,
       request_id: rid(),
       action: { type: 'talk', npc: 'ben', topic: 'nacht' },
@@ -99,48 +117,94 @@ describe('idempotency and costs', () => {
   });
 
   test('a foreign day is refused: before the start and beyond today', async () => {
-    const early = await call('act', { player_id: a, request_id: rid(), action: talk }, before);
+    const early = await call(
+      'act',
+      { slug: 'test', player_id: a, request_id: rid(), action: talk },
+      before,
+    );
     expect(early.status).toBe(403);
     const st = store.players.get(a)!;
     store.players.set(a, { ...st, state: { ...st.state, day: 4 } });
-    const ahead = await call('act', { player_id: a, request_id: rid(), action: talk }, DAY3);
+    const ahead = await call(
+      'act',
+      { slug: 'test', player_id: a, request_id: rid(), action: talk },
+      DAY3,
+    );
     expect(ahead.status).toBe(403);
     expect(bodyOf(ahead).error).toBe('day_not_available');
   });
 
   test('unknown player and malformed requests', async () => {
-    expect((await call('state', { player_id: 'nobody' })).status).toBe(404);
+    expect((await call('state', { slug: 'test', player_id: 'nobody' })).status).toBe(404);
     expect(
-      (await call('act', { player_id: a, request_id: 'x', action: { type: 'fly' } })).status,
+      (await call('act', { slug: 'test', player_id: a, request_id: 'x', action: { type: 'fly' } }))
+        .status,
     ).toBe(400);
-    expect((await call('settings', { player_id: a, settings: { is_admin: true } })).status).toBe(
-      400,
-    );
+    expect(
+      (await call('settings', { slug: 'test', player_id: a, settings: { is_admin: true } })).status,
+    ).toBe(400);
   });
 });
 
 describe('days, rooms, question of the day', () => {
   test('end_day moves to a neighbour in order; a bad room is rejected', async () => {
     expect(
-      (await call('end_day', { player_id: a, request_id: rid(), next_room: 'nirgends' })).status,
+      (
+        await call('end_day', {
+          slug: 'test',
+          player_id: a,
+          request_id: rid(),
+          next_room: 'nirgends',
+        })
+      ).status,
     ).toBe(400);
-    const r = await call('end_day', { player_id: a, request_id: rid(), next_room: 'keller' });
+    const r = await call('end_day', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      next_room: 'keller',
+    });
     expect(bodyOf(r).state.day).toBe(2);
     expect(bodyOf(r).state.room.id).toBe('keller');
     // day 2 has not arrived on day 1
-    const early = await call('act', { player_id: a, request_id: rid(), action: talk });
+    const early = await call('act', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      action: talk,
+    });
     expect(early.status).toBe(403);
   });
 
   test('question: right answer pays once, tip halves, wrong never costs points', async () => {
-    const right = await call('answer_daily', { player_id: a, request_id: rid(), option_id: 'b' });
+    const right = await call('answer_daily', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      option_id: 'b',
+    });
     expect(bodyOf(right).outcome.status).toBe('correct');
     expect(bodyOf(right).state.points).toBe(2 + 3);
-    const hinted = await call('answer_daily', { player_id: b, request_id: rid(), hint: true });
+    const hinted = await call('answer_daily', {
+      slug: 'test',
+      player_id: b,
+      request_id: rid(),
+      hint: true,
+    });
     expect(bodyOf(hinted).hint).toBeTruthy();
-    const ok = await call('answer_daily', { player_id: b, request_id: rid(), option_id: 'b' });
+    const ok = await call('answer_daily', {
+      slug: 'test',
+      player_id: b,
+      request_id: rid(),
+      option_id: 'b',
+    });
     expect(bodyOf(ok).state.points).toBe(2 + 1);
-    const wrong = await call('answer_daily', { player_id: a, request_id: rid(), option_id: 'a' });
+    const wrong = await call('answer_daily', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      option_id: 'a',
+    });
     expect(bodyOf(wrong).outcome.status).toBe('already_done');
   });
 });
@@ -148,15 +212,29 @@ describe('days, rooms, question of the day', () => {
 describe('first discoverer', () => {
   const lampe = { type: 'inspect', object: 'lampe' };
   test('only the first on-time player gets the plaque', async () => {
-    const first = await call('act', { player_id: a, request_id: rid(), action: lampe });
+    const first = await call('act', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      action: lampe,
+    });
     expect(bodyOf(first).plaque).toBe('Sehr aufmerksam');
-    const second = await call('act', { player_id: b, request_id: rid(), action: lampe });
+    const second = await call('act', {
+      slug: 'test',
+      player_id: b,
+      request_id: rid(),
+      action: lampe,
+    });
     expect(bodyOf(second).plaque).toBeNull();
     expect(bodyOf(first).state.points).toBe(bodyOf(second).state.points + 5);
   });
 
   test('catch-up players get no plaque', async () => {
-    const r = await call('act', { player_id: a, request_id: rid(), action: lampe }, DAY3);
+    const r = await call(
+      'act',
+      { slug: 'test', player_id: a, request_id: rid(), action: lampe },
+      DAY3,
+    );
     expect(bodyOf(r).result.status).toBe('found');
     expect(bodyOf(r).plaque).toBeNull();
   });
@@ -165,8 +243,8 @@ describe('first discoverer', () => {
 describe('newspaper and scoreboard', () => {
   test('two simultaneous first requests produce one newspaper', async () => {
     const [x, y] = await Promise.all([
-      call('newspaper', { player_id: a, day: 2 }, DAY3),
-      call('newspaper', { player_id: b, day: 2 }, DAY3),
+      call('newspaper', { slug: 'test', player_id: a, day: 2 }, DAY3),
+      call('newspaper', { slug: 'test', player_id: b, day: 2 }, DAY3),
     ]);
     expect(x.status).toBe(200);
     expect(bodyOf(x).newspaper).toEqual(bodyOf(y).newspaper);
@@ -174,13 +252,13 @@ describe('newspaper and scoreboard', () => {
   });
 
   test('future newspapers are refused', async () => {
-    const r = await call('newspaper', { player_id: a, day: 2 }, DAY1);
+    const r = await call('newspaper', { slug: 'test', player_id: a, day: 2 }, DAY1);
     expect(r.status).toBe(403);
   });
 
   test('scoreboard ranks by points and marks the caller', async () => {
-    await call('act', { player_id: b, request_id: rid(), action: talk });
-    const r = bodyOf(await call('scoreboard', { player_id: a }));
+    await call('act', { slug: 'test', player_id: b, request_id: rid(), action: talk });
+    const r = bodyOf(await call('scoreboard', { slug: 'test', player_id: a }));
     expect(r.rows[0].name).toBe('Ben-Spieler');
     expect(r.rows.find((x: { is_you: boolean }) => x.is_you).name).toBe('Anna-Spielerin');
     expect(r.rows[0].rank).toBeTruthy();
@@ -209,6 +287,7 @@ describe('admin', () => {
     expect(list.players!.map((p) => p.name)).toEqual(['Anna-Spielerin', 'Ben-Spieler']);
     const up = await adminPlayers(store, {
       op: 'update',
+      slug: 'test',
       player_id: a,
       player: { name: 'Neu', is_duo: true },
     });
@@ -216,5 +295,25 @@ describe('admin', () => {
     await expect(
       adminPlayers(store, { op: 'update', player_id: 'x', player: {} }),
     ).rejects.toThrow();
+  });
+});
+
+describe('game by link slug', () => {
+  test('a request with another game slug is refused like an unknown player', async () => {
+    const r = await call('state', { slug: 'other-game', player_id: a });
+    expect(r.status).toBe(404);
+    expect(bodyOf(r).error).toBe('player_not_found');
+  });
+
+  test('a missing or malformed slug is a bad request', async () => {
+    expect((await call('state', { player_id: a })).status).toBe(400);
+    expect((await call('state', { slug: 'Bad Slug!', player_id: a })).status).toBe(400);
+  });
+
+  test('lobby shows the name tiles of that game only; unknown slug is 404', async () => {
+    const out = await lobby(store, { slug: 'test' });
+    expect(out.players.map((p) => p.name)).toEqual(['Anna-Spielerin', 'Ben-Spieler']);
+    expect(JSON.stringify(out)).not.toContain('state');
+    await expect(lobby(store, { slug: 'nope' })).rejects.toBeInstanceOf(ApiError);
   });
 });

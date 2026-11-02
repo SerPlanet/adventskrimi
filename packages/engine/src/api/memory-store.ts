@@ -77,11 +77,12 @@ export class MemoryStore implements Store {
   async transaction<T>(
     playerId: string,
     fn: (tx: PlayerTx) => Promise<T>,
-    opts = { lock: true },
+    opts: { lock: boolean; slug?: string } = { lock: true },
   ): Promise<T> {
     const run = async () => {
       const player = this.players.get(playerId);
-      if (!player) throw new ApiError('player_not_found', 404);
+      if (!player || (opts.slug !== undefined && opts.slug !== this.gameRecord.slug))
+        throw new ApiError('player_not_found', 404);
       const self = this;
       const tx: PlayerTx = {
         ...this.gameTx(),
@@ -116,6 +117,11 @@ export class MemoryStore implements Store {
 
   async game<T>(_gameId: string, fn: (tx: GameTx) => Promise<T>): Promise<T> {
     return fn(this.gameTx());
+  }
+
+  async gameBySlug(slug: string) {
+    const g = this.gameRecord;
+    return g.slug === slug ? { id: g.id, name: g.name, profile: g.profile.id } : undefined;
   }
 
   async listPlayers() {

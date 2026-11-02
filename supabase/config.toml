@@ -41,3 +41,7 @@ import_map = "./functions/deno.json"
 [functions.admin_players]
 verify_jwt = false
 import_map = "./functions/deno.json"
+
+[functions.lobby]
+verify_jwt = false
+import_map = "./functions/deno.json"

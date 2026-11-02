@@ -43,6 +43,7 @@ export async function dispatch(
       (tx) => run(tx as never, req as never, now),
       {
         lock: MUTATING.includes(name),
+        slug: req.slug,
       },
     );
     return { status: 200, body: { ok: true, ...(out as object) } };

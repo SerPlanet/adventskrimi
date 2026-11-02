@@ -1,0 +1,104 @@
+import { expect, test } from '@playwright/test';
+import postgres from 'postgres';
+import { connInfo, readEnv } from '../tools/lib/db';
+
+// Day 2 is "today" in the fake clock, so a fresh player (still on day 1) can play day 1 and then day 2.
+const NOW = encodeURIComponent('2026-12-02T12:00:00+01:00');
+const env = readEnv();
+const NAME = `E2E-${Date.now().toString(36)}`;
+let gameId = '';
+
+async function admin(body: object) {
+  const res = await fetch(`${env.SUPABASE_STAGING_URL}/functions/v1/admin_players`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-admin-token': env.ADMIN_TOKEN_STAGING as string,
+    },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+test.beforeAll(async () => {
+  const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
+  const [g] = await sql`select id from games where name = 'Testspiel' limit 1`;
+  await sql.end();
+  gameId = g?.id as string;
+  await admin({ op: 'create', game_id: gameId, player: { name: NAME, avatar: '\u{1F9EA}' } });
+});
+
+test.afterAll(async () => {
+  const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
+  await sql`delete from players where name = ${NAME}`;
+  await sql.end();
+});
+
+test('wrong or missing link shows a friendly note', async ({ page }) => {
+  await page.goto('/#/gibt-es-nicht');
+  await expect(page.getByText('Bitte öffne den Link, den du bekommen hast.')).toBeVisible();
+  await page.goto('/#/');
+  await expect(page.getByText('Bitte öffne den Link, den du bekommen hast.')).toBeVisible();
+});
+
+test('name tile, newspaper, action, dossier, end of day, next day', async ({ page }) => {
+  await page.goto(`/?now=${NOW}#/test`);
+
+  // name tiles -> newspaper
+  await page.getByRole('button', { name: new RegExp(NAME) }).click();
+  await expect(page.getByRole('heading', { name: 'Der Bergbote' })).toBeVisible();
+  await expect(page.getByText('Ausgabe vom Tag 1')).toBeVisible();
+  await expect(page.getByText(/Aktionen: 1 von 1 übrig/)).toBeVisible();
+
+  // question of the day
+  await page.getByRole('button', { name: 'Schnee' }).click();
+  await expect(page.getByText('Richtig! Gut gelesen.')).toBeVisible();
+
+  // hotel: an empty topic costs nothing is covered by unit tests; here a real action
+  await page.getByRole('button', { name: 'Hotel' }).click();
+  // Anna's find already came with the newspaper, so only Cora's statement is new
+  await page
+    .getByRole('button', { name: /Fragen: Die Nacht/ })
+    .nth(1)
+    .click();
+  await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
+  await expect(page.getByText(/Aktionen: 0 von 1 übrig/)).toBeVisible();
+
+  // dossier shows the find, tagged as fact
+  await page.getByRole('button', { name: 'Akte' }).click();
+  await expect(page.getByText('Ben ist als Dieb ausgeschlossen.')).toBeVisible();
+  await expect(page.getByText('Das stimmt.').first()).toBeVisible();
+  await expect(page.getByText('Ich war die ganze Nacht in der Halle.')).toBeVisible();
+  await expect(page.getByText('Das kann falsch sein.')).toBeVisible();
+
+  // end the day with a confirmation
+  await page.getByRole('button', { name: 'Hotel' }).click();
+  await page.getByRole('button', { name: 'Tag beenden' }).click();
+  await expect(page.getByText('Danach kannst du diesen Tag nicht mehr ändern.')).toBeVisible();
+  await page.getByLabel(/Keller/).check();
+  await page.getByRole('button', { name: 'Ja, Tag beenden' }).click();
+  await expect(page.getByText(/^Tag 2 ·/)).toBeVisible();
+
+  // next day: newspaper of day 2, now in the cellar
+  await page.getByRole('button', { name: 'Zeitung' }).click();
+  await expect(page.getByText('Ausgabe vom Tag 2')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Der Keller ist kalt' })).toBeVisible();
+  await page.getByRole('button', { name: 'Hotel' }).click();
+  await expect(page.getByRole('heading', { name: 'Keller', exact: true })).toBeVisible();
+
+  // no horizontal scrolling at 360 px, also with the biggest font
+  const overflow = () =>
+    page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  expect(await overflow()).toBe(false);
+  await page.getByRole('button', { name: /Einstellungen/ }).click();
+  await page.getByLabel('Schriftgröße').selectOption('xl');
+  await expect(page.locator('html')).toHaveCSS('font-size', '26px');
+  for (const tab of ['Zeitung', 'Hotel', 'Akte', 'Rangliste']) {
+    await page.getByRole('button', { name: tab }).click();
+    await page.waitForTimeout(400);
+    expect(await overflow(), `overflow on ${tab}`).toBe(false);
+  }
+
+  // ranking shows me
+  await expect(page.getByText(/\(du\)/)).toBeVisible();
+});

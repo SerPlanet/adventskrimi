@@ -57,6 +57,10 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
   const q = questionOfDay(ctx, st.day);
   const qp = st.questions[st.day];
   const canPlay = canPlayDay(st, now, startDate);
+  const prolog = c.prolog.days.find((d) => d.day === st.day);
+  const hasBook = c.sources.sources.some(
+    (s) => s.kind === 'hotelbook' && [st.room, '*'].includes(ctx.reach.roomOn(s.id, st.day) ?? ''),
+  );
 
   return {
     player: { id: player.id, name: player.name, avatar: player.avatar, settings: player.settings },
@@ -73,6 +77,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       name: room.name,
       description: room.description,
       blocked: blockedToday,
+      book: hasBook && !blockedToday,
       objects: room.objects.map((o) => ({
         id: o.id,
         name: o.name,
@@ -116,6 +121,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       hint: qp?.hint ? q.hint : undefined,
       can_hint: !!q.hint && !qp?.done,
     },
+    prolog: prolog && { goal: prolog.goal, intro: prolog.intro, tips: prolog.tips },
     theory: st.theory,
     newspaper_days: Math.max(0, Math.min(24, today)),
   };

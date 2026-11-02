@@ -4,8 +4,10 @@
     "composite": true,
     "emitDeclarationOnly": true,
     "declaration": true,
+    "types": ["vite/client"],
     "outDir": "../node_modules/.cache/tsc-app",
     "tsBuildInfoFile": "../node_modules/.cache/tsc-app/info"
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "vite.config.ts"],
+  "references": [{ "path": "../packages/engine" }]
 }

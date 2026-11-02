@@ -17,6 +17,8 @@ export type Settings = z.infer<typeof SettingsSchema>;
 
 export interface GameRecord {
   id: string;
+  /** link slug: the game is chosen by /#/<slug> */
+  slug: string;
   name: string;
   caseId: string;
   startDate: string;
@@ -92,9 +94,10 @@ export interface Store {
   transaction<T>(
     playerId: string,
     fn: (tx: PlayerTx) => Promise<T>,
-    opts?: { lock: boolean },
+    opts?: { lock: boolean; slug?: string },
   ): Promise<T>;
   game<T>(gameId: string, fn: (tx: GameTx) => Promise<T>): Promise<T>;
+  gameBySlug(slug: string): Promise<{ id: string; name: string; profile: string } | undefined>;
   listPlayers(gameId: string): Promise<PlayerRecord[]>;
   createPlayer(
     gameId: string,
@@ -109,6 +112,8 @@ export interface Store {
 // ---- requests ----
 const RequestId = z.string().min(8).max(64);
 const PlayerId = z.string().min(1).max(64);
+/** Every player request names its game by link slug; it must match the player's game. */
+const Slug = z.string().regex(/^[a-z0-9-]{2,40}$/);
 
 export const ActionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('talk'), npc: Id, topic: Id }),
@@ -118,19 +123,25 @@ export const ActionSchema = z.discriminatedUnion('type', [
 ]);
 
 export const Requests = {
-  state: z.object({ player_id: PlayerId }),
-  open_day: z.object({ player_id: PlayerId }),
-  act: z.object({ player_id: PlayerId, request_id: RequestId, action: ActionSchema }),
-  end_day: z.object({ player_id: PlayerId, request_id: RequestId, next_room: Id.optional() }),
+  state: z.object({ slug: Slug, player_id: PlayerId }),
+  open_day: z.object({ slug: Slug, player_id: PlayerId }),
+  act: z.object({ slug: Slug, player_id: PlayerId, request_id: RequestId, action: ActionSchema }),
+  end_day: z.object({
+    slug: Slug,
+    player_id: PlayerId,
+    request_id: RequestId,
+    next_room: Id.optional(),
+  }),
   answer_daily: z.object({
+    slug: Slug,
     player_id: PlayerId,
     request_id: RequestId,
     option_id: Id.optional(),
     hint: z.boolean().optional(),
   }),
-  scoreboard: z.object({ player_id: PlayerId }),
-  newspaper: z.object({ player_id: PlayerId, day: z.number().int().min(1).max(24) }),
-  settings: z.object({ player_id: PlayerId, settings: SettingsSchema }),
+  scoreboard: z.object({ slug: Slug, player_id: PlayerId }),
+  newspaper: z.object({ slug: Slug, player_id: PlayerId, day: z.number().int().min(1).max(24) }),
+  settings: z.object({ slug: Slug, player_id: PlayerId, settings: SettingsSchema }),
 } as const;
 
 export class ApiError extends Error {

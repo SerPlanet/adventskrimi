@@ -10,6 +10,7 @@ const URL = env.SUPABASE_STAGING_URL as string;
 const ANON = env.SUPABASE_STAGING_ANON_KEY as string;
 const ADMIN = env.ADMIN_TOKEN_STAGING as string;
 const DAY1 = '2026-12-01T12:00:00+01:00';
+const SLUG = 'int-test';
 const DAY3 = '2026-12-03T12:00:00+01:00';
 
 const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 2 });
@@ -38,8 +39,8 @@ beforeAll(async () => {
     profile: loadProfile('config/profiles/friends.yaml'),
     scoring: loadScoring('config/scoring.json'),
   };
-  const [g] = await sql`insert into games (name, profile, start_date, config, case_id)
-    values ('int-test', 'friends', '2026-12-01', ${sql.json(config as never)}, 'test') returning id`;
+  const [g] = await sql`insert into games (name, slug, profile, start_date, config, case_id)
+    values ('int-test', 'int-test', 'friends', '2026-12-01', ${sql.json(config as never)}, 'test') returning id`;
   gameId = g!.id;
   const mk = async (name: string) =>
     (
@@ -72,7 +73,7 @@ describe('staging edge functions', () => {
   });
 
   test('state shows nothing locked and never the solution', async () => {
-    const r = await post('state', { player_id: a }, { now: DAY1 });
+    const r = await post('state', { slug: SLUG, player_id: a }, { now: DAY1 });
     expect(r.status).toBe(200);
     const text = JSON.stringify(r.body);
     for (const s of ['solution', 'truth', 'world', 'f_excl_ben', '"answer"'])
@@ -81,7 +82,7 @@ describe('staging edge functions', () => {
   });
 
   test('same request_id twice: one effect, same answer; empty action is free', async () => {
-    const body = { player_id: a, request_id: rid(), action: talk };
+    const body = { slug: SLUG, player_id: a, request_id: rid(), action: talk };
     const first = await post('act', body, { now: DAY1 });
     const again = await post('act', body, { now: DAY1 });
     expect(first.body.result.status).toBe('found');
@@ -91,7 +92,7 @@ describe('staging edge functions', () => {
     expect(ledger).toBe(1);
     const empty = await post(
       'act',
-      { player_id: a, request_id: rid(), action: { ...talk, topic: 'wetter' } },
+      { slug: SLUG, player_id: a, request_id: rid(), action: { ...talk, topic: 'wetter' } },
       { now: DAY1 },
     );
     expect(empty.body.result.status).toBe('empty');
@@ -101,13 +102,13 @@ describe('staging edge functions', () => {
   test('a day that has not arrived is refused', async () => {
     const end = await post(
       'end_day',
-      { player_id: a, request_id: rid(), next_room: 'keller' },
+      { slug: SLUG, player_id: a, request_id: rid(), next_room: 'keller' },
       { now: DAY1 },
     );
     expect(end.body.state.day).toBe(2);
     const early = await post(
       'act',
-      { player_id: a, request_id: rid(), action: talk },
+      { slug: SLUG, player_id: a, request_id: rid(), action: talk },
       { now: DAY1 },
     );
     expect(early.status).toBe(403);
@@ -116,8 +117,8 @@ describe('staging edge functions', () => {
   test('first discoverer: unique insert decides', async () => {
     const lampe = { type: 'inspect', object: 'lampe' };
     const [x, y] = await Promise.all([
-      post('act', { player_id: b, request_id: rid(), action: lampe }, { now: DAY1 }),
-      post('act', { player_id: b, request_id: rid(), action: lampe }, { now: DAY1 }),
+      post('act', { slug: SLUG, player_id: b, request_id: rid(), action: lampe }, { now: DAY1 }),
+      post('act', { slug: SLUG, player_id: b, request_id: rid(), action: lampe }, { now: DAY1 }),
     ]);
     expect([x.body.plaque, y.body.plaque].filter(Boolean)).toEqual(['Sehr aufmerksam']);
     const [{ n: rows }] = await sql`select count(*)::int as n from plaques where player_id = ${b}`;
@@ -126,19 +127,33 @@ describe('staging edge functions', () => {
 
   test('two simultaneous first newspaper requests create one newspaper', async () => {
     const [x, y] = await Promise.all([
-      post('newspaper', { player_id: a, day: 2 }, { now: DAY3 }),
-      post('newspaper', { player_id: b, day: 2 }, { now: DAY3 }),
+      post('newspaper', { slug: SLUG, player_id: a, day: 2 }, { now: DAY3 }),
+      post('newspaper', { slug: SLUG, player_id: b, day: 2 }, { now: DAY3 }),
     ]);
     expect(x.status).toBe(200);
     expect(x.body.newspaper).toEqual(y.body.newspaper);
     const [{ n: rows }] =
       await sql`select count(*)::int as n from newspaper where game_id = ${gameId} and day = 2`;
     expect(rows).toBe(1);
-    expect((await post('newspaper', { player_id: a, day: 3 }, { now: DAY1 })).status).toBe(403);
+    expect(
+      (await post('newspaper', { slug: SLUG, player_id: a, day: 3 }, { now: DAY1 })).status,
+    ).toBe(403);
+  });
+
+  test('the link slug chooses the game: tiles per game, wrong slug refused', async () => {
+    const tiles = await post('lobby', { slug: SLUG });
+    expect(tiles.body.players.map((p: { name: string }) => p.name).sort()).toEqual([
+      'Int-A',
+      'Int-B',
+    ]);
+    expect(JSON.stringify(tiles.body)).not.toContain('state');
+    expect((await post('lobby', { slug: 'gibt-es-nicht' })).status).toBe(404);
+    const other = await post('state', { slug: 'test', player_id: a }, { now: DAY1 });
+    expect(other.status).toBe(404);
   });
 
   test('scoreboard lists both players', async () => {
-    const r = await post('scoreboard', { player_id: a }, { now: DAY1 });
+    const r = await post('scoreboard', { slug: SLUG, player_id: a }, { now: DAY1 });
     expect(r.body.rows.map((x: { name: string }) => x.name).sort()).toEqual(['Int-A', 'Int-B']);
     expect(r.body.rows.filter((x: { is_you: boolean }) => x.is_you)).toHaveLength(1);
   });

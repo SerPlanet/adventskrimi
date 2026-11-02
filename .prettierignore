@@ -6,3 +6,5 @@ docs
 CLAUDE.md
 README.md
 supabase/functions/_shared/engine.js
+test-results
+playwright-report
