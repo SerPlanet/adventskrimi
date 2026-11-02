@@ -13,7 +13,11 @@ const res = loadCase(CASE_DIR);
 if (!res.ok) throw new Error(res.errors.join('\n'));
 const good: LoadedCase = res.data;
 const friends = loadProfile(join(ROOT, 'config/profiles/friends.yaml'));
-const family = loadProfile(join(ROOT, 'config/profiles/family.yaml'));
+// the real family profile selects Berghotel rooms; for the test case use the same settings without the subset
+const family = {
+  ...loadProfile(join(ROOT, 'config/profiles/family.yaml')),
+  include: { exclude_facts: [], exclude_sources: [] },
+};
 const quality = Quality.parse({
   ...loadQuality(join(ROOT, 'config/quality.json')),
   ...JSON.parse(readFileSync(join(CASE_DIR, 'quality.override.json'), 'utf8')),

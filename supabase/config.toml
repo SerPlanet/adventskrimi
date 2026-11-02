@@ -3,3 +3,41 @@ project_id = "adventskrimi"
 
 [db]
 major_version = 15
+
+# Edge functions: no Supabase login (players pick a name tile); admin_players checks ADMIN_TOKEN itself.
+
+[functions.state]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.open_day]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.act]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.end_day]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.answer_daily]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.scoreboard]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.newspaper]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.settings]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.admin_players]
+verify_jwt = false
+import_map = "./functions/deno.json"

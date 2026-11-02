@@ -11,3 +11,4 @@ DB.txt
 
 # Fall mit Lösung: nie committen (lokal + Supabase)
 cases/berghotel/
+supabase/functions/_shared/engine.js

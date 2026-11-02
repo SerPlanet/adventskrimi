@@ -15,6 +15,13 @@ export interface Discovery {
   day: number;
 }
 
+export interface QuestionProgress {
+  attempts: number;
+  done: boolean;
+  correct: boolean;
+  hint: boolean;
+}
+
 export interface PuzzleProgress {
   attempts: number;
   hints: number;
@@ -38,6 +45,8 @@ export interface PlayerState {
   finishedDays: number[];
   /** final accusation handed in: theory is locked */
   accused: boolean;
+  /** question of the day progress by day */
+  questions: Record<number, QuestionProgress>;
 }
 
 /** Immutable game inputs for a (profile-applied) case. */
@@ -69,6 +78,7 @@ export function newPlayer(ctx: GameCtx): PlayerState {
     ledger: [],
     finishedDays: [],
     accused: false,
+    questions: {},
   };
 }
 

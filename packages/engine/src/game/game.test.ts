@@ -155,7 +155,10 @@ describe('movement', () => {
   });
 
   test('free movement allows any room', () => {
-    const family = loadProfile(join(ROOT, 'config/profiles/family.yaml'));
+    const family = {
+      ...loadProfile(join(ROOT, 'config/profiles/family.yaml')),
+      include: { exclude_facts: [], exclude_sources: [] },
+    };
     const c2 = makeCtx(applyProfile(res.data, family), family, scoring);
     expect(nextRooms(newPlayer(c2), c2).sort()).toEqual(['halle', 'keller']);
   });
