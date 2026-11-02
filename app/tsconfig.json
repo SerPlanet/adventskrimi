@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "outDir": "../node_modules/.cache/tsc-app",
+    "tsBuildInfoFile": "../node_modules/.cache/tsc-app/info"
+  },
+  "include": ["src", "vite.config.ts"]
+}

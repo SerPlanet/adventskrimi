@@ -1,0 +1,7 @@
+node_modules
+dist
+adventskrimi
+package-lock.json
+docs
+CLAUDE.md
+README.md

@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "outDir": "../../node_modules/.cache/tsc-engine",
+    "tsBuildInfoFile": "../../node_modules/.cache/tsc-engine/info"
+  },
+  "include": ["src"]
+}

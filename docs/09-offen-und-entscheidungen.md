@@ -1,0 +1,44 @@
+# 09 – Offen und Entscheidungslog
+
+Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (siehe `CLAUDE.md` §7).
+
+## Offen (braucht den Menschen, Default gilt bis Antwort)
+| ID | Frage | Default |
+|---|---|---|
+| O2 | Hosting-Pfad | GitHub Pages aus privatem Repo (Pro via Student Pack), sonst Cloudflare Pages |
+| O3 | Titel, Hotelname, Beute, Tonfall | „Berghotel Edelweiß“, „Goldene Schneekugel“, gemütlicher Krimi |
+| O4 | Motiv als fünfte Kategorie | Nein in v1 |
+| O5 | Mensch spielt mit | Nein, Beobachter |
+| O6 | Schach-Rätsel (Pool aus CC0-Puzzle-Datenbank) | Nur Freunde, Could |
+| O7 | Familie: Bewegung frei oder Nachbarräume | Frei |
+| O8 | Gleicher Starttermin für Familie und Freunde | Ja, 1.12. |
+| O9 | Insider/Namen der Gruppe im Fall | Optional über `insider.yaml`, der Mensch befüllt |
+| O10 | Punktewerte | Startwerte in `03`, Anpassung nach WP13 |
+
+## Entschieden
+| ID | Entscheidung |
+|---|---|
+| D1 | Genre: eingeschneites Berghotel, Diebstahl statt Mord, Tat in der Nikolausnacht (Tag 6) |
+| D2 | Jeder Spieler löst allein, Rangliste, Anklage am 24. durch alle |
+| D3 | Gesuchte Kategorien: Wer, Wann, Wo, Komplize (+2 Beweisfragen) |
+| D4 | Pacing über Aktionsbudget und Bewegung, nicht über zeitgebundene Beweise |
+| D5 | Boden/Decke: Zeitung als Basis für alle, Raum/Aktion als Detail |
+| D6 | Keine leeren Aktionen: nur Aktionen mit neuem Fund verbrauchen Budget |
+| D7 | Aussage vs. Fakt gekennzeichnet, NPCs dürfen lügen, Spieler nie |
+| D8 | Kein Teilen, Chat, Beschatten, Sabotage in v1 |
+| D9 | Soziales über Zeitung: Gerüchte (anonymisiert, ≥3 Spieler) und Erstentdecker-Plaketten |
+| D10 | Keine Minuspunkte, keine Streaks, kein Verfall; Nachholen jederzeit in Reihenfolge |
+| D11 | Tageswechsel 0:00 Europe/Berlin, Gnadenfrist bis 3:00 |
+| D12 | Anmeldung per Namenskachel ohne Passwort, Duo-Profile möglich |
+| D13 | Notizstufen Auto/Halb/Manuell pro Spieler |
+| D14 | Rätsel des Tages in der Zeitung: nur Punkte, ohne Fallbezug |
+| D15 | Objekt-Rätsel nur als Schloss vor einem Fund, nie alleiniger Weg |
+| D16 | Familie und Freunde = Profile derselben Engine, Familie = abgespeckter Fall |
+| D17 | Stack: Vite/React/TS, Supabase, GitHub Pages, Solver/Simulator als TS-Tools |
+| D18 | Max. 1 Haupt-Agent + 1 Sub-Agent gleichzeitig |
+| D19 | Auflösung wird erst nach eigener Abgabe und ab Tag 24 gezeigt |
+| D20 | Prolog Tag 1–5 als Einführung mit Stollen-Übungsfall |
+| D21 | Frühanklage für Freunde und Familie, frühestens ab Tag 20, weil davor die Lösung nicht herleitbar sein darf (Tempo-Prüfung `07` §3) |
+| D22 | WP00-Dependencies: react 18, vite 5, @vitejs/plugin-react, typescript 5, vitest 2, eslint 9 + typescript-eslint, prettier 3, supabase CLI (devDep), @types/node 20 |
+| D23 | Pages-Deploy baut mit `BASE_PATH=/<repo>/`; Staging und Prod getrennt über Supabase-Projekte (Build-Variablen), Pages selbst nur ein Ziel. Zweite Pages-Umgebung erst bei Bedarf (WP12) |
+| D24 | Ordner `adventskrimi/` und `adventskrimi.zip` im Projektroot (Doku-Duplikat) sind per `.gitignore` ausgeschlossen; Mensch kann sie löschen |

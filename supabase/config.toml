@@ -1,0 +1,5 @@
+# Minimal Supabase CLI config (WP00). The project ref is linked locally via `supabase link`.
+project_id = "adventskrimi"
+
+[db]
+major_version = 15
