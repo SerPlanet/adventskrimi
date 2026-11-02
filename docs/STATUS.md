@@ -1,12 +1,12 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-02 · Phase: WP08 + WP09 Teil 2 fertig, WP04 (Simulator) läuft. Staging: Functions neu deployt.
+Stand: 2026-11-02 · Phase: **M2 erreicht** (Testfall bis Tag 24 im Zeitraffer, WP08, WP09 Teil 2, WP04 fertig). Offen: Push, Prod-Migration, WP11
 
 ## Nächstes Work Package
-WP04 → `docs/wp/WP04-simulator.md`. Danach **M2** (Testfall bis Tag 24 im Zeitraffer), dann WP11.
+**M2 erreicht.** Nächstes: WP11 (Admin) → `docs/wp/WP11-admin.md`; parallel Balance-Verstöße aus `npm run balance` (siehe unten) in WP10/WP13 beheben.
 
 Reihenfolge (Details: `docs/08-roadmap.md`):
-WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → WP06 ✓ → WP07 ✓ → WP09 (Teil 1 ✓) → **M1** ✓ → WP08 ✓ → WP09 Teil 2 ✓ → WP04 → WP11 → WP12 → WP13 → WP14
+WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → WP06 ✓ → WP07 ✓ → WP09 (Teil 1 ✓) → **M1** ✓ → WP08 ✓ → WP09 Teil 2 ✓ → WP04 ✓ → **M2** ✓ → WP11 → WP12 → WP13 → WP14
 
 ## Erledigt
 - Doku v0.1 (Spielregeln, Punkte, Architektur, Roadmap)
@@ -22,6 +22,8 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → 
 - WP08: Raster (Auto/Halb/Manuell), Zeitstrahl (Tippen, Widersprüche aus eigenen Einträgen, „Passt das zusammen?“), Theorie mit Verlauf, serverseitig pro Spieler. Neue Functions `set_note`, `fits`, `set_theory`, `get_theory`. Playwright + Lighthouse 100 (inkl. Theorie).
 - WP09 Teil 2: Wochenzeugnis (beim Tagesende, einmalig, Inspektor-Satz nach Trefferzahl), Anklage (`accuse`, ab Tag 20, Bestätigung, endgültig), Frühbonus nur pünktlich, Zeitungsnotiz, Auflösung (`story`) nur nach Abgabe und ab echtem Tag 24. Nicht gebaut: Admin-Knopf Zeugnis, „Gemeinsames Finale“ (WP11).
 - Fix: alte Spielerstände ohne neue Felder (z. B. `daily`) führten zu HTTP 500; `normalizeState` beim Laden.
+- WP04: `packages/engine/src/sim` (Bots optimal/greedy/random/newspaper_only/worst auf der echten Engine), `npm run simulate -- <fall> --profile <p> [--bot] [--seeds] [--json]`, `npm run balance [-- <fall>]` (07 §5). Test `timelapse.test.ts`: Testfall Tag 1–24 über die API bis zur Auflösung. Laufzeit alle Bots <1 s.
+- Balance auf Berghotel (Stand heute, Verstöße für WP10/WP13): newspaper_only und random liegen über dem Boden (Wer 8/5 statt ≤3, Komplize 7), greedy wird bis Tag 24 nicht eindeutig (Freunde), optimal/greedy/worst haben späte Tage ohne neue Funde (ab Tag 18–20, teils Grenze des Bots).
 
 ## In Arbeit
 - –
