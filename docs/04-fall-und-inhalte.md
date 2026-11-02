@@ -62,7 +62,7 @@ Präsentation (optional, für das UI-Redesign `WP06b`): `presentation` = `dialog
 Aussage: `id`, `npc`, `text`, `claims` (Fakt-ähnlich), `truth: true|false`. NPCs dürfen lügen, aber:
 - Jede falsche Aussage muss durch mindestens einen erreichbaren Fakt widerlegbar sein (Validator prüft).
 - Lügen haben ein Motiv, das später erklärbar ist (oft ein harmloses Geheimnis, nicht der Diebstahl).
-- Familie: höchstens 2 Lügner mit klaren Erkennungsmerkmalen, Freunde bis zu 4.
+- Ab WP06c lügt oder verschweigt **jede** Figur mindestens einmal (`02b` §5, D54). Damit das lesbar bleibt: Familie höchstens 5, Freunde höchstens 8 Figuren mit Lügen, davon in der Familie nur 2 mit gravierenden (diebstahlnahen) Lügen. Alle anderen Lügen sind harmlos und haben einen entdeckbaren Grund.
 
 ## 7. Qualitätsregeln für Inhalte
 1. **Redundanz:** Jede Schlüssel-Tatsache für die Lösung ist über ≥3 Wege (Freunde) bzw. ≥2 Wege (Familie) erreichbar, über unterschiedliche Räume/Quellen.
