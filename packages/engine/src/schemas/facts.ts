@@ -53,6 +53,12 @@ export const Source = z.object({
   yields: z.array(Id).min(1),
   /** neutral first-discoverer title, must not reveal place or content */
   plaque: z.string().optional(),
+  /** how the UI shows the find (WP06b); the whole popup text is at most 60 words */
+  presentation: z.enum(['dialog', 'note', 'object', 'ambient']).optional(),
+  lines: z.array(z.object({ speaker: z.string().min(1), text: z.string().min(1) })).optional(),
+  note: z
+    .object({ from: z.string().min(1), to: z.string().min(1), text: z.string().min(1) })
+    .optional(),
 });
 
 export const FactsFile = listFile('facts', Fact);

@@ -24,7 +24,7 @@ export function runBots(
   const ctx = makeCtx(c, profile, scoring);
   const info = buildInfo(c, profile);
   return (opts.bots ?? [...BOTS]).map((bot) => {
-    const n = bot === 'random' ? (opts.seeds ?? 20) : 1;
+    const n = bot === 'random' || bot === 'casual' ? (opts.seeds ?? 20) : 1;
     const runs = Array.from({ length: n }, (_, i) =>
       simulate(ctx, info, bot, i + 1, quality.reading_wpm),
     );
@@ -97,15 +97,8 @@ export function balanceFindings(
     for (const k of CATS)
       if (c[k] > limit(k)) out.push(`${label}: ${k} ${c[k]} > ${limit(k)} an Tag 24`);
   };
-  cap(
-    'newspaper_only',
-    (k) =>
-      k === 'who'
-        ? q.bots.newspaper_only_max_candidates.who
-        : q.bots.newspaper_only_max_candidates.other,
-    'newspaper_only',
-  );
   cap('random', () => q.bots.random_median_max_candidates, 'random (Median)');
+  cap('casual', () => q.bots.casual_median_max_candidates, 'casual (Median)');
   cap('worst', () => q.bots.worst_max_candidates, 'worst');
   for (const b of ['optimal', 'greedy', 'worst'] as BotName[]) {
     const idle = get(b)?.runs[0]?.idleDays ?? [];

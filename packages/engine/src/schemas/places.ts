@@ -6,6 +6,8 @@ export const RoomObject = z.object({
   name: z.string().min(1),
   text: CardText,
   auffaellig: z.boolean().default(false),
+  /** hotspot position in the room scene, percent of width/height */
+  spot: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100) }).optional(),
 });
 
 export const Room = z.object({
@@ -14,6 +16,10 @@ export const Room = z.object({
   description: CardText,
   neighbors: z.array(Id),
   objects: z.array(RoomObject).default([]),
+  /** position in the hotel cross-section and scene id (WP06b, optional) */
+  floor: z.number().int().optional(),
+  col: z.number().int().optional(),
+  scene: z.string().optional(),
 });
 
 export const Npc = z.object({

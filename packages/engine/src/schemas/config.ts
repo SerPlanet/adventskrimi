@@ -66,8 +66,8 @@ export const Quality = z.object({
   red_herrings_min: z.object({ friends: z.number().int(), family: z.number().int() }),
   liars_max: z.object({ friends: z.number().int(), family: z.number().int() }),
   bots: z.object({
-    newspaper_only_max_candidates: z.object({ who: z.number().int(), other: z.number().int() }),
     random_median_max_candidates: z.number().int(),
+    casual_median_max_candidates: z.number().int(),
     worst_max_candidates: z.number().int(),
   }),
   mind_share_min: z.number().min(0).max(1),

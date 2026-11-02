@@ -35,6 +35,10 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
   const finds = st.discoveries.flatMap((d) => {
     const src = c.sources.sources.find((s) => s.id === d.sourceId);
     const source = {
+      id: d.sourceId,
+      presentation: src?.presentation,
+      lines: src?.lines,
+      note: src?.note,
       kind: src?.kind,
       room: roomName(src?.room),
       npc: npcName(src?.npc),
@@ -85,6 +89,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       id: room.id,
       name: room.name,
       description: room.description,
+      scene: room.scene ?? room.id,
       blocked: blockedToday,
       book: hasBook && !blockedToday,
       objects: room.objects.map((o) => ({
@@ -92,6 +97,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
         name: o.name,
         text: o.text,
         auffaellig: o.auffaellig,
+        spot: o.spot,
       })),
       npcs: blockedToday
         ? []
@@ -100,7 +106,13 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
             .map((n) => ({ id: n.id, name: n.name, role: n.role, topics: n.topics })),
     },
     map: {
-      rooms: c.rooms.rooms.map((r) => ({ id: r.id, name: r.name, neighbors: r.neighbors })),
+      rooms: c.rooms.rooms.map((r) => ({
+        id: r.id,
+        name: r.name,
+        neighbors: r.neighbors,
+        floor: r.floor,
+        col: r.col,
+      })),
       next_rooms: st.day <= 24 ? nextRooms(st, ctx) : [],
     },
     finds,

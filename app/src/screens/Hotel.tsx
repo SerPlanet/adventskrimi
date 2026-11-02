@@ -1,29 +1,64 @@
 import { useState } from 'react';
 import { useSession, type ActResult, type Action } from '../store';
-import { FindCard } from './FindCard';
 import { ObjectPuzzles } from './ObjectPuzzles';
+import { FindCard } from './FindCard';
+import { EndDay } from './EndDay';
+import { Popup } from '../ui/Popup';
+import { Candles } from '../ui/Candles';
+import { HotelMap } from '../ui/HotelMap';
+import { RoomScene, spotsOf, type Spot } from '../ui/RoomScene';
+import { SourceCard } from '../ui/Bubbles';
 
-/** Hotel: map, current room, free "Ansehen", actions, end of day. */
+type Open =
+  | { kind: 'spot'; spot: Spot }
+  | { kind: 'found'; result: ActResult; plaque: string | null }
+  | { kind: 'night' };
+
+/** Hotel: cross-section map, room scene with hotspots, popups for people and things. */
 export function Hotel() {
   const { view, act, busy } = useSession();
-  const [last, setLast] = useState<{ result: ActResult; plaque: string | null } | null>(null);
-  const [ending, setEnding] = useState(false);
+  const [open, setOpen] = useState<Open | null>(null);
+  const [armed, setArmed] = useState<string | null>(null);
+  const [msg, setMsg] = useState('');
   if (!view) return null;
 
-  const left = view.actions.budget - view.actions.used;
   const play = view.can_play && !view.finished;
   const room = view.room;
-
-  const run = async (a: Action) => setLast(await act(a));
-  const newFinds = view.finds.filter((f) => last?.result.new_items?.includes(f.id));
+  const left = view.actions.budget - view.actions.used;
 
   if (view.finished)
     return (
       <section className="card">
         <h1>Der Fall ist abgeschlossen</h1>
-        <p>Du hast alle 24 Tage gespielt. Sieh dir die Rangliste an.</p>
+        <p>Du hast alle 24 Tage gespielt. Sieh dir Theorie und Rangliste an.</p>
       </section>
     );
+
+  const run = async (a: Action) => {
+    setMsg('');
+    const r = await act(a);
+    if (!r) return;
+    if (r.result.status === 'found') setOpen({ kind: 'found', ...r });
+    else {
+      setMsg(r.result.message ?? '');
+      setOpen(null);
+    }
+  };
+
+  const onSpot = (s: Spot) => {
+    setMsg('');
+    if (armed) {
+      void run({ type: 'use', item: armed, target: s.id });
+      setArmed(null);
+    } else setOpen({ kind: 'spot', spot: s });
+  };
+
+  const close = () => setOpen(null);
+  const npc = open?.kind === 'spot' ? room?.npcs.find((n) => n.id === open.spot.id) : undefined;
+  const obj = open?.kind === 'spot' ? room?.objects.find((o) => o.id === open.spot.id) : undefined;
+  const newFinds =
+    open?.kind === 'found' ? view.finds.filter((f) => open.result.new_items?.includes(f.id)) : [];
+  const bySource = [...new Map(newFinds.map((f) => [f.source.id, f])).values()];
 
   return (
     <>
@@ -33,190 +68,127 @@ export function Hotel() {
           früherer Tage kannst du jederzeit lesen.
         </p>
       )}
-      <section aria-labelledby="map-h">
-        <h2 id="map-h">Karte</h2>
-        <ul className="map">
-          {view.map.rooms.map((r) => {
-            const here = r.id === view.room?.id;
-            const reachable = view.map.next_rooms.includes(r.id);
-            return (
-              <li key={r.id} className={here ? 'here' : reachable ? 'near' : 'far'}>
-                {here ? '📍 ' : reachable ? '➡️ ' : ''}
-                {r.name}
-                <small>{here ? ' (du bist hier)' : reachable ? ' (morgen erreichbar)' : ''}</small>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+      <h2>Das Hotel</h2>
+      <HotelMap />
 
       {room && (
         <section aria-labelledby="room-h">
           <h1 id="room-h">{room.name}</h1>
           <p>{room.description}</p>
+          <p className="row">
+            <Candles left={left} budget={view.actions.budget} />
+            <span className="small">Eine Aktion zählt nur, wenn sie etwas Neues bringt.</span>
+          </p>
           {room.blocked && (
             <p className="card">
               ⛔ Dieser Raum ist heute gesperrt. Du kannst nur den Tag beenden.
             </p>
           )}
-
-          {room.npcs.length > 0 && <h2>Personen</h2>}
-          {room.npcs.map((n) => (
-            <div className="card" key={n.id}>
-              <h3>{n.name}</h3>
-              <p className="small">{n.role}</p>
-              <div className="row wrap">
-                {n.topics.map((t) => (
-                  <button
-                    key={t.id}
-                    disabled={!play || busy}
-                    onClick={() => void run({ type: 'talk', npc: n.id, topic: t.id })}
-                  >
-                    Fragen: {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-
-          {room.objects.length > 0 && <h2>Dinge im Raum</h2>}
-          {room.objects.map((o) => (
-            <div className="card" key={o.id}>
-              <h3>
-                {o.name}{' '}
-                {o.auffaellig && (
-                  <span title="Auffällig">
-                    ❗<span className="sr"> Auffällig</span>
-                  </span>
-                )}
-              </h3>
-              <p>{o.text}</p>
-              <button
-                disabled={!play || busy}
-                onClick={() => void run({ type: 'inspect', object: o.id })}
-              >
-                Genau untersuchen
+          {armed && (
+            <p className="card" role="status">
+              Gegenstand gewählt. Tippe jetzt Person oder Ding an.{' '}
+              <button className="link" onClick={() => setArmed(null)}>
+                Abbrechen
               </button>
-            </div>
-          ))}
+            </p>
+          )}
+          {!room.blocked && <RoomScene room={room} onSpot={onSpot} armed={!!armed} />}
+
+          <h2>Was gibt es hier?</h2>
+          <ul className="plain">
+            {spotsOf(room).map((s) => (
+              <li key={s.key}>
+                <button disabled={!play || busy} onClick={() => onSpot(s)}>
+                  <span aria-hidden="true">{s.icon}</span> {s.label}
+                  {s.bang && <span className="sr"> (auffällig)</span>}
+                </button>
+              </li>
+            ))}
+            {room.book && (
+              <li>
+                <button disabled={!play || busy} onClick={() => void run({ type: 'hotelbook' })}>
+                  📖 Hotelbuch lesen
+                </button>
+              </li>
+            )}
+          </ul>
+          <p role="status">{msg}</p>
 
           <ObjectPuzzles disabled={!play || busy} />
 
-          {room.book && (
-            <button disabled={!play || busy} onClick={() => void run({ type: 'hotelbook' })}>
-              📖 Hotelbuch lesen
-            </button>
-          )}
-
-          {view.inventory.length > 0 && <UseItem run={run} disabled={!play || busy} />}
-        </section>
-      )}
-
-      {last && (
-        <section className="card result" aria-live="polite" aria-label="Ergebnis">
-          {last.result.status === 'found' ? (
-            <>
-              <h2>Neu in deiner Akte</h2>
-              {newFinds.map((f) => (
-                <FindCard key={f.id} f={f} />
+          {view.inventory.length > 0 && (
+            <div className="inv" role="group" aria-label="Deine Gegenstände">
+              {view.inventory.map((i) => (
+                <button
+                  key={i.id}
+                  aria-pressed={armed === i.id}
+                  title={i.text}
+                  disabled={!play || busy}
+                  onClick={() => setArmed(armed === i.id ? null : i.id)}
+                >
+                  🎒 {i.name}
+                </button>
               ))}
-              {last.plaque && <p>🏅 Du bist die/der Erste! Plakette: „{last.plaque}“.</p>}
-            </>
-          ) : (
-            <p>{last.result.message}</p>
+            </div>
           )}
         </section>
       )}
 
-      <p className="small">
-        Eine Aktion zählt nur, wenn sie etwas Neues bringt. Leere Versuche kosten nichts.
-      </p>
+      <button
+        className="primary"
+        disabled={!play || busy}
+        onClick={() => setOpen({ kind: 'night' })}
+      >
+        🌙 Gute Nacht (Tag beenden)
+      </button>
 
-      {!ending ? (
-        <button className="primary" disabled={!play || busy} onClick={() => setEnding(true)}>
-          Tag beenden
-        </button>
-      ) : (
-        <EndDay left={left} close={() => setEnding(false)} />
+      {open?.kind === 'spot' && npc && (
+        <Popup title={npc.name} onClose={close}>
+          <p className="small">{npc.role}</p>
+          <p>Worüber willst du sprechen?</p>
+          <div className="row wrap">
+            {npc.topics.map((t) => (
+              <button
+                key={t.id}
+                className="chip"
+                disabled={!play || busy}
+                onClick={() => void run({ type: 'talk', npc: npc.id, topic: t.id })}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </Popup>
+      )}
+      {open?.kind === 'spot' && obj && (
+        <Popup title={obj.name} onClose={close}>
+          <p>{obj.text}</p>
+          <button
+            disabled={!play || busy}
+            onClick={() => void run({ type: 'inspect', object: obj.id })}
+          >
+            🔎 Genau untersuchen
+          </button>
+          <p className="small">Nur Ansehen kostet nichts.</p>
+        </Popup>
+      )}
+      {open?.kind === 'found' && (
+        <Popup title="Neu in deiner Akte" onClose={close}>
+          {bySource.map((f) => (
+            <div key={f.source.id}>
+              <SourceCard s={f.source} text={f.text} />
+            </div>
+          ))}
+          {bySource.length === 0 && newFinds.map((f) => <FindCard key={f.id} f={f} />)}
+          {open.plaque && <p>🏅 Du bist die/der Erste! Plakette: „{open.plaque}“.</p>}
+          <p className="small">Alles liegt jetzt in deiner Akte.</p>
+        </Popup>
+      )}
+      {open?.kind === 'night' && (
+        <Popup title="Gute Nacht" onClose={close}>
+          <EndDay left={left} close={close} />
+        </Popup>
       )}
     </>
-  );
-}
-
-function UseItem({ run, disabled }: { run: (a: Action) => Promise<void>; disabled: boolean }) {
-  const { view } = useSession();
-  const [item, setItem] = useState(view?.inventory[0]?.id ?? '');
-  const targets = [...(view?.room?.objects ?? []), ...(view?.room?.npcs ?? [])];
-  const [target, setTarget] = useState('');
-  return (
-    <div className="card">
-      <h2>Gegenstand benutzen</h2>
-      <label>
-        Gegenstand
-        <select value={item} onChange={(e) => setItem(e.target.value)}>
-          {view?.inventory.map((i) => (
-            <option key={i.id} value={i.id}>
-              {i.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Benutzen auf
-        <select value={target} onChange={(e) => setTarget(e.target.value)}>
-          <option value="">Bitte wählen</option>
-          {targets.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button
-        disabled={disabled || !target}
-        onClick={() => void run({ type: 'use', item, target })}
-      >
-        Benutzen
-      </button>
-    </div>
-  );
-}
-
-function EndDay({ left, close }: { left: number; close: () => void }) {
-  const { view, endDay, busy } = useSession();
-  const options = view?.map.next_rooms ?? [];
-  const [room, setRoom] = useState(view?.room?.id ?? '');
-  const name = (id: string) => view?.map.rooms.find((r) => r.id === id)?.name ?? id;
-  return (
-    <section className="card" aria-labelledby="end-h">
-      <h2 id="end-h">Tag beenden?</h2>
-      <p>
-        Danach kannst du diesen Tag nicht mehr ändern.
-        {left > 0 &&
-          ` Du hast noch ${left} ${left === 1 ? 'Aktion' : 'Aktionen'} übrig. Sie verfallen nicht, aber sie gelten nur für heute.`}
-      </p>
-      <fieldset>
-        <legend>Wo willst du morgen sein?</legend>
-        {options.map((id) => (
-          <label key={id} className="radio">
-            <input type="radio" name="room" checked={room === id} onChange={() => setRoom(id)} />
-            {name(id)}
-            {id === view?.room?.id ? ' (hier bleiben)' : ''}
-          </label>
-        ))}
-      </fieldset>
-      <div className="row">
-        <button
-          className="primary"
-          disabled={busy || !room}
-          onClick={async () => {
-            if (await endDay(room === view?.room?.id ? undefined : room)) close();
-          }}
-        >
-          Ja, Tag beenden
-        </button>
-        <button onClick={close}>Noch nicht</button>
-      </div>
-    </section>
   );
 }

@@ -32,8 +32,13 @@ export function Newspaper() {
     return <p>Das Hotel öffnet am 1. Dezember. Dann gibt es hier die erste Zeitung.</p>;
 
   return (
-    <article>
-      <h1>Der Bergbote</h1>
+    <article className="paper">
+      <header className="masthead">
+        <h1>Der Bergbote</h1>
+        <p className="issue">
+          Ausgabe Nr. {shown} · {dateOf(view?.start_date, shown)}
+        </p>
+      </header>
       <div className="row between" role="group" aria-label="Ausgabe wählen">
         <button
           disabled={shown <= 1}
@@ -42,7 +47,7 @@ export function Newspaper() {
         >
           ◀ Zurück
         </button>
-        <strong>Ausgabe vom Tag {shown}</strong>
+        <strong>Tag {shown}</strong>
         <button
           disabled={shown >= latest}
           onClick={() => setDay(shown + 1)}
@@ -53,22 +58,45 @@ export function Newspaper() {
       </div>
       {error && <p role="alert">{error}</p>}
       {!paper && !error && <p role="status">Die Zeitung wird gedruckt …</p>}
-      {paper && <Issue p={paper} />}
+      {paper && (
+        <div key={shown} className="sheet">
+          <Issue p={paper} />
+        </div>
+      )}
       {view?.question && shown === view.day && <Question />}
       {view?.daily_puzzle && shown === view.day && <DailyPuzzle />}
     </article>
   );
 }
 
+const dateOf = (start: string | undefined, day: number): string => {
+  if (!start) return '';
+  const d = new Date(`${start}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + day - 1);
+  return d.toLocaleDateString('de-DE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+};
+
 function Issue({ p }: { p: Paper }) {
   return (
     <>
-      <section className="card">
-        <h2>{p.headline}</h2>
-        <p>{p.text}</p>
-        {p.weather && <p>🌨️ Wetter: {p.weather}</p>}
-        {p.blocked_rooms.length > 0 && <p>⛔ Gesperrt: {p.blocked_rooms.join(', ')}</p>}
-        {p.bonus_rooms.length > 0 && <p>⭐ Heute offen: {p.bonus_rooms.join(', ')}</p>}
+      <section className="lead">
+        <h2 className="headline">{p.headline}</h2>
+        <p className="columns">{p.text}</p>
+        <div className="boxes">
+          {p.weather && <p className="box">🌨️ Wetter: {p.weather}</p>}
+          {p.blocked_rooms.length > 0 && (
+            <p className="box">⛔ Gesperrt: {p.blocked_rooms.join(', ')}</p>
+          )}
+          {p.bonus_rooms.length > 0 && (
+            <p className="box">⭐ Heute offen: {p.bonus_rooms.join(', ')}</p>
+          )}
+        </div>
       </section>
       {p.gossip.length > 0 && (
         <section className="card">
@@ -101,7 +129,7 @@ function Issue({ p }: { p: Paper }) {
             <p key={name}>⚖️ {name} hat Anklage erhoben.</p>
           ))}
           {p.plaques.map((x) => (
-            <p key={x.title + x.player}>
+            <p key={x.title + x.player} className="stamp">
               🏅 {x.player} hat etwas als Erste/r entdeckt: „{x.title}“.
             </p>
           ))}

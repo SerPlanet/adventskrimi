@@ -10,9 +10,9 @@
   "red_herrings_min": { "friends": 4, "family": 2 },
   "liars_max": { "friends": 4, "family": 2 },
   "bots": {
-    "newspaper_only_max_candidates": { "who": 3, "other": 4 },
     "random_median_max_candidates": 3,
-    "worst_max_candidates": 3
+    "casual_median_max_candidates": 4,
+    "worst_max_candidates": 4
   },
   "mind_share_min": 0.35,
   "daily_minutes_max": 10,

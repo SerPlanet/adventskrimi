@@ -82,13 +82,14 @@ export function simulate(
     st = readNewspaper(st, ctx).state;
 
     // object puzzles in the room are free; every bot but the two "careless" ones solves them
-    if (bot !== 'random' && bot !== 'newspaper_only')
+    if (bot !== 'random' && bot !== 'casual' && bot !== 'newspaper_only')
       for (const p of ctx.c.puzzles.puzzles)
         if (p.room === st.room) st = solvePuzzle(st, ctx, p.id, p.answer).state;
 
     const q = questionOfDay(ctx, day);
     if (q) {
-      const pick = bot === 'random' ? (q.options[0]?.id ?? q.correct) : q.correct;
+      const pick =
+        bot === 'random' || bot === 'casual' ? (q.options[0]?.id ?? q.correct) : q.correct;
       st = answerQuestion(st, ctx, pick).state;
     }
     if (bot === 'optimal' || bot === 'greedy') {

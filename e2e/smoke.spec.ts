@@ -48,8 +48,10 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   // name tiles -> newspaper
   await page.getByRole('button', { name: new RegExp(NAME) }).click();
   await expect(page.getByRole('heading', { name: 'Der Bergbote' })).toBeVisible();
-  await expect(page.getByText('Ausgabe vom Tag 1')).toBeVisible();
-  await expect(page.getByText(/Aktionen: 1 von 1 übrig/)).toBeVisible();
+  await expect(page.getByText('Ausgabe Nr. 1')).toBeVisible();
+  await expect(
+    page.getByLabel('Tagesstatus').getByRole('img', { name: 'Aktionen: 1 von 1 übrig' }),
+  ).toBeVisible();
 
   // question of the day
   await page.getByRole('button', { name: 'Schnee' }).click();
@@ -65,12 +67,15 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   // hotel: an empty topic costs nothing is covered by unit tests; here a real action
   await page.getByRole('button', { name: 'Hotel' }).click();
   // Anna's find already came with the newspaper, so only Cora's statement is new
+  await page.getByRole('button', { name: /Cora/ }).last().click();
   await page
-    .getByRole('button', { name: /Fragen: Die Nacht/ })
-    .nth(1)
+    .getByRole('dialog')
+    .getByRole('button', { name: /Die Nacht/ })
     .click();
   await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
-  await expect(page.getByText(/Aktionen: 0 von 1 übrig/)).toBeVisible();
+  await expect(
+    page.getByLabel('Tagesstatus').getByRole('img', { name: 'Aktionen: 0 von 1 übrig' }),
+  ).toBeVisible();
 
   // dossier shows the find, tagged as fact
   await page.getByRole('button', { name: 'Akte' }).click();
@@ -81,15 +86,18 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
 
   // end the day with a confirmation
   await page.getByRole('button', { name: 'Hotel' }).click();
-  await page.getByRole('button', { name: 'Tag beenden' }).click();
+  await page.getByRole('button', { name: /Gute Nacht/ }).click();
   await expect(page.getByText('Danach kannst du diesen Tag nicht mehr ändern.')).toBeVisible();
-  await page.getByLabel(/Keller/).check();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /^Keller/ })
+    .click();
   await page.getByRole('button', { name: 'Ja, Tag beenden' }).click();
   await expect(page.getByText(/^Tag 2 ·/)).toBeVisible();
 
   // next day: newspaper of day 2, now in the cellar
   await page.getByRole('button', { name: 'Zeitung' }).click();
-  await expect(page.getByText('Ausgabe vom Tag 2')).toBeVisible();
+  await expect(page.getByText('Ausgabe Nr. 2')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Der Keller ist kalt' })).toBeVisible();
   // day 2 puzzle = letter salad; the test knows the word list
   await expect(page.getByRole('heading', { name: /Buchstabensalat/ })).toBeVisible();
@@ -108,18 +116,20 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   // object puzzle: the lock in the cellar opens with the code, then the chest can be examined
   await page.getByRole('button', { name: 'Hotel' }).click();
   await expect(page.getByRole('heading', { name: 'Keller', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Genau untersuchen' }).click();
-  await expect(
-    page.getByRole('region', { name: 'Ergebnis' }).getByText(/verschlossen/),
-  ).toBeVisible();
+  await page.getByRole('button', { name: /Kiste/ }).last().click();
+  await page.getByRole('button', { name: /Genau untersuchen/ }).click();
+  await expect(page.getByText(/verschlossen/)).toBeVisible();
   await page.getByLabel('Deine Antwort').fill('000');
   await page.getByRole('button', { name: 'Ausprobieren' }).click();
   await expect(page.getByText(/Das passt noch nicht/)).toBeVisible();
   await page.getByLabel('Deine Antwort').fill('123');
   await page.getByRole('button', { name: 'Ausprobieren' }).click();
   await expect(page.getByText(/Das Schloss springt auf/)).toBeVisible();
-  await page.getByRole('button', { name: 'Genau untersuchen' }).click();
+  await page.getByRole('button', { name: /Kiste/ }).last().click();
+  await page.getByRole('button', { name: /Genau untersuchen/ }).click();
   await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 
   // no horizontal scrolling at 360 px, also with the biggest font
   const overflow = () =>

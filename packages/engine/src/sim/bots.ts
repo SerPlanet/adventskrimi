@@ -1,7 +1,7 @@
 import { nextRooms, resolveAction, type Action, type GameCtx, type PlayerState } from '../game';
 import { combine, count, type Info } from '../solver';
 
-export const BOTS = ['optimal', 'greedy', 'random', 'newspaper_only', 'worst'] as const;
+export const BOTS = ['optimal', 'greedy', 'random', 'casual', 'newspaper_only', 'worst'] as const;
 export type BotName = (typeof BOTS)[number];
 
 export type Rng = () => number;
@@ -82,7 +82,8 @@ export function chooseAction(
   rng: Rng,
 ): Action | null {
   if (bot === 'newspaper_only') return null;
-  if (bot === 'random') {
+  if (bot === 'random' || bot === 'casual') {
+    if (bot === 'casual' && st.actionsUsed >= 1) return null;
     const all = actionsHere(st, ctx);
     return all.length ? (all[Math.floor(rng() * all.length)] as Action) : null;
   }
@@ -104,7 +105,7 @@ export function chooseRoom(
 ): string | undefined {
   const rooms = nextRooms(st, ctx);
   if (!rooms.length || bot === 'newspaper_only') return undefined;
-  if (bot === 'random') return rooms[Math.floor(rng() * rooms.length)];
+  if (bot === 'random' || bot === 'casual') return rooms[Math.floor(rng() * rooms.length)];
   const day = st.day + 1;
   const scored = rooms.map((r) => ({
     r,

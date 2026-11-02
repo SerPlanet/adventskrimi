@@ -463,3 +463,206 @@ ul.plain li {
 :root[data-theme='dark'] .slot.bad {
   border-color: #ff8a80;
 }
+
+/* WP06b: hotel map, scene, popups, candles, newspaper */
+.hotelmap .grid {
+  display: grid;
+  gap: 0.4rem;
+}
+.hotelmap .floor {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.rm {
+  display: grid;
+  gap: 0.2rem;
+  text-align: left;
+  min-height: 56px;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.8rem;
+  border: 2px solid var(--line);
+  background: var(--card);
+}
+.rm.near {
+  border-style: dashed;
+  border-color: var(--accent);
+}
+.rm.far {
+  opacity: 0.6;
+}
+.rm.here {
+  background: #ffe9a8;
+  color: #2a2118;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.rm.picked {
+  outline: 3px solid var(--focus);
+}
+.rm .marks {
+  display: flex;
+  gap: 0.2rem;
+  flex-wrap: wrap;
+}
+.rm .who {
+  font-style: normal;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.7rem;
+}
+.rm .bang {
+  color: #8a4b00;
+  background: #ffd24a;
+  border-radius: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: inline-grid;
+  place-items: center;
+}
+.scene {
+  position: relative;
+  aspect-ratio: 100 / 56;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  margin: 0.6rem 0;
+}
+.scene svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.spot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 1.4rem;
+}
+.spot.target {
+  outline: 3px dashed var(--focus);
+}
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgb(0 0 0 / 0.55);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.popup {
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  width: min(100%, 30rem);
+  max-height: 90vh;
+  overflow: auto;
+}
+.chip {
+  border-radius: 999px;
+}
+.bubbles {
+  display: grid;
+  gap: 0.4rem;
+}
+.bubble {
+  margin: 0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 1rem;
+  border: 2px solid var(--line);
+  max-width: 90%;
+}
+.bubble.l {
+  justify-self: start;
+}
+.bubble.r {
+  justify-self: end;
+  background: rgb(232 176 114 / 0.2);
+}
+.zettel {
+  background: #fff6c9;
+  color: #2a2118;
+  border: 1px solid #cdbb6a;
+  padding: 0.6rem 0.9rem;
+  transform: rotate(-1deg);
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+}
+.candles {
+  letter-spacing: 0.1rem;
+  white-space: nowrap;
+}
+.inv {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+.inv button[aria-pressed='true'] {
+  outline: 3px solid var(--focus);
+}
+.paper .masthead {
+  text-align: center;
+  border-bottom: 4px double var(--text);
+  margin-bottom: 0.5rem;
+}
+.paper .masthead h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.2rem;
+  margin: 0;
+}
+.paper .issue {
+  margin: 0.2rem 0;
+  font-size: 0.85rem;
+}
+.sheet {
+  animation: turn 250ms ease-out;
+}
+@keyframes turn {
+  from {
+    opacity: 0;
+    transform: translateX(0.8rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    animation: none;
+  }
+}
+.headline {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.8rem;
+  line-height: 1.15;
+}
+.columns {
+  column-width: 16rem;
+  column-gap: 1.2rem;
+  text-align: justify;
+  hyphens: auto;
+}
+.boxes {
+  display: grid;
+  gap: 0.4rem;
+}
+.box {
+  margin: 0;
+  border: 2px solid var(--text);
+  padding: 0.3rem 0.6rem;
+}
+.stamp {
+  display: inline-block;
+  border: 3px double var(--accent);
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  color: var(--accent);
+  transform: rotate(-1.5deg);
+}

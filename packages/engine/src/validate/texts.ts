@@ -22,6 +22,11 @@ export function checkTexts(info: Info, q: Quality): CheckResult {
     ...c.statements.statements.map((s) => [`statement ${s.id}`, s.text] as [string, string]),
     ...c.puzzles.puzzles.map((p) => [`puzzle ${p.id}`, p.prompt] as [string, string]),
     ...c.events.events.map((e) => [`event day ${e.day}`, e.text] as [string, string]),
+    // whole popup text of a source: dialog lines or note
+    ...c.sources.sources.flatMap((s) => {
+      const t = [...(s.lines ?? []).map((l) => l.text), s.note ? s.note.text : ''].join(' ').trim();
+      return t ? [[`source ${s.id} popup`, t] as [string, string]] : [];
+    }),
   ];
   for (const [where, text] of cards) {
     const w = wordCount(text);

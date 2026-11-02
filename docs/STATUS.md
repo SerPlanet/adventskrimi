@@ -26,7 +26,9 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → 
 - Balance auf Berghotel (Stand heute, Verstöße für WP10/WP13): newspaper_only und random liegen über dem Boden (Wer 8/5 statt ≤3, Komplize 7), greedy wird bis Tag 24 nicht eindeutig (Freunde), optimal/greedy/worst haben späte Tage ohne neue Funde (ab Tag 18–20, teils Grenze des Bots).
 
 ## In Arbeit
-- –
+- **WP06b (halb fertig, nicht gepusht):** Neu: `app/src/ui/` (Popup, Candles, HotelMap, RoomScene, Bubbles), `screens/EndDay.tsx`, neues Hotel, Zeitungs-Layout, Schema-Felder (`floor/col/scene`, `spot`, `presentation/lines/note`), Popup-Wortprüfung. Functions auf Staging neu deployt. **Offen:** `e2e/smoke.spec.ts` bricht nach dem Fund-Popup ab (das Popup „Neu in deiner Akte" bleibt offen und blockiert den Klick auf „Akte"; im Test vor dem Wechsel `Escape` drücken), danach Lighthouse (`npm run a11y`, Preview muss laufen) und Playwright für Dialog/Notiz/Karte ergänzen.
+- **Balance (D48):** Bot `casual` und neue Grenzen (random ≤3, casual ≤4, worst ≤4, newspaper_only ohne Ziel) sind in Engine, `config/quality.json` und `npm run balance`. Sub-Agent repariert `cases/berghotel` (Balance + Präsentationsformat). Ergebnis noch nicht geprüft: `npm run validate-case -- cases/berghotel --profile friends|family` und `npm run balance` ausführen. Lose Datei `tools/_dbg.ts` (vom Sub-Agent) löschen, sonst schlägt `npm run lint` fehl.
+- Prod-Migration: `advent-prod` existiert (ref `ypmvgceksyehykgkosxq`), ist aber nicht verknüpft; noch nicht migriert.
 
 ## Blocker / offene Fragen an den Menschen
 - Siehe `docs/09-offen-und-entscheidungen.md` (Abschnitt „Offen“)
