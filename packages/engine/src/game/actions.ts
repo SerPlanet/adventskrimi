@@ -1,3 +1,4 @@
+import { normalize } from '../puzzles';
 import type { Source } from '../schemas';
 import { addLedger, budgetFor, type GameCtx, type PlayerState } from './state';
 
@@ -179,7 +180,7 @@ export function solvePuzzle(
   const p = ctx.c.puzzles.puzzles.find((x) => x.id === puzzleId);
   if (!p || p.room !== st.room) return { state: st, correct: false };
   const prev = st.puzzles[puzzleId] ?? { attempts: 0, hints: 0, solved: false };
-  const correct = answer.trim().toLowerCase() === p.answer.trim().toLowerCase();
+  const correct = normalize(answer) === normalize(p.answer);
   const puzzles = {
     ...st.puzzles,
     [puzzleId]: { ...prev, attempts: prev.attempts + 1, solved: prev.solved || correct },

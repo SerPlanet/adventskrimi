@@ -1,6 +1,7 @@
 import { join } from 'node:path';
 import { beforeEach, describe, expect, test } from 'vitest';
 import { loadCase, loadProfile, loadScoring } from '../loader';
+import { generateDaily } from '../puzzles';
 import {
   adminPlayers,
   ApiError,
@@ -315,5 +316,107 @@ describe('game by link slug', () => {
     expect(out.players.map((p) => p.name)).toEqual(['Anna-Spielerin', 'Ben-Spieler']);
     expect(JSON.stringify(out)).not.toContain('state');
     await expect(lobby(store, { slug: 'nope' })).rejects.toBeInstanceOf(ApiError);
+  });
+});
+
+describe('puzzle of the day', () => {
+  const daily = (player: string, body: object) =>
+    call('daily_puzzle', { slug: 'test', player_id: player, request_id: rid(), ...body });
+  // level "medium" is the default; day 1 is a sudoku
+  const answer = () => generateDaily('test', 1, 'medium').answer;
+
+  test('the state offers the puzzle without answer or solution', async () => {
+    const s = bodyOf(await call('state', { slug: 'test', player_id: a })).state;
+    expect(s.daily_puzzle.kind).toBe('sudoku');
+    const text = JSON.stringify(s.daily_puzzle);
+    expect(text).not.toContain(answer());
+    expect(text).not.toContain('solutionText');
+  });
+
+  test('wrong attempts are free, the right answer pays full points once', async () => {
+    const wrong = await daily(a, { op: 'check', answer: '0000' });
+    expect(bodyOf(wrong).outcome).toBe('wrong');
+    expect(bodyOf(wrong).state.points).toBe(0);
+    const right = await daily(a, { op: 'check', answer: answer() });
+    expect(bodyOf(right).outcome).toBe('correct');
+    expect(bodyOf(right).state.points).toBe(3);
+    expect(bodyOf(await daily(a, { op: 'check', answer: answer() })).outcome).toBe('already_done');
+  });
+
+  test('a tip halves the points', async () => {
+    const h = await daily(b, { op: 'hint' });
+    expect(bodyOf(h).hint).toBeTruthy();
+    expect(bodyOf(h).state.daily_puzzle.hints).toHaveLength(1);
+    const right = await daily(b, { op: 'check', answer: answer() });
+    expect(bodyOf(right).state.points).toBe(1);
+  });
+
+  test('tip ladder ends with the solution; skipping is free and final', async () => {
+    await daily(a, { op: 'hint' });
+    await daily(a, { op: 'hint' });
+    const last = await daily(a, { op: 'hint' });
+    expect(bodyOf(last).solution).toBe(true);
+    expect(bodyOf(last).state.daily_puzzle.done).toBe(true);
+    expect(bodyOf(last).state.points).toBe(0);
+    expect((await daily(a, { op: 'hint' })).status).toBe(400);
+    const skip = await daily(b, { op: 'skip' });
+    expect(bodyOf(skip).state.daily_puzzle.done).toBe(true);
+    expect(bodyOf(skip).state.points).toBe(0);
+  });
+
+  test('same request_id twice changes nothing', async () => {
+    const body = { slug: 'test', player_id: a, request_id: rid(), op: 'check', answer: answer() };
+    const first = await call('daily_puzzle', body);
+    const again = await call('daily_puzzle', body);
+    expect(again.body).toEqual(first.body);
+    expect(bodyOf(again).state.points).toBe(3);
+  });
+});
+
+describe('object puzzle', () => {
+  const inKeller = () => {
+    const st = store.players.get(a)!;
+    store.players.set(a, { ...st, state: { ...st.state, day: 2, room: 'keller' } });
+  };
+  const obj = (body: object) =>
+    call(
+      'object_puzzle',
+      { slug: 'test', player_id: a, request_id: rid(), puzzle_id: 'p_code', ...body },
+      DAY3,
+    );
+
+  test('the prompt is visible in the room, the answer is not', async () => {
+    inKeller();
+    const s = bodyOf(await call('state', { slug: 'test', player_id: a }, DAY3)).state;
+    expect(s.puzzles[0].prompt).toContain('Zahlen');
+    expect(JSON.stringify(s)).not.toContain('"answer"');
+  });
+
+  test('wrong answers cost nothing, the right one opens the lock', async () => {
+    inKeller();
+    const kiste = { type: 'inspect', object: 'kiste' };
+    const locked = await call(
+      'act',
+      { slug: 'test', player_id: a, request_id: rid(), action: kiste },
+      DAY3,
+    );
+    expect(bodyOf(locked).result.status).toBe('locked');
+    expect(bodyOf(await obj({ op: 'check', answer: '999' })).correct).toBe(false);
+    expect(bodyOf(await obj({ op: 'check', answer: ' 123 ' })).correct).toBe(true);
+    const open = await call(
+      'act',
+      { slug: 'test', player_id: a, request_id: rid(), action: kiste },
+      DAY3,
+    );
+    expect(bodyOf(open).result.status).toBe('found');
+  });
+
+  test('tip ladder gives two tips and then the solution', async () => {
+    inKeller();
+    const t1 = bodyOf(await obj({ op: 'hint' })).hint;
+    const t2 = bodyOf(await obj({ op: 'hint' })).hint;
+    const t3 = bodyOf(await obj({ op: 'hint' })).hint;
+    expect([t1, t2]).not.toContain('123');
+    expect(t3).toBe('123');
   });
 });

@@ -22,6 +22,15 @@ export interface QuestionProgress {
   hint: boolean;
 }
 
+export interface DailyProgress {
+  level: 'easy' | 'medium' | 'hard';
+  attempts: number;
+  /** tips used: 1, 2, then 3 = solution shown */
+  hints: number;
+  solved: boolean;
+  done: boolean;
+}
+
 export interface PuzzleProgress {
   attempts: number;
   hints: number;
@@ -47,6 +56,8 @@ export interface PlayerState {
   accused: boolean;
   /** question of the day progress by day */
   questions: Record<number, QuestionProgress>;
+  /** puzzle of the day progress by day */
+  daily: Record<number, DailyProgress>;
 }
 
 /** Immutable game inputs for a (profile-applied) case. */
@@ -79,6 +90,7 @@ export function newPlayer(ctx: GameCtx): PlayerState {
     finishedDays: [],
     accused: false,
     questions: {},
+    daily: {},
   };
 }
 

@@ -1,5 +1,8 @@
 import {
   budgetFor,
+  dailyLevel,
+  dailyPuzzleFor,
+  dailyView,
   canPlayDay,
   dayOf,
   nextRooms,
@@ -122,10 +125,23 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       can_hint: !!q.hint && !qp?.done,
     },
     prolog: prolog && { goal: prolog.goal, intro: prolog.intro, tips: prolog.tips },
+    daily_puzzle:
+      st.day <= 24
+        ? dailyView(
+            st,
+            dailyPuzzleFor(
+              startSalt(tx),
+              st.day,
+              dailyLevel(st, ctx, player.settings.puzzle_level),
+            ),
+          )
+        : null,
     theory: st.theory,
     newspaper_days: Math.max(0, Math.min(24, today)),
   };
 }
+
+const startSalt = (tx: GameTx) => tx.game.slug;
 
 function claimOf(f: FactBody): FactBody {
   // strip id/text/tags: only the structural claim is needed for grid and timeline

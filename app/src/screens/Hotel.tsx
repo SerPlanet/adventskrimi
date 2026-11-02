@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSession, type ActResult, type Action } from '../store';
 import { FindCard } from './FindCard';
+import { ObjectPuzzles } from './ObjectPuzzles';
 
 /** Hotel: map, current room, free "Ansehen", actions, end of day. */
 export function Hotel() {
@@ -98,6 +99,8 @@ export function Hotel() {
               </button>
             </div>
           ))}
+
+          <ObjectPuzzles disabled={!play || busy} />
 
           {room.book && (
             <button disabled={!play || busy} onClick={() => void run({ type: 'hotelbook' })}>

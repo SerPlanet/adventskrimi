@@ -5,3 +5,4 @@ export * from './movement';
 export * from './points';
 export * from './contradictions';
 export * from './daily';
+export * from './dailypuzzle';

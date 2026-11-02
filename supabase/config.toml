@@ -45,3 +45,11 @@ import_map = "./functions/deno.json"
 [functions.lobby]
 verify_jwt = false
 import_map = "./functions/deno.json"
+
+[functions.daily_puzzle]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.object_puzzle]
+verify_jwt = false
+import_map = "./functions/deno.json"

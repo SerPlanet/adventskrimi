@@ -36,6 +36,15 @@ interface Session {
   answer(optionId: string): Promise<string | null>;
   hint(): Promise<string | null>;
   saveSettings(s: Record<string, unknown>): Promise<void>;
+  daily(
+    op: 'check' | 'hint' | 'skip',
+    answer?: string,
+  ): Promise<{ outcome?: string; hint?: string; solution?: boolean } | null>;
+  objectPuzzle(
+    id: string,
+    op: 'check' | 'hint',
+    answer?: string,
+  ): Promise<{ correct?: boolean; hint?: string } | null>;
   say(msg: string): void;
 }
 
@@ -134,6 +143,12 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
           hint: true,
         });
         return r?.hint ?? null;
+      },
+      async daily(op, answer) {
+        return run('daily_puzzle', { request_id: newRequestId(), op, answer });
+      },
+      async objectPuzzle(id, op, answer) {
+        return run('object_puzzle', { request_id: newRequestId(), puzzle_id: id, op, answer });
       },
       async saveSettings(s) {
         await run('settings', { settings: s });

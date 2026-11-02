@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { call, type Paper } from '../api';
 import { useSession } from '../store';
+import { DailyPuzzle } from './DailyPuzzle';
 
 /** "Der Bergbote": start screen of every day. Older issues stay readable. */
 export function Newspaper() {
@@ -54,6 +55,7 @@ export function Newspaper() {
       {!paper && !error && <p role="status">Die Zeitung wird gedruckt …</p>}
       {paper && <Issue p={paper} />}
       {view?.question && shown === view.day && <Question />}
+      {view?.daily_puzzle && shown === view.day && <DailyPuzzle />}
     </article>
   );
 }

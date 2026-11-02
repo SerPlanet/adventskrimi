@@ -152,6 +152,26 @@ describe('staging edge functions', () => {
     expect(other.status).toBe(404);
   });
 
+  test('puzzle of the day: tip and skip over HTTP, never an answer in the state', async () => {
+    const day = '2026-12-01T12:00:00+01:00';
+    const h = await post(
+      'daily_puzzle',
+      { slug: SLUG, player_id: b, request_id: rid(), op: 'hint' },
+      { now: day },
+    );
+    expect(h.body.hint).toBeTruthy();
+    expect(JSON.stringify(h.body.state.daily_puzzle)).not.toContain('"answer"');
+    const skip = await post(
+      'daily_puzzle',
+      { slug: SLUG, player_id: b, request_id: rid(), op: 'skip' },
+      { now: day },
+    );
+    expect(skip.body.state.daily_puzzle.done).toBe(true);
+    const [{ n: rows }] =
+      await sql`select count(*)::int as n from daily_puzzles where player_id = ${b}`;
+    expect(rows).toBe(1);
+  });
+
   test('scoreboard lists both players', async () => {
     const r = await post('scoreboard', { slug: SLUG, player_id: a }, { now: DAY1 });
     expect(r.body.rows.map((x: { name: string }) => x.name).sort()).toEqual(['Int-A', 'Int-B']);

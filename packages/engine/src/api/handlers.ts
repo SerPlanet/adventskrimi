@@ -1,6 +1,13 @@
 import { z } from 'zod';
 import {
   answerQuestion,
+  dailyLevel,
+  dailyPuzzleFor,
+  hintDaily,
+  puzzleHint,
+  skipDaily,
+  solvePuzzle,
+  submitDaily,
   awardPlaque,
   canPlayDay,
   dayOf,
@@ -115,6 +122,58 @@ export const handlers = {
     });
   },
 
+  /** Puzzle of the day: check an answer, ask for a tip (tip 1, tip 2, solution) or skip. */
+  async daily_puzzle(tx: PlayerTx, req: Req<'daily_puzzle'>, now: Date) {
+    return once(tx, req.request_id, async () => {
+      requirePlayable(tx, now);
+      const ctx = await ctxOf(tx);
+      const st = tx.player.state;
+      const level = dailyLevel(st, ctx, tx.player.settings.puzzle_level);
+      const puzzle = dailyPuzzleFor(tx.game.slug, st.day, level);
+      let next = st;
+      let extra: Record<string, unknown> = {};
+      if (req.op === 'check') {
+        if (!req.answer) throw new ApiError('bad_request', 400);
+        const r = submitDaily(st, ctx, puzzle, req.answer);
+        next = r.state;
+        extra = { outcome: r.outcome };
+      } else if (req.op === 'hint') {
+        const h = hintDaily(st, puzzle);
+        if (!h) throw new ApiError('no_hint', 400);
+        next = h.state;
+        extra = { hint: h.text, solution: h.solution };
+      } else {
+        next = skipDaily(st, puzzle);
+      }
+      if (next !== st) await tx.save(next);
+      return { ...extra, state: view(tx, ctx, now, next) };
+    });
+  },
+
+  /** Object puzzle in the current room: lock in front of a source. Wrong answers are free. */
+  async object_puzzle(tx: PlayerTx, req: Req<'object_puzzle'>, now: Date) {
+    return once(tx, req.request_id, async () => {
+      requirePlayable(tx, now);
+      const ctx = await ctxOf(tx);
+      const st = tx.player.state;
+      let next = st;
+      let extra: Record<string, unknown> = {};
+      if (req.op === 'check') {
+        if (!req.answer) throw new ApiError('bad_request', 400);
+        const r = solvePuzzle(st, ctx, req.puzzle_id, req.answer);
+        next = r.state;
+        extra = { correct: r.correct };
+      } else {
+        const h = puzzleHint(st, ctx, req.puzzle_id);
+        if (!h || st.puzzles[req.puzzle_id]?.solved) throw new ApiError('no_hint', 400);
+        next = h.state;
+        extra = { hint: h.text };
+      }
+      if (next !== st) await tx.save(next);
+      return { ...extra, state: view(tx, ctx, now, next) };
+    });
+  },
+
   async settings(tx: PlayerTx, req: Req<'settings'>, now: Date) {
     const merged: Settings = { ...tx.player.settings, ...req.settings };
     await tx.save(tx.player.state, merged);
@@ -153,4 +212,12 @@ export const handlers = {
 };
 
 export type HandlerName = keyof typeof handlers;
-export const MUTATING: HandlerName[] = ['open_day', 'act', 'end_day', 'answer_daily', 'settings'];
+export const MUTATING: HandlerName[] = [
+  'open_day',
+  'act',
+  'end_day',
+  'answer_daily',
+  'daily_puzzle',
+  'object_puzzle',
+  'settings',
+];

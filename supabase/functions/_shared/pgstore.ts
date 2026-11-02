@@ -1,7 +1,7 @@
 // Postgres implementation of the engine's Store contract (see packages/engine/src/api/types.ts).
 // Runs in Deno (edge functions) and in Node (integration tests via tsx).
 import postgres from 'postgres';
-import { ApiError } from './engine.js';
+import { ApiError, kindOfDay } from './engine.js';
 import type {
   GameRecord,
   GameTx,
@@ -286,6 +286,11 @@ async function persist(q: Q, prev: PlayerRecord, next: PlayerState, settings: an
         values (${id}, ${pid}, ${pr.attempts}, ${pr.hints}, ${pr.solved ? new Date() : null})
         on conflict (player_id, puzzle_id) do update set attempts = excluded.attempts, hints_used = excluded.hints_used,
           solved_at = coalesce(puzzle_state.solved_at, excluded.solved_at)`;
+  for (const [day, dp] of Object.entries(next.daily))
+    if (JSON.stringify(prev.state.daily[Number(day)]) !== JSON.stringify(dp))
+      await q`insert into daily_puzzles (player_id, day, type, level, solved, hint_used)
+        values (${id}, ${Number(day)}, ${kindOfDay(Number(day))}, ${dp.level}, ${dp.solved}, ${dp.hints > 0})
+        on conflict (player_id, day) do update set solved = excluded.solved, hint_used = excluded.hint_used`;
   for (const [day, qp] of Object.entries(next.questions))
     if (qp.done && !prev.state.questions[Number(day)]?.done) {
       const qid = c.questions.questions.find((x) => x.day === Number(day))?.id ?? `q${day}`;

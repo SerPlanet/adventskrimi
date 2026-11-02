@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import postgres from 'postgres';
+import { WORDS } from '../packages/engine/src/puzzles/word';
 import { connInfo, readEnv } from '../tools/lib/db';
 
 // Day 2 is "today" in the fake clock, so a fresh player (still on day 1) can play day 1 and then day 2.
@@ -54,6 +55,13 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: 'Schnee' }).click();
   await expect(page.getByText('Richtig! Gut gelesen.')).toBeVisible();
 
+  // puzzle of the day (day 1 = number field): tip, then skip; both are free
+  await expect(page.getByRole('heading', { name: /Rätsel des Tages: Zahlenfeld/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Tipp 1' }).click();
+  await expect(page.getByText(/Tipp 1:/)).toBeVisible();
+  await page.getByRole('button', { name: 'Überspringen' }).click();
+  await expect(page.getByText('Das Rätsel ist beendet. Morgen gibt es ein neues.')).toBeVisible();
+
   // hotel: an empty topic costs nothing is covered by unit tests; here a real action
   await page.getByRole('button', { name: 'Hotel' }).click();
   // Anna's find already came with the newspaper, so only Cora's statement is new
@@ -83,8 +91,35 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: 'Zeitung' }).click();
   await expect(page.getByText('Ausgabe vom Tag 2')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Der Keller ist kalt' })).toBeVisible();
+  // day 2 puzzle = letter salad; the test knows the word list
+  await expect(page.getByRole('heading', { name: /Buchstabensalat/ })).toBeVisible();
+  const label = (await page.locator('.letters').getAttribute('aria-label')) ?? '';
+  const letters = label.replace('Buchstaben: ', '').split(' ').sort().join('');
+  const word = Object.values(WORDS)
+    .flat()
+    .find((w) => [...w].sort().join('') === letters) as string;
+  await page.getByLabel('Deine Antwort').fill('definitiv falsch');
+  await page.getByRole('button', { name: 'Prüfen' }).click();
+  await expect(page.getByText(/Das stimmt noch nicht/)).toBeVisible();
+  await page.getByLabel('Deine Antwort').fill(word.toLowerCase());
+  await page.getByRole('button', { name: 'Prüfen' }).click();
+  await expect(page.getByText('Richtig! Das hast du gut gelöst.')).toBeVisible();
+
+  // object puzzle: the lock in the cellar opens with the code, then the chest can be examined
   await page.getByRole('button', { name: 'Hotel' }).click();
   await expect(page.getByRole('heading', { name: 'Keller', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Genau untersuchen' }).click();
+  await expect(
+    page.getByRole('region', { name: 'Ergebnis' }).getByText(/verschlossen/),
+  ).toBeVisible();
+  await page.getByLabel('Deine Antwort').fill('000');
+  await page.getByRole('button', { name: 'Ausprobieren' }).click();
+  await expect(page.getByText(/Das passt noch nicht/)).toBeVisible();
+  await page.getByLabel('Deine Antwort').fill('123');
+  await page.getByRole('button', { name: 'Ausprobieren' }).click();
+  await expect(page.getByText(/Das Schloss springt auf/)).toBeVisible();
+  await page.getByRole('button', { name: 'Genau untersuchen' }).click();
+  await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
 
   // no horizontal scrolling at 360 px, also with the biggest font
   const overflow = () =>

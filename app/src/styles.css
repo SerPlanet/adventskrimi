@@ -369,3 +369,55 @@ fieldset {
     transition: background-color 0.2s;
   }
 }
+
+/* puzzle of the day */
+.sudoku {
+  display: grid;
+  width: 100%;
+  margin: 0.6rem 0;
+  border: 3px solid var(--text);
+}
+.sudoku .cell {
+  min-height: 0;
+  min-width: 0;
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 0;
+  border: 1px solid var(--line);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.sudoku .cell.fixed {
+  background: var(--bg);
+  color: var(--muted);
+}
+.sudoku .cell.sel {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+.sudoku .bR {
+  border-right: 3px solid var(--text);
+}
+.sudoku .bB {
+  border-bottom: 3px solid var(--text);
+}
+.pad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.letters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.letters span {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 2px solid var(--accent);
+  border-radius: 0.4rem;
+  font-weight: 700;
+  background: var(--card);
+}

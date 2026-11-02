@@ -4,3 +4,4 @@ export * from './schemas';
 export * from './game';
 export * from './names';
 export * from './api';
+export * from './puzzles';
