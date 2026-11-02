@@ -133,6 +133,12 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
   // note popup: the little paper with sender and receiver
   await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
+  // WP06d: pocket the document, read it again from the inventory
+  await page.getByRole('button', { name: /Einstecken/ }).click();
+  await expect(page.getByText(/Eingesteckt/).first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: /Zettel aus der Kiste/ }).click();
+  await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
   // WP06d: the chest is drawn as a prop and now shows its open state

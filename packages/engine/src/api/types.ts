@@ -164,6 +164,7 @@ export const Requests = {
   newspaper: z.object({ slug: Slug, player_id: PlayerId, day: z.number().int().min(1).max(24) }),
   settings: z.object({ slug: Slug, player_id: PlayerId, settings: SettingsSchema }),
   link: z.object({ slug: Slug, player_id: PlayerId, link_id: Id }),
+  pocket: z.object({ slug: Slug, player_id: PlayerId, source_id: Id }),
   get_theory: z.object({ slug: Slug, player_id: PlayerId }),
   set_theory: z.object({
     slug: Slug,

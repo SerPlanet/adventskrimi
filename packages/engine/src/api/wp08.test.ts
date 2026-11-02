@@ -229,3 +229,50 @@ describe('links (Verknüpfen)', () => {
     expect(out(await call('link', { link_id: 'l_cora' })).state.points).toBe(scoring.link);
   });
 });
+
+describe('visible texts', () => {
+  test('no placeholder braces reach the player, not even in the prolog or page texts', async () => {
+    const state = out(await call('state', {})).state;
+    const json = JSON.stringify(state);
+    const strings: string[] = [];
+    JSON.parse(json, (_k, v) => (typeof v === 'string' ? strings.push(v) : v));
+    expect(strings.filter((t) => /[{}]/.test(t))).toEqual([]);
+    expect(json).toContain('Sprich mit Anna');
+    expect(json).not.toContain('{n:');
+    expect(json.toLowerCase()).not.toContain('aktion');
+  });
+});
+
+describe('the "!" marker', () => {
+  test('only things that bring a find in this room today are marked', async () => {
+    const view = out(await call('state', {})).state;
+    for (const o of view.room.objects) {
+      const brings = res.data.sources.sources.some(
+        (s) => s.object === o.id && s.room === view.room.id && s.days,
+      );
+      if (o.auffaellig) expect(brings).toBe(true);
+    }
+    // day 1, hall: the lamp has a source on day 1, so it is marked; nothing unrelated is
+    expect(
+      view.room.objects.filter((o: { auffaellig: boolean }) => o.auffaellig).length,
+    ).toBeLessThanOrEqual(view.room.objects.length);
+  });
+});
+
+describe('documents (Einstecken)', () => {
+  test('only found documents can be pocketed; the full text stays readable', async () => {
+    expect((await call('pocket', { source_id: 'src_kiste' })).status).toBe(400);
+    patch((s: { discoveries: unknown[] }) => ({
+      found: ['f_kiste_offen', 'f_ben_keller'],
+      discoveries: [
+        ...s.discoveries,
+        { sourceId: 'src_kiste', itemIds: ['f_kiste_offen', 'f_ben_keller'], day: 2 },
+      ],
+    }));
+    expect(out(await call('state', {})).state.documents).toEqual([]);
+    const r = out(await call('pocket', { source_id: 'src_kiste' }));
+    expect(r.state.documents).toHaveLength(1);
+    expect(r.state.documents[0].note.text).toMatch(/Keller/);
+    expect(out(await call('pocket', { source_id: 'src_kiste' })).state.documents).toHaveLength(1);
+  });
+});

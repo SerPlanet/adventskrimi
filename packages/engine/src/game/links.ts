@@ -27,3 +27,15 @@ export function exploreProgress(st: PlayerState, ctx: GameCtx) {
   const done = here.filter((s) => s.yields.every((y) => st.found.includes(y))).length;
   return { found: done, total: here.length };
 }
+
+/** "Einstecken": a found document goes into the inventory. null = not a document of this player. */
+export function pocketDocument(
+  st: PlayerState,
+  ctx: GameCtx,
+  sourceId: string,
+): PlayerState | null {
+  const src = ctx.c.sources.sources.find((x) => x.id === sourceId);
+  if (!src?.document || !st.discoveries.some((d) => d.sourceId === sourceId)) return null;
+  if (st.pocket?.includes(sourceId)) return st;
+  return { ...st, pocket: [...(st.pocket ?? []), sourceId] };
+}

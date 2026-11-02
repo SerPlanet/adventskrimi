@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { LoadedCase } from '../loader';
 import {
   answerQuestion,
   dailyLevel,
@@ -12,6 +13,7 @@ import {
   bonusDay,
   canAccuse,
   confirmLink,
+  pocketDocument,
   canPlayDay,
   changeTheory,
   closeDay,
@@ -31,13 +33,22 @@ import {
   type GameCtx,
 } from '../game';
 import { applyProfile } from '../solver/profile';
+import { renameCase } from '../names';
 import { generateNewspaper } from './newspaper';
 import { ApiError, Requests, type GameTx, type PlayerTx, type Settings } from './types';
 import { buildView } from './view';
 
+/** Placeholders like {n:leitung} are always rendered, even if the stored case still has them. */
+const rendered = new WeakMap<object, LoadedCase>();
+function withNames(c: LoadedCase): LoadedCase {
+  let r = rendered.get(c);
+  if (!r) rendered.set(c, (r = renameCase(c, {})));
+  return r;
+}
+
 export async function ctxOf(tx: GameTx): Promise<GameCtx> {
   const profile = tx.game.profile;
-  return makeCtx(applyProfile(await tx.caseData(), profile), profile, tx.game.scoring);
+  return makeCtx(applyProfile(withNames(await tx.caseData()), profile), profile, tx.game.scoring);
 }
 
 const view = (tx: PlayerTx, ctx: GameCtx, now: Date, state = tx.player.state) =>
@@ -120,6 +131,15 @@ export const handlers = {
   async link(tx: PlayerTx, req: Req<'link'>, now: Date) {
     const ctx = await ctxOf(tx);
     const next = confirmLink(tx.player.state, ctx, req.link_id);
+    if (!next) throw new ApiError('bad_request', 400);
+    if (next !== tx.player.state) await tx.save(next);
+    return { state: view(tx, ctx, now, next) };
+  },
+
+  /** "Einstecken": a found document goes into the inventory and stays readable in full. */
+  async pocket(tx: PlayerTx, req: Req<'pocket'>, now: Date) {
+    const ctx = await ctxOf(tx);
+    const next = pocketDocument(tx.player.state, ctx, req.source_id);
     if (!next) throw new ApiError('bad_request', 400);
     if (next !== tx.player.state) await tx.save(next);
     return { state: view(tx, ctx, now, next) };
@@ -305,5 +325,6 @@ export const MUTATING: HandlerName[] = [
   'set_theory',
   'set_note',
   'link',
+  'pocket',
   'accuse',
 ];

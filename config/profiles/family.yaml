@@ -22,4 +22,4 @@ rumor_min_players: 3
 crowd_share: 0.5
 puzzle_levels: [easy, medium]
 chess: false
-max_liars: 2
+max_liars: 5

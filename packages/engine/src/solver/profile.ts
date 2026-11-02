@@ -43,7 +43,11 @@ export function applyProfile(full: LoadedCase, p: Profile): LoadedCase {
   const statements = full.statements.statements
     .filter((s) => npcs.has(s.npc) && s.claims.every(refsOk))
     .map((s) => ({ ...s, claims: s.claims.map((c) => remapBody(c, win)) }));
-  const known = new Set([...facts.map((f) => f.id), ...statements.map((s) => s.id)]);
+  const known = new Set([
+    ...facts.map((f) => f.id),
+    ...statements.map((s) => s.id),
+    ...full.puzzles.items.map((i) => i.id),
+  ]);
   const objectRoom = new Map<string, string>();
   for (const r of full.rooms.rooms) for (const o of r.objects) objectRoom.set(o.id, r.id);
 

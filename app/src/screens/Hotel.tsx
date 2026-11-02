@@ -12,11 +12,12 @@ import { Prop } from '../ui/props';
 type Open =
   | { kind: 'spot'; spot: Spot }
   | { kind: 'found'; result: ActResult; plaque: string | null }
+  | { kind: 'doc'; id: string }
   | { kind: 'night' };
 
 /** Hotel: cross-section map, room scene with hotspots, popups for people and things. */
 export function Hotel() {
-  const { view, act, busy } = useSession();
+  const { view, act, busy, pocket } = useSession();
   const [open, setOpen] = useState<Open | null>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
@@ -121,8 +122,13 @@ export function Hotel() {
 
           <ObjectPuzzles disabled={!play || busy} />
 
-          {view.inventory.length > 0 && (
-            <div className="inv" role="group" aria-label="Deine Gegenstände">
+          {(view.inventory.length > 0 || view.documents.length > 0) && (
+            <div className="inv" role="group" aria-label="Dein Inventar">
+              {view.documents.map((d) => (
+                <button key={d.id} onClick={() => setOpen({ kind: 'doc', id: d.id })}>
+                  📄 {d.title}
+                </button>
+              ))}
               {view.inventory.map((i) => (
                 <button
                   key={i.id}
@@ -186,11 +192,39 @@ export function Hotel() {
           {bySource.map((f) => (
             <div key={f.source.id}>
               <SourceCard s={f.source} text={f.text} />
+              {f.source.document && !view.documents.some((d) => d.id === f.source.id) && (
+                <button disabled={busy} onClick={() => void pocket(f.source.id)}>
+                  📄 Einstecken
+                </button>
+              )}
+              {f.source.document && view.documents.some((d) => d.id === f.source.id) && (
+                <p className="small">📄 Eingesteckt: Du findest es im Inventar.</p>
+              )}
             </div>
           ))}
           {bySource.length === 0 && newFinds.map((f) => <FindCard key={f.id} f={f} />)}
           {open.plaque && <p>🏅 Du bist die/der Erste! Plakette: „{open.plaque}“.</p>}
           <p className="small">Alles liegt jetzt in deiner Akte.</p>
+        </Popup>
+      )}
+      {open?.kind === 'doc' && (
+        <Popup
+          title={view.documents.find((d) => d.id === open.id)?.title ?? 'Dokument'}
+          onClose={close}
+        >
+          {view.documents
+            .filter((d) => d.id === open.id)
+            .map((d) => (
+              <div key={d.id}>
+                <p className="small">
+                  {d.room ? `Gefunden: ${d.room}` : ''} {d.day ? `(Tag ${d.day})` : ''}
+                </p>
+                <SourceCard
+                  s={{ ...d, kind: 'inspect', room: d.room, day: d.day ?? 0 } as never}
+                  text={d.title}
+                />
+              </div>
+            ))}
         </Popup>
       )}
       {open?.kind === 'night' && (

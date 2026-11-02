@@ -21,7 +21,15 @@ if (!res.ok) {
   process.exit(1);
 }
 const names = loadNames(`${dir}/insider.yaml`);
-const c = Object.keys(names).length ? renameCase(res.data, names) : res.data;
+// Always rendered: without insider names the placeholders become the default figure names.
+const c = renameCase(res.data, names);
+{
+  const left = JSON.stringify(c).match(/\{(n|anrede):[a-z0-9_]+\}/g);
+  if (left) {
+    console.error(`✗ unresolved placeholders after rendering: ${[...new Set(left)].join(', ')}`);
+    process.exit(1);
+  }
+}
 if (envName === 'prod' && c.case.id === 'test') {
   console.error('✗ refusing to load the test case into prod');
   process.exit(1);

@@ -53,6 +53,7 @@ sources:
       auffaellig: true,
       yields: [f_kiste_offen, f_ben_keller],
       presentation: note,
+      document: { title: Zettel aus der Kiste, kind: zettel },
       note: { from: Ben, to: Cora, text: Ich komme spaeter in den Keller. },
     }
   - {

@@ -3,7 +3,7 @@ days:
       day: 1,
       goal: Lerne die Halle kennen,
       actions: 1,
-      intro: Willkommen im Testhaus. Sprich mit Anna.,
+      intro: 'Willkommen im Testhaus. Sprich mit {n:anna}.',
     }
   - { day: 2, goal: Öffne die Kiste, actions: 2, intro: Im Keller steht eine Kiste mit Schloss. }
 mini_case:

@@ -67,6 +67,8 @@ export interface PlayerState {
   theoryHistory?: { day: number; theory: Partial<Record<Category, string>> }[];
   /** report card by day: how many categories were right (details stay private) */
   reports?: Record<number, number>;
+  /** documents the player put in the pocket (source ids), readable again in full */
+  pocket?: string[];
   /** the player's own day on which the accusation was handed in */
   accusedDay?: number;
   /** result of the accusation, shown only together with the resolution */

@@ -55,6 +55,7 @@ interface Session {
   ): Promise<boolean>;
   fits(a: string, b: string): Promise<boolean | null>;
   link(id: string): Promise<boolean>;
+  pocket(sourceId: string): Promise<boolean>;
   accuse(theory: Record<string, string>, proof: Record<string, string[]>): Promise<boolean>;
 }
 
@@ -170,6 +171,11 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
       },
       async setNote(n) {
         return (await run('set_note', n)) !== null;
+      },
+      async pocket(sourceId) {
+        const r = await run('pocket', { source_id: sourceId });
+        if (r) setNotice('Eingesteckt. Du findest es im Inventar.');
+        return r !== null;
       },
       async link(id) {
         const r = await run('link', { link_id: id });

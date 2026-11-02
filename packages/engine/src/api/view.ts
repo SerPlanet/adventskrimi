@@ -99,7 +99,15 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
         id: o.id,
         name: o.name,
         text: o.text,
-        auffaellig: o.auffaellig,
+        // only things that really bring a find in this room today are marked (02b: nothing else gets a "!")
+        auffaellig:
+          o.auffaellig &&
+          c.sources.sources.some(
+            (x) =>
+              x.object === o.id &&
+              x.yields.length > 0 &&
+              ctx.reach.roomOn(x.id, st.day) === st.room,
+          ),
         spot: o.spot,
         prop: o.prop,
         // state of the thing: opened once everything its inspect sources hold has been found
@@ -124,6 +132,23 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       next_rooms: st.day <= 24 ? nextRooms(st, ctx) : [],
     },
     finds,
+    // pocketed documents: title and the full text, readable again at any time
+    documents: (st.pocket ?? []).flatMap((sid) => {
+      const src = c.sources.sources.find((x) => x.id === sid);
+      if (!src?.document) return [];
+      return [
+        {
+          id: sid,
+          title: src.document.title,
+          kind: src.document.kind,
+          room: roomName(src.room),
+          day: st.discoveries.find((d) => d.sourceId === sid)?.day,
+          presentation: src.presentation,
+          note: src.note,
+          lines: src.lines,
+        },
+      ];
+    }),
     inventory: st.inventory.map((id) => {
       const i = c.puzzles.items.find((x) => x.id === id);
       return { id, name: i?.name ?? id, text: i?.text ?? '' };
