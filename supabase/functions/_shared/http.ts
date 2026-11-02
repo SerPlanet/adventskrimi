@@ -25,7 +25,7 @@ function getStore(): PgStore {
   if (!store) {
     const url = Deno.env.get('SUPABASE_DB_URL');
     if (!url) throw new ApiError('no_db', 500);
-    store = new PgStore(postgres(url, { max: 3, prepare: false, idle_timeout: 20 }));
+    store = new PgStore(postgres(url, { max: 1, prepare: false, idle_timeout: 5 }));
   }
   return store;
 }

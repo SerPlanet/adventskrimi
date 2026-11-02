@@ -26,7 +26,7 @@ const rowsOf = async (sql: Sql | Q, table: string, caseId: string): Promise<any[
   );
 
 /** Rebuilds the validated case from the case_* tables. Server only: it contains the solution. */
-async function loadCaseData(sql: Sql, caseId: string): Promise<LoadedCase> {
+async function loadCaseData(sql: Sql | Q, caseId: string): Promise<LoadedCase> {
   const hit = caseCache.get(caseId);
   if (hit && Date.now() - hit.at < CASE_TTL_MS) return hit.data;
   const [meta] =
@@ -111,7 +111,7 @@ const PLAYER_SELECT = (q: Sql | Q) => q`
          to_char(g.start_date, 'YYYY-MM-DD') as start_date
   from players p join games g on g.id = p.game_id`;
 
-function gameTx(sql: Sql | Q, game: GameRecord, base: Sql): GameTx {
+function gameTx(sql: Sql | Q, game: GameRecord, base: Sql | Q): GameTx {
   return {
     game,
     caseData: () => loadCaseData(base, game.caseId),
@@ -175,7 +175,6 @@ export class PgStore implements Store {
     opts: { lock: boolean; slug?: string } = { lock: true },
   ): Promise<T> {
     if (!UUID.test(playerId)) throw new ApiError('player_not_found', 404);
-    const base = this.sql;
     return this.sql.begin(async (q) => {
       const [row] = opts.lock
         ? await q`${PLAYER_SELECT(q)} where p.id = ${playerId} for update of p`
@@ -186,7 +185,7 @@ export class PgStore implements Store {
         throw new ApiError('player_not_found', 404);
       let cur = toPlayer(row);
       const tx: PlayerTx = {
-        ...gameTx(q, game, base),
+        ...gameTx(q, game, q),
         get player() {
           return cur;
         },
@@ -200,13 +199,7 @@ export class PgStore implements Store {
                   values (${playerId}, ${requestId}, ${q.json(response as any)}) on conflict do nothing`;
         },
         async save(next, settings) {
-          await persist(
-            q,
-            cur,
-            next,
-            settings ?? cur.settings,
-            await loadCaseData(base, game.caseId),
-          );
+          await persist(q, cur, next, settings ?? cur.settings, await loadCaseData(q, game.caseId));
           cur = { ...cur, state: next, settings: settings ?? cur.settings };
         },
         async tryPlaque(sourceId, title) {

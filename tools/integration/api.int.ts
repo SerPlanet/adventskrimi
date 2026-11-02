@@ -172,6 +172,33 @@ describe('staging edge functions', () => {
     expect(rows).toBe(1);
   });
 
+  test('parallel requests of one player do not overwrite each other', async () => {
+    const id = (
+      await post(
+        'admin_players',
+        { op: 'create', game_id: gameId, player: { name: 'Int-P' } },
+        { admin: ADMIN },
+      )
+    ).body.player.id as string;
+    await sql`update players set state = jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb) where id = ${id}`;
+    const base = { slug: SLUG, player_id: id };
+    const opts = { now: DAY1 };
+    const res = await Promise.all([
+      post('set_note', { ...base, kind: 'timeline', key: 'f_cora_keller#0', put: true }, opts),
+      post('set_note', { ...base, kind: 'timeline', key: 's_cora_halle#0', put: true }, opts),
+      post('set_theory', { ...base, theory: { who: 'anna' } }, opts),
+      post('set_note', { ...base, kind: 'grid', cat: 'who', candidate: 'ben', mark: 'no' }, opts),
+      post('settings', { ...base, settings: { note_level: 'half' } }, opts),
+      post('open_day', base, opts),
+    ]);
+    expect(res.map((r) => r.status)).toEqual([200, 200, 200, 200, 200, 200]);
+    const [row] = await sql`select state, settings from players where id = ${id}`;
+    expect([...row!.state.timeline].sort()).toEqual(['f_cora_keller#0', 's_cora_halle#0']);
+    expect(row!.state.theory).toEqual({ who: 'anna' });
+    expect(row!.state.grid).toEqual({ 'who:ben': 'no' });
+    expect(row!.settings.note_level).toBe('half');
+  });
+
   test('scoreboard lists both players', async () => {
     const r = await post('scoreboard', { slug: SLUG, player_id: a }, { now: DAY1 });
     expect(r.body.rows.map((x: { name: string }) => x.name).sort()).toEqual(['Int-A', 'Int-B']);

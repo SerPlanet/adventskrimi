@@ -26,6 +26,12 @@ sources:
       days: { from: 1, to: 3 },
       yields: [s_cora_halle],
       auffaellig: true,
+      presentation: dialog,
+      lines:
+        [
+          { speaker: Du, text: 'Wo warst du in der Nacht?' },
+          { speaker: Cora, text: 'Ich war die ganze Nacht in der Halle.' },
+        ],
     }
   - {
       id: src_lampe,
@@ -46,6 +52,8 @@ sources:
       requires: p_code,
       auffaellig: true,
       yields: [f_kiste_offen, f_ben_keller],
+      presentation: note,
+      note: { from: Ben, to: Cora, text: Ich komme spaeter in den Keller. },
     }
   - {
       id: src_lampe2,

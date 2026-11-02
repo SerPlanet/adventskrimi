@@ -80,20 +80,31 @@ const client = new pg.Client({
 await client.connect();
 try {
   await client.query('begin');
-  await client.query('delete from case_meta where case_id = $1', [c.case.id]);
-  await client.query(
-    'insert into case_meta (case_id, title, start_date, data) values ($1,$2,$3,$4)',
-    [
-      c.case.id,
-      c.case.title,
-      c.case.start_date,
-      JSON.stringify({
-        night: c.case.night,
-        windows: c.case.windows,
-        categories: c.case.categories,
-      }),
-    ],
-  );
+  // Games reference case_meta, so an existing case is updated in place and its content rows are replaced.
+  const meta = [
+    c.case.id,
+    c.case.title,
+    c.case.start_date,
+    JSON.stringify({
+      night: c.case.night,
+      windows: c.case.windows,
+      categories: c.case.categories,
+    }),
+  ];
+  const known = await client.query('select 1 from case_meta where case_id = $1', [c.case.id]);
+  if (known.rowCount) {
+    for (const t of ['case_solution', ...Object.keys(tables)])
+      await client.query(`delete from ${t} where case_id = $1`, [c.case.id]);
+    await client.query(
+      'update case_meta set title = $2, start_date = $3, data = $4 where case_id = $1',
+      meta,
+    );
+  } else {
+    await client.query(
+      'insert into case_meta (case_id, title, start_date, data) values ($1,$2,$3,$4)',
+      meta,
+    );
+  }
   await client.query(
     'insert into case_solution (case_id, solution, world, proof_questions) values ($1,$2,$3,$4)',
     [c.case.id, J(c.case.solution), J(c.world), J(c.case.proof_questions)],

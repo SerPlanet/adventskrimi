@@ -73,6 +73,10 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
     .getByRole('button', { name: /Die Nacht/ })
     .click();
   await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
+  // dialog popup: speech bubbles, closed with the button
+  await expect(page.locator('.bubble')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Schließen' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(
     page.getByLabel('Tagesstatus').getByRole('img', { name: 'Aktionen: 0 von 1 übrig' }),
   ).toBeVisible();
@@ -130,6 +134,8 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: /Kiste/ }).last().click();
   await page.getByRole('button', { name: /Genau untersuchen/ }).click();
   await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
+  // note popup: the little paper with sender and receiver
+  await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
 
