@@ -49,7 +49,7 @@ app/               Frontend (Vite + React + TypeScript)
 packages/engine/   Reine Spiellogik + Schemas (von Backend, Solver, Simulator genutzt)
 tools/             CLI: validate-case, simulate, load-case
 supabase/          migrations/, functions/
-cases/berghotel/   Fall-Inhalte inkl. Lösung (SPOILER!)   cases/_test/ = Testfall ohne Spoilerwert
+cases/berghotel/   Fall-Inhalte inkl. Lösung (SPOILER!), NUR LOKAL, per .gitignore nie im Repo   cases/_test/ = Testfall ohne Spoilerwert
 config/            profiles/ (family, friends), scoring.json
 docs/              Doku (siehe docs/00-index.md)
 ```

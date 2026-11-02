@@ -1,7 +1,7 @@
 # 06 – Architektur
 
 ## Stack (Defaults, Änderungen im Entscheidungslog)
-- **Frontend:** Vite + React + TypeScript, statisch gebaut. Hosting: GitHub Pages, deployt per GitHub Action aus dem **privaten** Repo (private Pages brauchen GitHub Pro, kostenlos im Student Developer Pack). Fallback: Cloudflare Pages. Die Fall-Daten und die Lösung liegen nie im veröffentlichten Build, auch nicht verschlüsselt.
+- **Frontend:** Vite + React + TypeScript, statisch gebaut. Hosting: GitHub Pages, deployt per GitHub Action aus dem **öffentlichen** Repo. `cases/berghotel/` (mit Lösung) steht in der `.gitignore`, liegt nur lokal und in Supabase und wird nie committet. Nur `cases/_test/` ist im Repo. Fall-Daten sind nie im veröffentlichten Build. Fallback: Cloudflare Pages.
 - **Backend:** Supabase (Postgres + Edge Functions in TypeScript). Alle Spiellogik in `packages/engine` (reine Funktionen), von den Functions, vom Solver und vom Simulator gemeinsam genutzt.
 - **Umgebungen:** `staging` (Zeitraffer, Testfall) und `prod`. Eigene Supabase-Projekte.
 - Kein Realtime nötig. Der Client pollt höchstens beim Öffnen und nach Aktionen.

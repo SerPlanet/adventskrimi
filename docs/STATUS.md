@@ -26,7 +26,7 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 als Sub-Agent parallel
 - [ ] Einmalig `gh auth refresh -s workflow` ausführen (Browser-Login), danach `git push -u origin main`
 - [x] Supabase `advent-staging` angelegt, verknüpft, leere Migration angewendet (2026-11-02)
 - [x] Supabase `advent-prod` angelegt (2026-11-02), noch ohne Migration
-- [ ] GitHub Pro über das Student Developer Pack aktivieren, dann Repo → Settings → Pages → Source „GitHub Actions“; danach Actions → „Deploy Pages“ → Run workflow (Abnahme „Staging-URL“)
+- [x] Repo ist öffentlich, Pages läuft über GitHub Actions (kein Pro nötig)
 - [ ] Optional: Repo → Settings → Secrets and variables → Actions → Variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (anon-Key ist öffentlich, kein Service-Key!)
 - [ ] Spieler-Namen und Profilwahl (Familie/Freunde) bereitstellen, siehe WP14
 

@@ -5,7 +5,6 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 ## Offen (braucht den Menschen, Default gilt bis Antwort)
 | ID | Frage | Default |
 |---|---|---|
-| O2 | Hosting-Pfad | GitHub Pages aus privatem Repo (Pro via Student Pack), sonst Cloudflare Pages |
 | O3 | Titel, Hotelname, Beute, Tonfall | „Berghotel Edelweiß“, „Goldene Schneekugel“, gemütlicher Krimi |
 | O4 | Motiv als fünfte Kategorie | Nein in v1 |
 | O5 | Mensch spielt mit | Nein, Beobachter |
@@ -53,3 +52,4 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D33 | Neue optionale Felder `red_herring`, `reinterpreted_on` an Fakten/Aussagen für die Mindestmengen. Fallweise Qualitäts-Overrides in `<fall>/quality.override.json` (nur `_test`) |
 | D34 | WP03: Engine ist reiner Zustand (`PlayerState`) + `GameCtx`; Funktionen geben neuen Zustand zurück. Quellen dürfen auch Gegenstände (`items`) in `yields` liefern. Zeitung ist gratis und zählt nicht als gespielter Tag; Hotelbuch ist eine normale Aktion |
 | D35 | Erstentdecker entscheidet der Server (Unique-Insert), die Engine liefert nur Plaketten-Kandidaten und bucht Punkte. Frühanklage-Bonus bekommt nur, wem der Aufrufer `earlyDay` (aus `isOnTime`) übergibt |
+| D36 | Repo ist öffentlich (kostenlose Pages). `cases/berghotel/` ist per `.gitignore` ausgeschlossen, lokal + Supabase. Backup des Falls macht der Mensch. CI validiert nur `_test`; `berghotel` validiert/lädt der Mensch/Agent lokal. |
