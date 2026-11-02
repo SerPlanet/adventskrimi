@@ -17,7 +17,7 @@
 ## Datenmodell (Tabellen, Kernspalten)
 | Tabelle | Zweck |
 |---|---|
-| `games` | `id`, `name`, `profile` (family/friends), `start_date`, `config jsonb`, `case_id` |
+| `games` | `id`, `slug` (unique, z. B. `freunde`/`familie`), `name`, `profile` (family/friends), `start_date`, `config jsonb`, `case_id` |
 | `players` | `id`, `game_id`, `name`, `avatar`, `is_duo`, `settings jsonb`, `next_day` |
 | `case_*` | Importierte Fall-Inhalte (rooms, npcs, facts, statements, sources, puzzles, events, questions, newspaper_templates, solution) |
 | `player_days` | `player_id`, `day`, `room_id`, `actions_used`, `finished_at`, `next_room_id` |
@@ -48,6 +48,9 @@ Jede mutierende Funktion trägt eine `request_id`, ist **idempotent** und liefer
 - **Erstentdecker:** `plaques.source_id` Unique-Insert; wer ihn bekommt, gewinnt. Gilt nach Zeitstempel der Aktion.
 - **Wochenzeugnis, Frühanklage, Finale:** beim ersten Aufruf nach Fristende erzeugt, plus Admin-Knopf als Sicherheitsnetz. Kein Cron zwingend nötig.
 - **Auflösung:** `solution` wird nur geliefert, wenn `accusation` existiert und `today ≥ 24`.
+
+## Spielwahl über den Link
+Eine Webseite, mehrere Spiele. Der Hash-Link bestimmt das Spiel: `…/adventskrimi/#/<slug>` (z. B. `#/freunde`, `#/familie`). Der Client schickt `slug` bei jedem API-Aufruf, der Server löst ihn zu `game_id` auf. Namenskacheln zeigen nur Spieler dieses Spiels. Ohne oder mit unbekanntem Slug: freundliche Meldung („Bitte öffne den Link, den du bekommen hast.“), kein Absturz. Es gibt keinen Zugriffsschutz außer dem Slug (bewusst, siehe Restrisiko oben). Wer es wünscht, nimmt kurze, schwer erratbare Slugs.
 
 ## Konfiguration
 `config/profiles/{family,friends}.yaml`: Räume/NPC-Auswahl, Aktionen pro Tag, Bewegungsmodus, Hilfen, Frühanklage an/aus, Gerüchte-Schwelle, Rätselpool-Level.

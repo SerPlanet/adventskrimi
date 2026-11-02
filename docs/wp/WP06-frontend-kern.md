@@ -5,6 +5,7 @@
 **Abhängig von:** WP05
 
 ## Lieferumfang (`app/`)
+- Spielwahl über den Hash-Link `/#/<slug>` (siehe `docs/06`, Abschnitt Spielwahl über den Link), Meldung bei fehlendem/unbekanntem Slug. Migration: Spalte `games.slug` (unique).
 - Routing, Layout, untere Navigation, Spielerwechsel, Einstellungen (Schrift, Notizstufe, Rätselstufe, Erklärungen, Dunkelmodus).
 - Screens: Namenswahl, Zeitung, Hotel (Karte, Raumansicht, Aktionsleiste), Gespräch/Untersuchung (Karten), Akte (Filter, Suche, Inventar, Hotelbuch).
 - „Ansehen gratis“ mit Auffälligkeitsmarkern, Atmosphäre-Meldung bei leeren Aktionen, Anzeige „Aktionen übrig“.

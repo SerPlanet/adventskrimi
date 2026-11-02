@@ -6,7 +6,7 @@
 
 ## Lieferumfang
 - Prod-Supabase mit Migrationen, Fall geladen (`load-case`), `GAME_NOW_OVERRIDE` entfernt, Admin-Token gesetzt.
-- Zwei Spiele anlegen (Freunde, Familie) mit `start_date = 2026-12-01`, Profile gesetzt.
+- Zwei Spiele anlegen (Freunde, Familie) mit `start_date = 2026-12-01`, Profile gesetzt und `slug` je Spiel (Links: `/#/freunde`, `/#/familie`). Links an die Gruppen schicken.
 - Spieler anlegen laut Liste des Menschen; Namenskacheln prüfen.
 - GitHub-Pages-Prod-Deployment, URL prüfen. `tools/check-bundle` gegen Prod-Build.
 - Keep-Alive für Supabase (täglicher Aufruf ab jetzt), Backup-Export einmal testen.
