@@ -77,6 +77,8 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
     page.getByLabel('Tagesstatus').getByRole('img', { name: 'Aktionen: 0 von 1 übrig' }),
   ).toBeVisible();
 
+  await page.keyboard.press('Escape');
+
   // dossier shows the find, tagged as fact
   await page.getByRole('button', { name: 'Akte' }).click();
   await expect(page.getByText('Ben ist als Dieb ausgeschlossen.')).toBeVisible();
@@ -118,7 +120,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.getByRole('heading', { name: 'Keller', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /Kiste/ }).last().click();
   await page.getByRole('button', { name: /Genau untersuchen/ }).click();
-  await expect(page.getByText(/verschlossen/)).toBeVisible();
+  await expect(page.getByText(/verschlossen/).first()).toBeVisible();
   await page.getByLabel('Deine Antwort').fill('000');
   await page.getByRole('button', { name: 'Ausprobieren' }).click();
   await expect(page.getByText(/Das passt noch nicht/)).toBeVisible();
@@ -150,7 +152,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
 
 test('timeline: place two cards, the contradiction shows; theory is saved', async ({ page }) => {
   const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
-  await sql`update players set state = jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb) where name = ${NAME}`;
+  await sql`update players set settings = '{}'::jsonb, state = jsonb_set(jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb), '{timeline}', '[]'::jsonb) where name = ${NAME}`;
   await sql.end();
 
   await page.goto(`/?now=${NOW}#/test`);
@@ -161,6 +163,7 @@ test('timeline: place two cards, the contradiction shows; theory is saved', asyn
   for (const card of [/Fakt: In Keller/, /Aussage: In Halle/]) {
     await page.getByRole('button', { name: card }).click();
     await page.getByRole('button', { name: /Hierhin legen/ }).click();
+    await expect(page.getByRole('button', { name: card })).toHaveCount(0);
   }
   await expect(page.getByRole('alert').getByText(/Passt nicht: Cora/)).toBeVisible();
 
@@ -170,5 +173,5 @@ test('timeline: place two cards, the contradiction shows; theory is saved', asyn
     .click();
   await page.getByLabel('Wer war der Dieb?').selectOption({ label: 'Anna' });
   await page.getByRole('button', { name: 'Theorie speichern' }).click();
-  await expect(page.getByText('Deine Theorie ist gespeichert.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Theorie speichern' })).toBeDisabled();
 });

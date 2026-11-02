@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -71,6 +72,8 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
   const [view, setView] = useState<View | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
+  // a slow older reply must never overwrite the view of a newer request
+  const seq = useRef(0);
 
   const logout = useCallback(() => {
     memory.set(key, null);
@@ -90,6 +93,7 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
     async <T extends object>(fn: string, body: object): Promise<T | null> => {
       if (!playerId) return null;
       setBusy(true);
+      const mine = ++seq.current;
       const r = await call<T>(fn, { player_id: playerId, ...body });
       setBusy(false);
       if (!r.ok) {
@@ -98,7 +102,7 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
         return null;
       }
       const next = (r as { state?: View }).state;
-      if (next) setView(next);
+      if (next && mine === seq.current) setView(next);
       return r;
     },
     [playerId, logout],
