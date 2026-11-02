@@ -8,3 +8,6 @@ supabase/.branches
 *.zip
 /adventskrimi/
 DB.txt
+
+# Fall mit Lösung: nie committen (lokal + Supabase)
+cases/berghotel/
