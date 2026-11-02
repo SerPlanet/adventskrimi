@@ -48,6 +48,8 @@ export interface SimResult {
   /** reading load of the busiest day in minutes */
   maxMinutes: number;
   accusedDay: number | null;
+  /** the player after the last simulated day */
+  state: PlayerState;
 }
 
 const words = (t: string) => t.split(/\s+/).filter(Boolean).length;
@@ -60,9 +62,11 @@ export function simulate(
   seed: number,
   wpm: number,
   salt = 'sim',
+  /** continue a saved player and stop when day `until` begins (staging fast-forward) */
+  from?: { state: PlayerState; until: number },
 ): SimResult {
   const rng: Rng = makeRng(seed);
-  let st: PlayerState = newPlayer(ctx);
+  let st: PlayerState = from?.state ?? newPlayer(ctx);
   const res: SimResult = {
     bot,
     seed,
@@ -75,9 +79,10 @@ export function simulate(
     idleDays: [],
     maxMinutes: 0,
     accusedDay: null,
+    state: st,
   };
 
-  for (let day = 1; day <= 24; day++) {
+  for (let day = st.day; day <= Math.min(24, (from?.until ?? 25) - 1); day++) {
     const foundBefore = st.found.length;
     st = readNewspaper(st, ctx).state;
 
@@ -160,6 +165,7 @@ export function simulate(
     st = closeDay(ended.ok ? ended.state : { ...st, day: day + 1, actionsUsed: 0 }, ctx, day);
   }
 
+  res.state = st;
   res.points = totalPoints(st);
   const mind = st.ledger.filter((l) => MIND.includes(l.kind)).reduce((a, l) => a + l.points, 0);
   res.mindShare = res.points ? mind / res.points : 0;

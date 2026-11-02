@@ -3,11 +3,29 @@ rooms:
     name: Halle
     description: Eine große Halle mit Kamin und einer alten Lampe.
     neighbors: [keller]
+    floor: 1
+    col: 0
+    scene: halle
     objects:
-      - { id: lampe, name: Alte Lampe, text: Die Lampe flackert leicht., auffaellig: true }
+      - {
+          id: lampe,
+          name: Alte Lampe,
+          text: Die Lampe flackert leicht.,
+          auffaellig: true,
+          spot: { x: 70, y: 30 },
+        }
   - id: keller
     name: Keller
     description: Ein kühler Keller mit einer schweren Kiste.
     neighbors: [halle]
+    floor: 0
+    col: 0
+    scene: keller
     objects:
-      - { id: kiste, name: Schwere Kiste, text: Die Kiste hat ein Zahlenschloss., auffaellig: true }
+      - {
+          id: kiste,
+          name: Schwere Kiste,
+          text: Die Kiste hat ein Zahlenschloss.,
+          auffaellig: true,
+          spot: { x: 35, y: 48 },
+        }

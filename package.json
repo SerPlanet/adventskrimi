@@ -24,6 +24,7 @@
     "validate-case": "tsx tools/validate-case/index.ts",
     "simulate": "tsx tools/simulate/index.ts",
     "balance": "tsx tools/balance/index.ts",
+    "fast-forward": "tsx tools/fast-forward/index.ts",
     "create-game": "tsx tools/create-game/index.ts",
     "build:functions": "node tools/build-functions/index.mjs",
     "test:int": "npm run build:functions && vitest run --config vitest.int.config.ts",
