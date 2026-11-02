@@ -1,6 +1,6 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-02 · Phase: WP03 fertig, WP05 als Nächstes, WP10 (Sub-Agent) läuft. Mensch: Prod-Migration, Pages
+Stand: 2026-11-02 · Phase: WP10 fertig (Inhalte nur lokal). WP05 begonnen (api/ in packages/engine, noch nicht committet). Mensch: Prod-Migration, Pages, Namen
 
 ## Nächstes Work Package
 **WP05** → `docs/wp/WP05-backend.md` (WP10 läuft als Sub-Agent)
@@ -14,6 +14,7 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 als Sub-Agent parallel
 - WP01: Zod-Schemas, Loader mit Referenzprüfung, Migration (27 Tabellen, RLS gesperrt), `load-case`, `validate-schema`, Testfall `cases/_test`, Configs. Auf Staging angewendet und geladen.
 - WP02: Solver (Kandidatenraum, Fakt-Auswertung, Tempo-Planer), Profilanwendung, Validator `npm run validate-case -- <fall> --profile <p> [--only <check>]` mit 9 Prüfungen, Mini-Fall-Tests. `_test` besteht beide Profile.
 - WP03: Engine-Kern `packages/engine/src/game/` (Aktionen, Bewegung, Tage/Gnadenfrist, Punkte, Zeugnis, Anklage, Widersprüche). Vollständiger 24-Tage-Lauf auf `_test` als Test.
+- WP10: Fall Berghotel (lokal, per .gitignore nicht im Repo) und Familienprofil; `validate-case` grün für friends und family, Tempo Tag 20. Noch offen: `npm run balance` (WP04), Namen in `insider.yaml`.
 
 ## In Arbeit
 - –
