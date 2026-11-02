@@ -22,7 +22,7 @@ WP00 → WP01 → WP02 → WP03 → (WP10 als Sub-Agent parallel) → WP05 → W
 - [x] GitHub: privates Repo `SerPlanet/adventskrimi` angelegt
 - [ ] Einmalig `gh auth refresh -s workflow` ausführen (Browser-Login), danach `git push -u origin main`
 - [x] Supabase `advent-staging` angelegt, verknüpft, leere Migration angewendet (2026-11-02)
-- [ ] Supabase `advent-prod`: Free-Limit (2 Projekte) erreicht. Vor Launch: Projekt „SerPlanet's Project“ löschen/pausieren oder Pro buchen, dann Agent bitten, prod anzulegen
+- [x] Supabase `advent-prod` angelegt (2026-11-02), noch ohne Migration
 - [ ] GitHub Pro über das Student Developer Pack aktivieren, dann Repo → Settings → Pages → Source „GitHub Actions“; danach Actions → „Deploy Pages“ → Run workflow (Abnahme „Staging-URL“)
 - [ ] Optional: Repo → Settings → Secrets and variables → Actions → Variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (anon-Key ist öffentlich, kein Service-Key!)
 - [ ] Spieler-Namen und Profilwahl (Familie/Freunde) bereitstellen, siehe WP14
