@@ -19,7 +19,8 @@ WP00 → WP01 → WP02 → WP03 → (WP10 als Sub-Agent parallel) → WP05 → W
 - Siehe `docs/09-offen-und-entscheidungen.md` (Abschnitt „Offen“)
 
 ## Mensch (kann kein Agent tun)
-- [x] GitHub: privates Repo anlegen (`adventskrimi`)
+- [x] GitHub: privates Repo `SerPlanet/adventskrimi` angelegt
+- [ ] Einmalig `gh auth refresh -s workflow` ausführen (Browser-Login), danach `git push -u origin main`
 - [ ] Supabase: Projekte `advent-staging` und `advent-prod` anlegen; Werte lokal in `.env` (Vorlage `.env.example`, nie committen)
 - [ ] Supabase Access Token (Dashboard → Account → Access Tokens) in `.env` als `SUPABASE_ACCESS_TOKEN`
 - [ ] Danach lokal: `npx supabase link --project-ref <STAGING_REF>` und `npm run db:push:staging` (Abnahme „leere Migration“)
