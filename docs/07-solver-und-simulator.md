@@ -20,9 +20,17 @@ Prüft in dieser Reihenfolge und bricht bei Schemafehlern früh ab. Ausgabe: je 
 9. **Texte:** Wortzahl je Karte ≤60, Zeitung ≤250, Satzlänge-Grenze im Familienprofil. Plakettentitel und Gerüchte spoilerfrei (kein Raum-/Objektname).
 10. **Tempo (Budgetprüfung):** siehe §3.
 
+## 2b. Zusatzprüfungen ab WP06c (Erkunden, Lügennetz)
+- **Lügennetz:** Jede Figur hat ≥1 Lüge/Verschweigen mit `reason`. Jeder Grund ist über ≥2 Wege entdeckbar. Jede Figur wird von ≥2 anderen erwähnt oder bestätigt.
+- **Zeugenketten:** Jede falsche Aussage ist durch Fakt **oder** Zeugen widerlegbar, und der Zeuge ist erreichbar.
+- **Keine Urteile:** Textprüfung auf Verbotsmuster („war es nicht“, „ist unschuldig“, „ist der Dieb“) in allen sichtbaren Texten.
+- **Dokumente:** Jedes Dokument ≤60 Wörter und mit `found_at`. Kein Dokument ist alleiniger Weg zu einer Schlüssel-Tatsache.
+- **Tagesbogen:** Jeder Tag hat `beat`. Je besuchtem Raum ≥1 neuer Fund pro Tag möglich.
+- **Aha-Dichte:** ≥1 Verknüpfung oder Widerspruch pro Woche je Schwerpunktfigur.
+
 ## 3. Tempo-Prüfung (ersetzt „zeitgebundene Hinweise“)
-Pacing entsteht nur durch Aktionen und Bewegung, nicht durch gesperrte Beweise.
-Planer: sucht den **frühesten Spieltag**, an dem ein einzelner perfekter Spieler (kennt die Daten, wählt optimal) die Lösung eindeutig herleiten kann (DP/BFS über Zustand `(Tag, Raum, Funde, Inventar)` mit dem Aktionsbudget des Profils).
+Pacing entsteht durch **Raumwahl pro Tag** und die Verteilung der Funde auf Räume und Tage (kein Aktionsbudget ab WP06c), nicht durch gesperrte Beweise.
+Planer: sucht den **frühesten Spieltag**, an dem ein einzelner perfekter Spieler (kennt die Daten, wählt optimal) die Lösung eindeutig herleiten kann (DP/BFS über Zustand `(Tag, Raum, Funde, Inventar)`; pro Tag wählt er einen Raum und erhält alle dortigen Funde dieses Tages).
 Soll: **frühestens Tag 20–21** (Frühanklage beginnt Tag 20, davor darf nichts herleitbar sein). Liegt er davor, sind Hinweise zu dicht/zu nah: Validator meldet die Stellschrauben (Aktionen/Tag senken, Schlüssel-Quellen weiter auseinander, Wege verlängern). Liegt er nach Tag 22, ist der Fall zu hart.
 
 ## 4. Simulator (`tools/simulate <fall> --profile <p> --bot <name>`)

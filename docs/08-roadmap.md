@@ -13,6 +13,9 @@ Es arbeitet immer nur 1 Haupt-Agent (+ höchstens 1 Sub-Agent). Die Zeitfenster 
 | 5 | Backend | 11.–14.11. | WP03 | `wp/WP05-backend.md` |
 | 6 | Frontend-Kern | 12.–16.11. | WP05 | `wp/WP06-frontend-kern.md` |
 | 6b | UI-Redesign (Hotel, Raum, Popups, Zeitung) | nach M2 | M2 | `wp/WP06b-ui-redesign.md` |
+| 6c | Erkunden-Kern (Regeln, Daten, API) | nach M2, zuerst | M2 | `wp/WP06c-erkunden-kern.md` |
+| 6d | Props, Szenen, Nahansichten | nach WP06c | WP06c | `wp/WP06d-props-szenen.md` |
+| 10b | Inhalt-Umbau (Lügennetz, Dokumente, Dialoge) | parallel zu WP06d (Sub-Agent) | WP06c | `wp/WP10b-inhalt-umbau.md` |
 | 7 | Rätsel | 15.–17.11. | WP06 | `wp/WP07-raetsel.md` |
 | 9 | Wertung und Rangliste | 15.–17.11. (Teil 1), 19.–21.11. (Teil 2) | WP05, WP06 | `wp/WP09-wertung.md` |
 | – | **M1 Kalender-Light online** | ~17.11. | WP06, WP07, WP09-T1 | – |

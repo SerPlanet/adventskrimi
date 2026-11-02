@@ -16,7 +16,7 @@ Hinweise aus Tag 1–5 können später neu bedeutsam werden („Neudeutung“). 
 ## 3. Der Spieltag (≤10 Min.)
 1. **Zeitung** lesen (~2 Min.): Ereignis, Klatsch, Wetter, Anzeigen, Gerüchte, Ermittler des Tages, Rätsel des Tages.
 2. **Hotel:** Du bist in einem Raum (Start: Raum vom Vortag, Tag 1 Lobby). Du siehst NPCs, Objekte, Auffälligkeiten.
-3. **Aktionen** (Anzahl siehe §5): Befragen, Untersuchen, Benutzen.
+3. **Erkunden** (siehe `02b-erkunden.md`): Dinge ansehen und untersuchen, Dokumente lesen, Personen befragen, Gegenstände benutzen. Kein Aktionsbudget.
 4. **Frage des Tages** (~1 Min.).
 5. **Rätsel des Tages** (optional, ≤3 Min., nur Punkte).
 6. **Tag beenden:** nächsten Raum wählen (§4). Danach ist der Tag abgeschlossen.
@@ -25,17 +25,8 @@ Reihenfolge ist frei, außer „Tag beenden“ zuletzt. Ein Tag zählt als gespi
 ## 4. Räume und Bewegung
 Hotel = Graph aus Räumen (Familie 6, Freunde 9) mit Flur als Knoten. Beim Tag-Ende wählt man den Raum für den nächsten Tag. **Familie:** jeder Raum frei wählbar. **Freunde:** nur Nachbarräume. Konfigurierbar (`config/profiles`). Welche NPCs wann in welchem Raum sind, ist pro Tag fest vorgeschrieben (Tagesplan). Die Welt ist deterministisch und unabhängig von Spielern.
 
-## 5. Aktionen
-Budget pro Tag: Familie 3, Freunde 4 (Prolog: Tag 1 → 1, Tag 2–3 → 2, Tag 4–5 → 3). Werte sind Konfiguration, der Simulator justiert sie.
-
-| Aktion | Wirkung |
-|---|---|
-| **Ansehen** (gratis) | Beschreibung jedes Objekts/jeder Person. Zeigt Auffälligkeit („wirkt nervös“, „irgendetwas liegt unter dem Teppich“). Kostet nichts. |
-| **Befragen** | Person im Raum + Thema aus ihrer Themenliste wählen. Liefert Aussage(n) oder Fakt(en). |
-| **Untersuchen** | Objekt wählen, das als „auffällig“ markiert ist (oder unmarkiert, dann meist leer). Liefert Fakt(en) oder einen Gegenstand. |
-| **Benutzen** | Gegenstand aus dem Inventar auf Objekt/Person anwenden. Öffnet Quellen, die ein Schloss haben (Objekt-Rätsel §9). |
-
-**Regel „Keine leeren Aktionen“:** Eine Aktion wird nur verbraucht, wenn sie mindestens einen **neuen** Eintrag für den Spieler liefert. Liefert sie nichts (leer) oder schon Bekanntes, kommt eine kurze Atmosphäre-Meldung („Dazu weiß der Koch nichts.“) und das Budget bleibt unverändert. Wert bleibt: Der Spieler sieht vorher nur, *dass* etwas auffällig ist, nicht wie wertvoll es ist.
+## 5. Erkunden statt Aktionen
+Gilt ab WP06c, Details in `02b-erkunden.md`. Pro Raum und Tag gibt es eine feste Menge Entdeckungen, die der Spieler frei erkundet. Die Fortschrittsanzeige „x von y entdeckt“ ersetzt Aktionspunkte. Gespräche sind kostenlos. Die frühere Regel „Aktion nur bei neuem Fund verbrauchen“ entfällt, weil es nichts zu verbrauchen gibt.
 
 ## 6. Fund-Typen
 - **Fakt:** wahre Beobachtung (z. B. „Schneespuren im Treppenhaus um 02:00“). Gekennzeichnet mit Lupen-Symbol.
@@ -87,7 +78,7 @@ Der Admin legt Spieler (Name, Avatar, optional „Duo“) an. Beim Öffnen ersch
 
 ## 14. Prolog-Plan (Tag 1–5)
 Begleiter-NPC „Page“ erklärt in Sprechblasen jeweils eine Funktion (abschaltbar).
-| Tag | Lernziel | Aktionen | Mini-Ziel |
+| Tag | Lernziel | Dinge zu entdecken | Mini-Ziel |
 |---|---|---|---|
 | 1 | Ankommen, Zeitung, Karte, Raumwechsel | 1 (geführt) | Zimmer beziehen, Rezeption befragen |
 | 2 | Befragen, Aussage vs. Fakt, Hotelbuch | 2 | Stollen-Vorfall: erste Aussagen sammeln |

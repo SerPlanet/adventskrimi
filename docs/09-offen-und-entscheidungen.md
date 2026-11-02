@@ -66,3 +66,7 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D46 | WP04: Bot `optimal` = gieriger Informationsgewinn mit Raumwahl nach bester Tagesausbeute (kein DP), `greedy` = erste Quelle, `worst` = kleinster Gewinn aber ≥1 Fund. Alle Bots außer `random` lösen Objekt-Rätsel; `optimal`/`greedy` lösen das Tagesrätsel. Kandidatenzahlen zählen Tag-Ende. Das Familienprofil ist auf `_test` entartet (Verdächtige werden nach Berghotel-Namen gekürzt), daher dort nur Freunde im Zeitraffer-Test. |
 | D47 | UI-Redesign nach M2 (`WP06b`): Querschnitt-Karte, Raumszene mit Hotspots, Popups für Dialog/Notiz/Gegenstand, Kerzen, Zeitungs-Titelseite. Akte/Rangliste bleiben. |
 | D48 | Der Boden (niemand versteht am Ende nichts) kommt aus den **Aktionen** (Redundanz, keine leeren Aktionen, Tipps), nicht aus der Zeitung. Die Zeitung allein darf nicht zur Lösung reichen. Bots `random`, `casual`, `worst` sichern den Boden. |
+| D49 | Erkunden statt Aktionsbudget (`02b`): feste Entdeckungen pro Raum und Tag, alles frei, Gespräche kostenlos. Invariante 4 ersetzt. |
+| D50 | Dokumente werden eingesteckt, sind im Volltext erneut lesbar und nie automatisch in Raster/Zeitstrahl. Kein Fund nennt ein Urteil (Invariante 13). |
+| D51 | Lügennetz: jede Figur lügt/verschweigt aus entdeckbarem Grund, Zeugenverweise, Aha-Bausteine Verknüpfung, Déjà-vu, Bestätigung. |
+| D52 | Look: einheitliche Vektor-Props (SVG/React) mit Zuständen, vom Agenten erstellt, läuft statisch auf GitHub Pages. Familien-Räume zuerst. |

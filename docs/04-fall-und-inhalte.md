@@ -38,6 +38,7 @@ Jeder Fakt hat `id`, `text` (≤60 Wörter, einfache Sprache), `type` und Parame
 - `link`: Wenn Kategorie C1 = A, dann C2 ∈ Menge M.
 - `object_state`: Objekt O war zu Zeit Z in Zustand S (z. B. Fenster offen), mit definierter Folge für eine Kategorie.
 Neue Typen nur nach Eintrag im Entscheidungslog und Update dieser Liste.
+**Ab WP06c:** `exclusion` darf nie als sichtbarer Fund erscheinen (kein Urteil, siehe `02b` §3). Der Solver darf ihn intern ableiten. Sichtbare Funde sind Beobachtungen (`presence`, `absence`, `object_state`), Aussagen, Dokumente.
 
 ## 5. Quellen
 Eine **Quelle** liefert Funde. Felder: `id`, `kind` (talk | inspect | use | newspaper | hotelbook), `room`, `npc` oder `object`, `topic`, `days` (Liste oder Bereich, an denen sie verfügbar ist, folgt Tagesplan), `requires` (Gegenstand/Rätsel, optional), `auffaellig` (bool), `yields` (Fakt-/Aussage-IDs), `plaque` (optional, neutraler Titel).
@@ -47,6 +48,15 @@ Regeln:
 - Quellen am selben Ort an verschiedenen Tagen dürfen unterschiedliche Funde liefern (Tagesplan).
 
 Präsentation (optional, für das UI-Redesign `WP06b`): `presentation` = `dialog` (mit `lines`: Liste aus `speaker` + `text`), `note` (mit `note: {from, to, text}`, z. B. ein Zettel), `object` (Gegenstandskarte) oder `ambient` (Atmosphäre ohne Fund). Der gesamte Popup-Text einer Quelle ≤60 Wörter. Räume erhalten `floor`, `col`, `scene` und `objects[].spot {x,y}` für Karte und Szene.
+
+## 5b. Erkunden-Format (ab WP06c)
+- **Dinge** (`things`) je Raum: `id`, `room`, `spot {x,y}`, `prop` (Vektor-Prop), `states` (z. B. zu/auf), `auffaellig`, `layers`: L0 Ansehen, L1 Untersuchen (`opens`: Zustandswechsel, liefert Funde), L2 Benutzen (`requires`: Gegenstand/Fund).
+- **Verfügbarkeit** je Fund: `room`, `days` (Raum-Tag-Menge). Pro Raum/Tag 4–7 Entdeckungen, Prolog weniger.
+- **Dokument:** `id`, `title`, `kind` (zettel/brief/foto/quittung), `text` (Volltext ≤60 Wörter), `found_at`.
+- **Gespräch:** Themen mit `lines`, `shows` (welcher Fund neue Antworten freischaltet), `witness_of` (Verweis auf andere Figur).
+- **Lügennetz:** je Figur `secret` (Grund), `lies` (Liste von Aussagen mit `reason`, `refuted_by`, `confirmed_by`).
+- **Verknüpfungen** (`links`): Paare von Funden mit Text „Das erinnert dich an …“ (kein Urteil).
+- **Tagesbogen** (`beats`): je Tag Titel, geplanter Aha-Moment, neue Erkenntnis.
 
 ## 6. Aussagen und Lügen
 Aussage: `id`, `npc`, `text`, `claims` (Fakt-ähnlich), `truth: true|false`. NPCs dürfen lügen, aber:

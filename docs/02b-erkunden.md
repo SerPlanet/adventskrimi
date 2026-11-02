@@ -1,0 +1,49 @@
+# 02b – Erkunden (Kern des Spiels)
+
+Ersetzt das Aktionsbudget aus `02` §5. Gilt ab WP06c. Das Spiel fühlt sich an wie ein **Escape-Room-Krimi**: Räume ansehen, Dinge untersuchen, Dokumente lesen, Personen befragen, Widersprüche finden.
+
+## 1. Tagesablauf (≤10 Min.)
+1. Zeitung lesen. 2. Du bist in **einem Raum** (Wahl am Vorabend, Bewegung wie in `02` §4). 3. **Frei erkunden**, alles ist kostenlos. 4. Fortschrittsanzeige „5 von 7 entdeckt“. 5. Frage des Tages (optional Rätsel des Tages). 6. „Gute Nacht“: Raum für morgen wählen.
+**Kein Aktionsbudget.** Pro Raum und Tag gibt es eine feste Menge an Entdeckungen (Richtwert 4–7, Prolog weniger). Die Entscheidung des Spielers ist **welcher Raum** und was er aus dem Gefundenen schließt. „Entdeckt x von y“ zählt nur Dinge, die einen neuen Fund bringen. Sie sagt dem Spieler, wann ein Raum an diesem Tag erschöpft ist, ohne zu verraten, was fehlt.
+
+## 2. Ebenen eines Dings
+| Ebene | Was passiert | Visuelles Feedback |
+|---|---|---|
+| L0 Ansehen | Nahansicht, Beschreibung (immer frei) | Ding groß in einem Zustand (zu) |
+| L1 Untersuchen | Zustand ändert sich: Tür auf, Pinnwand anheben, Schublade ziehen | Anderer Zustand (auf), Dokument/Gegenstand sichtbar |
+| L2 Benutzen/Zeigen | Gegenstand auf Ding oder Person anwenden | Ergebnis sichtbar (Schloss springt auf, Person reagiert) |
+Alles ist frei. Das Spiel zeigt vorher nur „auffällig“ (L0 sichtbar markiert).
+
+## 3. Funde
+- **Dokument** (Zettel, Brief, Foto, Quittung): „Einstecken“ legt es in das Inventar. Es ist **jederzeit im Volltext erneut lesbar**. Die Akte zeigt nur Titel, Fundort und Tag.
+- **Gegenstand** (Schlüssel, Schuhe): Inventar, Nahansicht, benutzbar.
+- **Gespräch:** Protokoll „Gespräch mit X (Tag n)“ mit Volltext in der Akte.
+- **Beobachtung:** als Szene oder Text („Schneespuren vor der Seitentür, Größe 44“), nie als Urteil.
+**Nie automatisch** werden Dokumente und Beobachtungen in Raster oder Zeitstrahl übertragen. Der Spieler liest und trägt selbst ein. Nur die Notizstufe „Auto“ darf **Gesprächsaussagen** vorschlagen (siehe `02` §8).
+**Textregel:** Kein Fund nennt ein Urteil („Ben war es nicht“, „Tom ist unschuldig“). Der Schluss entsteht beim Spieler.
+
+## 4. Gespräche
+Kostenlos und beliebig oft, damit sie Geschichte erzählen. Themen-Chips. **Zeigen:** Einen Fund aus dem Inventar vorlegen und neue Antworten bekommen. **Zeugenverweise** entstehen im Gespräch („Fragen Sie Silvia, sie war dabei“) und öffnen neue Themen bei Silvia. Zeugen können Aussagen **bestätigen oder widerlegen**.
+
+## 5. Lügennetz (Glass-Onion-Prinzip)
+- **Jede Figur lügt oder verschweigt mindestens einmal.** Jede Lüge hat einen **Grund** (Affäre, verbotener Kuchen, Schulden, Schlafwandeln), den der Spieler entdecken und nachvollziehen kann (≥2 Wege).
+- Die Lüge des Diebes ist eine unter vielen. Die anderen Lügen sind harmlos, aber dem Spieler nicht sofort erkennbar.
+- Muster, das ständig entstehen soll: *Tom sagt, er war um 1 im Bad. Jonas sah Tom um 1 in der Bar. Jonas war zu der Zeit mit Silvia unterwegs.* → Der Spieler schließt: „Ich sollte mit Silvia reden, um Jonas’ Geschichte zu prüfen.“ Aussagen verweisen also aufeinander (Zeugen), jede Figur wird von mindestens 2 anderen erwähnt.
+- Aufdeckung einer Lüge ist ein **Aha-Moment**: Man versteht danach die Person besser (Charakterbild).
+
+## 6. Aha-Bausteine
+- **Widerspruch:** zwei Aussagen/Funde passen nicht (Zeitstrahl).
+- **Bestätigung:** Zeuge bestätigt oder widerlegt.
+- **Verknüpfung:** zwei Funde gehören zusammen (Fußspuren-Zettel ↔ Schuhe). Das System sagt nur „Das erinnert dich an …“, der Spieler bestätigt „Verknüpfen“ und bekommt Punkte.
+- **Déjà-vu:** Ein neuer Fund verweist auf einen älteren Eintrag, den man übersehen hat („Ah, das wusste ich schon“).
+- **Neudeutung:** Detail aus dem Prolog bekommt neuen Sinn.
+**Tagesbogen:** Jeder Tag hat in den Daten einen `beat` (was der Spieler Neues versteht, welcher Aha-Moment eingeplant ist). Mindestens 1 neuer Fund pro besuchtem Raum, 1 Erfolg pro Tag (Rätsel, Verknüpfung, entlarvte Lüge) und ein Faden für morgen.
+
+## 7. Escape-Room-Elemente
+Schlösser (Zahlencode, Chiffre, Buchstaben), Kombinieren (Gegenstand + Ding), **Ketten pro Raum** über mehrere Tage (Schlüssel → Schublade → Zettel → Code → Safe), ein „Raumgeheimnis“ pro Raum. Kein Rätsel ist alleiniger Weg zu einer Schlüssel-Tatsache. Höchstens 3 Min.
+
+## 8. Pacing und Boden ohne Aktionen
+Tempo kommt aus **Raumwahl pro Tag** und **Verteilung der Funde auf Räume und Tage**. Ziel bleibt: perfekter Spieler früheste Lösung Tag 20–21 (`07`). Der Boden kommt aus Redundanz und Gesprächen. Ein Spieler kann nie „leer“ ausgehen: jeder besuchte Raum liefert mindestens einen neuen Fund pro Tag.
+
+## 9. UI-Bausteine (siehe `05`, WP06d)
+Raumszene aus Vektor-Props, Nahansicht mit Zuständen, Dokumentleser, Dialog mit Chips, Inventar-Leiste, „Entdeckt x von y“, Hotspot-Liste für Tastatur und Screenreader.
