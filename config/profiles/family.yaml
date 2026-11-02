@@ -1,9 +1,16 @@
 id: family
 name: Familie
-# Subset of the full case. Concrete ids are filled in with the case content (WP10).
+# Subset of the full case (WP10).
 include:
-  exclude_facts: []
-  exclude_sources: []
+  rooms: [lobby, speisesaal, kueche, salon, bibliothek, keller]
+  npcs: [leitung, empfang, koch, sammler, magier]
+  exclude_facts: [f_empfang_w4]
+  exclude_sources: [i_uhrtuer]
+  window_groups:
+    w1: [w1, w2]
+    w3: [w3, w4]
+    w5: [w5, w6]
+    w7: [w7, w8]
 actions_per_day:
   default: 3
   prolog: { 1: 1, 2: 2, 3: 2, 4: 3, 5: 3 }
