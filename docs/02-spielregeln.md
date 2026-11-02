@@ -69,7 +69,7 @@ Fallakte, Verdächtigenraster, Zeitstrahl, Karte, Inventar, Theorie-Seite, Hotel
 - **Objekt-Rätsel** (im Hotel, 6 Familie / 10 Freunde im ganzen Spiel): Schloss vor einer Quelle (Zahlencode, Chiffre, Wort aus gesammelten Buchstaben, Querverweis auf ein Detail aus einem anderen Raum, Widerspruch zwischen zwei Aussagen). Lösung gibt Zugriff auf den Fund. Höchstens 3 Min., immer mit Tipp-Leiter (Tipp 1, Tipp 2, Lösung zeigen). Kein Rätsel ist der einzige Weg zu einer Schlüssel-Tatsache (siehe `04`, Redundanz).
 
 ## 10. Frage des Tages
-Eine Verständnisfrage mit 3 Antworten, lösbar aus der heutigen Zeitung oder dem eigenen Hotelbuch. Zwei Versuche. Sorgt für den Boden: Wer die Zeitung liest, versteht die Lage.
+Eine Verständnisfrage mit 3 Antworten, lösbar aus der heutigen Zeitung oder dem eigenen Hotelbuch. Zwei Versuche. Sie prüft das Verständnis der Lage und gibt kleine Punkte. Die Lösung folgt nicht aus der Zeitung, das Spiel lebt von den täglichen Aktionen.
 
 ## 11. Theorie, Zeugnisse, Anklage
 - **Theorie:** Jederzeit änderbar. Vier Felder: Wer, Wann, Wo, Komplize. Nur der Spieler sieht sie.

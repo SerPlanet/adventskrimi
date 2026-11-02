@@ -32,13 +32,14 @@ Reine Engine-Läufe, keine UI, keine DB. Bots:
 | `optimal` | Plant optimal wie der Solver-Planer | Fertig frühestens Tag 20–21 |
 | `greedy` | Wählt immer die nächste auffällige Quelle im Raum | Fertig bis Tag 24 |
 | `random` | Zufällige legale Aktionen (viele Seeds) | Median: ≤3 Kandidaten je Kategorie am Tag 24 |
-| `newspaper_only` | Liest nur die Zeitung und beantwortet die Tagesfrage | ≤3 Kandidaten Wer, ≤4 sonst (Boden) |
-| `worst` | Wählt Aktionen mit minimalem Informationsgewinn | ≤3 Kandidaten je Kategorie am Tag 24, mind. 1 Fund pro Tag |
+| `casual` | Spielt nur 1 zufällige legale Aktion pro Tag (wenig Zeit) | Median: ≤4 Kandidaten je Kategorie am Tag 24 |
+| `newspaper_only` | Liest nur die Zeitung und beantwortet die Tagesfrage | **kein Ziel**, nur Information: Die Zeitung allein soll **nicht** zur Lösung reichen |
+| `worst` | Wählt Aktionen mit minimalem Informationsgewinn | ≤4 Kandidaten je Kategorie am Tag 24, mind. 1 Fund pro Tag |
 Pro Lauf ausgegeben (Kurzform, max. 20 Zeilen): Tag der Eindeutigkeit, Kandidaten je Kategorie am Tag 10/17/24, Punkte-Verlauf, Anteil „Mitdenken“, Anzahl leerer Aktionen.
 
 ## 5. Balance-Ziele (Gate für WP10/WP13)
 - `optimal` löst frühestens Tag 20–21; `greedy` löst bis Tag 24.
-- `newspaper_only` und `worst` erreichen den Boden (siehe Tabelle).
+- Der **Boden kommt aus den Aktionen, nicht aus der Zeitung**: `random`, `casual` und `worst` erreichen die Grenzen der Tabelle. `newspaper_only` hat bewusst kein Ziel, die Zeitung trägt Stimmung und Ereignisse, nicht die Lösung.
 - Kein Bot hat an einem Tag 0 neue Funde, außer bei Raumsperre per Ereignis.
 - Mitdenken-Anteil an den Gesamtpunkten ≥35 %.
 - Der Spieler-Tagesaufwand (Wörter lesen + Aktionen ≈ 150 Wörter/Min.) liegt ≤10 Min. für `greedy`.

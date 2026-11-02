@@ -21,7 +21,7 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D2 | Jeder Spieler löst allein, Rangliste, Anklage am 24. durch alle |
 | D3 | Gesuchte Kategorien: Wer, Wann, Wo, Komplize (+2 Beweisfragen) |
 | D4 | Pacing über Aktionsbudget und Bewegung, nicht über zeitgebundene Beweise |
-| D5 | Boden/Decke: Zeitung als Basis für alle, Raum/Aktion als Detail |
+| D5 | ~~Zeitung als Boden~~ ersetzt durch D48 |
 | D6 | Keine leeren Aktionen: nur Aktionen mit neuem Fund verbrauchen Budget |
 | D7 | Aussage vs. Fakt gekennzeichnet, NPCs dürfen lügen, Spieler nie |
 | D8 | Kein Teilen, Chat, Beschatten, Sabotage in v1 |
@@ -65,3 +65,4 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D45 | WP08/09: Notizen (Raster, Zeitstrahl), Theorie-Verlauf, Zeugnisse und Anklage-Ergebnis liegen im Spielerstand (`players.state`), keine neue Migration. Zeitstrahl-Karten sind einzelne Behauptungen (`item#n`). Zeugnis-Satz nennt nur die Trefferzahl. Auflösung = `world.crime.steps` als Kapitel, Schlüssel `story` in der Ansicht. Spielerstände werden beim Laden mit `normalizeState` ergänzt. |
 | D46 | WP04: Bot `optimal` = gieriger Informationsgewinn mit Raumwahl nach bester Tagesausbeute (kein DP), `greedy` = erste Quelle, `worst` = kleinster Gewinn aber ≥1 Fund. Alle Bots außer `random` lösen Objekt-Rätsel; `optimal`/`greedy` lösen das Tagesrätsel. Kandidatenzahlen zählen Tag-Ende. Das Familienprofil ist auf `_test` entartet (Verdächtige werden nach Berghotel-Namen gekürzt), daher dort nur Freunde im Zeitraffer-Test. |
 | D47 | UI-Redesign nach M2 (`WP06b`): Querschnitt-Karte, Raumszene mit Hotspots, Popups für Dialog/Notiz/Gegenstand, Kerzen, Zeitungs-Titelseite. Akte/Rangliste bleiben. |
+| D48 | Der Boden (niemand versteht am Ende nichts) kommt aus den **Aktionen** (Redundanz, keine leeren Aktionen, Tipps), nicht aus der Zeitung. Die Zeitung allein darf nicht zur Lösung reichen. Bots `random`, `casual`, `worst` sichern den Boden. |
