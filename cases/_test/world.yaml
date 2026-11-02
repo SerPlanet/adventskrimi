@@ -1,0 +1,14 @@
+positions:
+  anna: { w1: halle, w2: halle }
+  ben: { w1: keller, w2: keller }
+  cora: { w1: halle, w2: keller }
+crime:
+  thief: anna
+  accomplice: cora
+  window: w2
+  theft_room: halle
+  distraction_room: keller
+  hiding_place: keller
+  steps:
+    - Cora lenkt im Keller ab.
+    - Anna nimmt die Beute in der Halle und versteckt sie im Keller.

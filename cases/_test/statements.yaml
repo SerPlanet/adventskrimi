@@ -1,0 +1,11 @@
+statements:
+  - id: s_ben_keller
+    npc: ben
+    text: Ich war die ganze Nacht im Keller.
+    claims: [{ type: presence, person: ben, window: w2, room: keller }]
+    truth: true
+  - id: s_cora_halle
+    npc: cora
+    text: Ich war die ganze Nacht in der Halle.
+    claims: [{ type: presence, person: cora, window: w2, room: halle }]
+    truth: false

@@ -1,0 +1,4 @@
+events:
+  - { day: 1, headline: Schnee fällt, text: Es schneit den ganzen Tag., weather: Schnee }
+  - { day: 2, headline: Der Keller ist kalt, text: Im Keller ist es besonders kalt. }
+  - { day: 3, headline: Heller Morgen, text: Die Sonne scheint., weather: Sonne }

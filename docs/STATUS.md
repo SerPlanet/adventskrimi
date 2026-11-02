@@ -1,16 +1,17 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-02 · Phase: WP00 Code fertig, wartet auf Menschen-Schritte (Staging/Pages)
+Stand: 2026-11-02 · Phase: WP01 fertig, WP02 als Nächstes. Mensch-Schritte (Prod-Migration, Pages) offen
 
 ## Nächstes Work Package
-**WP01** → `docs/wp/WP01-*.md` (WP00 ist code-seitig fertig; offen sind nur die Abnahmepunkte „Staging-URL“ und „Migration auf Staging“, siehe „Mensch“)
+**WP02** → `docs/wp/WP02-solver.md`
 
 Reihenfolge (Details: `docs/08-roadmap.md`):
-WP00 → WP01 → WP02 → WP03 → (WP10 als Sub-Agent parallel) → WP05 → WP06 → WP07 → WP09 → **M1** → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
+WP00 ✓ → WP01 ✓ → WP02 → WP03 → (WP10 als Sub-Agent parallel) → WP05 → WP06 → WP07 → WP09 → **M1** → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
 
 ## Erledigt
 - Doku v0.1 (Spielregeln, Punkte, Architektur, Roadmap)
 - WP00: Workspaces, TS strict, ESLint/Prettier/Vitest, Hello-App, check-bundle-Stub, CI + Pages-Workflow, Supabase-Config + leere Migration. `npm run lint && npm test && npm run build` grün.
+- WP01: Zod-Schemas, Loader mit Referenzprüfung, Migration (27 Tabellen, RLS gesperrt), `load-case`, `validate-schema`, Testfall `cases/_test`, Configs. Auf Staging angewendet und geladen.
 
 ## In Arbeit
 - –

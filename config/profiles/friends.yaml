@@ -1,0 +1,14 @@
+id: friends
+name: Freunde
+actions_per_day:
+  default: 4
+  prolog: { 1: 1, 2: 2, 3: 2, 4: 3, 5: 3 }
+movement: neighbors
+hints: { tip_ladder: true, max_tips: 2 }
+early_accusation: true
+early_accusation_from_day: 20
+rumor_min_players: 3
+crowd_share: 0.5
+puzzle_levels: [easy, medium, hard]
+chess: false # O6: optional, off by default
+max_liars: 4

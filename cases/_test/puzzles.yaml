@@ -1,0 +1,9 @@
+puzzles:
+  - id: p_code
+    type: code
+    room: keller
+    prompt: Das Schloss braucht drei Zahlen. Auf dem Zettel stehen 1, 2 und 3.
+    answer: '123'
+    hints: [Schau auf den Zettel., Die Zahlen stehen der Reihe nach da.]
+    unlocks: src_kiste
+items: []

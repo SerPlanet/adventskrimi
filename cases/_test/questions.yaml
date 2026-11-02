@@ -1,0 +1,8 @@
+questions:
+  - id: q1
+    day: 1
+    text: Was fällt heute vom Himmel?
+    options: [{ id: a, text: Regen }, { id: b, text: Schnee }]
+    correct: b
+    from: newspaper
+    hint: Schau in die Schlagzeile.

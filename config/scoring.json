@@ -1,0 +1,24 @@
+{
+  "day": {
+    "played": 2,
+    "find": 2,
+    "find_cap": 6,
+    "question": 3,
+    "question_hint": 1,
+    "puzzle": 3,
+    "puzzle_hint": 1
+  },
+  "prolog_mini_case": 10,
+  "first_discoverer": 5,
+  "report_card": { "per_category": 5, "days": [10, 14, 18, 22] },
+  "finale": { "who": 40, "accomplice": 40, "when": 40, "where": 40, "proof": 25 },
+  "early_accusation": { "factor": 6, "last_day": 24 },
+  "hint_divisor": 2,
+  "ranks": [
+    { "name": "Praktikant", "min_points": 0 },
+    { "name": "Ermittler", "min_points": 60 },
+    { "name": "Inspektor", "min_points": 160 },
+    { "name": "Kommissar", "min_points": 320 },
+    { "name": "Meisterdetektiv", "min_points": 500 }
+  ]
+}

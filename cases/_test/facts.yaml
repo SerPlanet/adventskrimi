@@ -1,0 +1,38 @@
+facts:
+  - {
+      id: f_ben_keller,
+      text: Ben war in der zweiten Nachthälfte im Keller.,
+      type: presence,
+      person: ben,
+      window: w2,
+      room: keller,
+    }
+  - {
+      id: f_excl_ben,
+      text: Ben ist als Dieb ausgeschlossen.,
+      type: exclusion,
+      category: who,
+      candidate: ben,
+    }
+  - {
+      id: f_excl_ben_acc,
+      text: Ben ist als Komplize ausgeschlossen.,
+      type: exclusion,
+      category: accomplice,
+      candidate: ben,
+    }
+  - {
+      id: f_cora_keller,
+      text: Cora war in der zweiten Nachthälfte im Keller.,
+      type: presence,
+      person: cora,
+      window: w2,
+      room: keller,
+    }
+  - id: f_kiste_offen
+    text: Die Kiste im Keller war in der zweiten Nachthälfte offen.
+    type: object_state
+    object: kiste
+    window: w2
+    state: offen
+    effect: { category: where, excludes: [halle] }

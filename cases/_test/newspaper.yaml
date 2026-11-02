@@ -1,0 +1,7 @@
+gossip:
+  - { id: g1, text: Viele Gäste waren heute unterwegs. }
+ads:
+  - { id: ad1, text: 'Zu verkaufen: eine alte Lampe.' }
+plaque_titles: [Sehr aufmerksam, Spürnase]
+filler:
+  - { id: fl1, text: Das Wetter bleibt winterlich. }

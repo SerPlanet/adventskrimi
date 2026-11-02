@@ -42,3 +42,7 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D22 | WP00-Dependencies: react 18, vite 5, @vitejs/plugin-react, typescript 5, vitest 2, eslint 9 + typescript-eslint, prettier 3, supabase CLI (devDep), @types/node 20 |
 | D23 | Pages-Deploy baut mit `BASE_PATH=/<repo>/`; Staging und Prod getrennt über Supabase-Projekte (Build-Variablen), Pages selbst nur ein Ziel. Zweite Pages-Umgebung erst bei Bedarf (WP12) |
 | D24 | Ordner `adventskrimi/` und `adventskrimi.zip` im Projektroot (Doku-Duplikat) sind per `.gitignore` ausgeschlossen; Mensch kann sie löschen |
+| D25 | WP01: Zusätzliche Dependencies zod 4, yaml, pg, tsx, @types/pg. `case_*`-Tabellen haben generische Form `(case_id, id, data jsonb)`, Validierung nur über Zod vor dem Import |
+| D26 | Loader (`packages/engine/src/loader.ts`) ist Node-only und nicht in `index.ts` exportiert, damit der Browser-Bundle keine fs/YAML-Abhängigkeit zieht |
+| D27 | `load-case` verbindet über den Supabase-Pooler (aus `supabase link`) mit `SUPABASE_<ENV>_DB_PASSWORD` aus `.env`; Testfall wird nie nach prod geladen |
+| D28 | Profil `family.yaml` hat bis WP10 keine konkreten Raum-/NPC-IDs (leeres `include`); Satzlänge-Grenze 18 Wörter in `quality.json` |

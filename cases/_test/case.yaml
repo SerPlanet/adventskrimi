@@ -1,0 +1,31 @@
+# Test case: tiny, no spoiler value (fictional "Testhaus"). Never ship to production.
+id: test
+title: Der Fall Testhaus
+start_date: '2026-12-01'
+night: { from: '22:00', to: '06:00' }
+windows:
+  - { id: w1, label: 'Erste Nachthälfte', from: '22:00', to: '02:00' }
+  - { id: w2, label: 'Zweite Nachthälfte', from: '02:00', to: '06:00' }
+categories:
+  who: [anna, ben]
+  accomplice: [ben, cora]
+  when: [w1, w2]
+  where: [halle, keller]
+solution: { who: anna, accomplice: cora, when: w2, where: keller }
+proof_questions:
+  - id: pq1
+    text: Wer war in der zweiten Nachthälfte im Keller?
+    options:
+      - { id: a, text: Anna }
+      - { id: b, text: Ben }
+      - { id: c, text: Cora }
+      - { id: d, text: Niemand }
+    correct: [b, c]
+  - id: pq2
+    text: Wessen Aussage stimmt nicht?
+    options:
+      - { id: a, text: Anna }
+      - { id: b, text: Ben }
+      - { id: c, text: Cora }
+      - { id: d, text: Keine }
+    correct: [c]

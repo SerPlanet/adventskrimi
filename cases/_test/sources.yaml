@@ -1,0 +1,49 @@
+sources:
+  - {
+      id: src_anna,
+      kind: talk,
+      room: halle,
+      npc: anna,
+      topic: nacht,
+      days: { from: 1, to: 3 },
+      yields: [f_excl_ben],
+    }
+  - {
+      id: src_ben,
+      kind: talk,
+      room: keller,
+      npc: ben,
+      topic: nacht,
+      days: { from: 1, to: 3 },
+      yields: [s_ben_keller, f_excl_ben_acc],
+    }
+  - {
+      id: src_cora,
+      kind: talk,
+      room: halle,
+      npc: cora,
+      topic: nacht,
+      days: { from: 1, to: 3 },
+      yields: [s_cora_halle],
+      auffaellig: true,
+    }
+  - {
+      id: src_lampe,
+      kind: inspect,
+      room: halle,
+      object: lampe,
+      days: [1, 2, 3],
+      auffaellig: true,
+      yields: [f_cora_keller],
+      plaque: Sehr aufmerksam,
+    }
+  - {
+      id: src_kiste,
+      kind: inspect,
+      room: keller,
+      object: kiste,
+      days: [2, 3],
+      requires: p_code,
+      auffaellig: true,
+      yields: [f_kiste_offen, f_ben_keller],
+    }

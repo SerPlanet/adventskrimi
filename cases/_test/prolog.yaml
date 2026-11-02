@@ -1,0 +1,13 @@
+days:
+  - {
+      day: 1,
+      goal: Lerne die Halle kennen,
+      actions: 1,
+      intro: Willkommen im Testhaus. Sprich mit Anna.,
+    }
+  - { day: 2, goal: Öffne die Kiste, actions: 2, intro: Im Keller steht eine Kiste mit Schloss. }
+mini_case:
+  title: Der Stollen
+  text: Im Stollen fehlt eine Laterne. Finde heraus, wer sie genommen hat.
+page_texts:
+  - { id: welcome, text: Willkommen, Detektiv! }

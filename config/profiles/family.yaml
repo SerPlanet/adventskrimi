@@ -1,0 +1,18 @@
+id: family
+name: Familie
+# Subset of the full case. Concrete ids are filled in with the case content (WP10).
+include:
+  exclude_facts: []
+  exclude_sources: []
+actions_per_day:
+  default: 3
+  prolog: { 1: 1, 2: 2, 3: 2, 4: 3, 5: 3 }
+movement: free
+hints: { tip_ladder: true, max_tips: 2 }
+early_accusation: true
+early_accusation_from_day: 20
+rumor_min_players: 3
+crowd_share: 0.5
+puzzle_levels: [easy, medium]
+chess: false
+max_liars: 2

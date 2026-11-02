@@ -1,0 +1,17 @@
+npcs:
+  - id: anna
+    name: Anna
+    role: Hausdame
+    topics: [{ id: nacht, label: Die Nacht }]
+    schedule: { 1: halle, 2: halle, 3: halle }
+  - id: ben
+    name: Ben
+    role: Hausmeister
+    topics: [{ id: nacht, label: Die Nacht }]
+    schedule: { 1: keller, 2: keller, 3: keller }
+  - id: cora
+    name: Cora
+    role: Köchin
+    quirk: Erzählt gern Geschichten.
+    topics: [{ id: nacht, label: Die Nacht }]
+    schedule: { 1: halle, 2: halle, 3: halle }
