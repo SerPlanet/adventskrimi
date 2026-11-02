@@ -58,6 +58,18 @@ export interface PlayerState {
   questions: Record<number, QuestionProgress>;
   /** puzzle of the day progress by day */
   daily: Record<number, DailyProgress>;
+  /** grid marks by "category:candidate"; absent in older saved states */
+  grid?: Record<string, 'yes' | 'no'>;
+  /** claims the player placed on the timeline, as "item#claimIndex" */
+  timeline?: string[];
+  /** every saved change of the theory, newest last */
+  theoryHistory?: { day: number; theory: Partial<Record<Category, string>> }[];
+  /** report card by day: how many categories were right (details stay private) */
+  reports?: Record<number, number>;
+  /** the player's own day on which the accusation was handed in */
+  accusedDay?: number;
+  /** result of the accusation, shown only together with the resolution */
+  verdict?: { correct: Category[]; proofCorrect: string[] };
 }
 
 /** Immutable game inputs for a (profile-applied) case. */
@@ -91,6 +103,27 @@ export function newPlayer(ctx: GameCtx): PlayerState {
     accused: false,
     questions: {},
     daily: {},
+  };
+}
+
+/**
+ * Fills in what saved states of older versions lack (e.g. `daily` before WP07), so a player
+ * created earlier never crashes a newer engine. Call whenever a state is loaded from storage.
+ */
+export function normalizeState(raw: PlayerState): PlayerState {
+  const s = raw as Partial<PlayerState>;
+  return {
+    ...raw,
+    found: s.found ?? [],
+    discoveries: s.discoveries ?? [],
+    inventory: s.inventory ?? [],
+    puzzles: s.puzzles ?? {},
+    theory: s.theory ?? {},
+    ledger: s.ledger ?? [],
+    finishedDays: s.finishedDays ?? [],
+    accused: s.accused ?? false,
+    questions: s.questions ?? {},
+    daily: s.daily ?? {},
   };
 }
 

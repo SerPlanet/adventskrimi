@@ -9,11 +9,20 @@ import {
   solvePuzzle,
   submitDaily,
   awardPlaque,
+  bonusDay,
+  canAccuse,
   canPlayDay,
+  changeTheory,
+  closeDay,
   dayOf,
   endDay,
+  fileAccusation,
+  fits,
+  isCandidate,
   isOnTime,
   makeCtx,
+  setMark,
+  setPlaced,
   questionHint,
   rankOf,
   readNewspaper,
@@ -99,8 +108,69 @@ export const handlers = {
       const ctx = await ctxOf(tx);
       const r = endDay(tx.player.state, ctx, req.next_room);
       if (!r.ok) throw new ApiError(r.reason, 400);
-      await tx.save(r.state);
-      return { state: view(tx, ctx, now, r.state) };
+      // the report card is booked once, from the theory at the end of that day
+      const next = closeDay(r.state, ctx, tx.player.state.day);
+      await tx.save(next);
+      return { state: view(tx, ctx, now, next) };
+    });
+  },
+
+  async get_theory(tx: PlayerTx, _req: Req<'get_theory'>) {
+    return { theory: tx.player.state.theory, history: tx.player.state.theoryHistory ?? [] };
+  },
+
+  /** Theory can change any time until the accusation. Needs no open day: thinking is free. */
+  async set_theory(tx: PlayerTx, req: Req<'set_theory'>, now: Date) {
+    const ctx = await ctxOf(tx);
+    const st = tx.player.state;
+    if (st.accused) throw new ApiError('already_accused', 409);
+    const next = changeTheory(st, ctx, req.theory);
+    if (next === 'invalid') throw new ApiError('bad_request', 400);
+    if (next !== st) await tx.save(next);
+    return { state: view(tx, ctx, now, next) };
+  },
+
+  /** Grid marks and timeline placements, stored per player so devices can change. */
+  async set_note(tx: PlayerTx, req: Req<'set_note'>, now: Date) {
+    const ctx = await ctxOf(tx);
+    const st = tx.player.state;
+    const next =
+      req.kind === 'grid'
+        ? setMark(st, ctx, req.cat, req.candidate, req.mark)
+        : setPlaced(st, ctx, req.key, req.put);
+    if (!next) throw new ApiError('bad_request', 400);
+    await tx.save(next);
+    return { state: view(tx, ctx, now, next) };
+  },
+
+  /** "Passt das zusammen?": free yes/no for two claims from the player's own file. */
+  async fits(tx: PlayerTx, req: Req<'fits'>) {
+    const ok = fits(await ctxOf(tx), tx.player.state, req.a, req.b);
+    if (ok === null) throw new ApiError('bad_request', 400);
+    return { fits: ok };
+  },
+
+  /** Final accusation: allowed from the early-accusation day on, final once handed in. */
+  async accuse(tx: PlayerTx, req: Req<'accuse'>, now: Date) {
+    return once(tx, req.request_id, async () => {
+      const ctx = await ctxOf(tx);
+      const st = tx.player.state;
+      if (st.accused) throw new ApiError('already_accused', 409);
+      if (!canAccuse(st, ctx)) throw new ApiError('too_early', 403);
+      const theory = req.theory;
+      const complete = (['who', 'accomplice', 'when', 'where'] as const).every(
+        (k) => theory[k] && isCandidate(ctx, k, theory[k]),
+      );
+      const questions = ctx.c.case.proof_questions;
+      const proofOk = questions.every((q) =>
+        (req.proof[q.id] ?? []).every((o) => q.options.some((x) => x.id === o)),
+      );
+      if (!complete || !proofOk) throw new ApiError('bad_request', 400);
+      // early bonus only for players who are not behind the real day
+      const real = bonusDay(st, now, tx.game.startDate);
+      const next = fileAccusation(st, ctx, req, st.day >= real ? real : null);
+      await tx.save(next);
+      return { state: view(tx, ctx, now, next) };
     });
   },
 
@@ -207,6 +277,7 @@ export const handlers = {
       req.day,
       await tx.activity(req.day - 1),
       await tx.plaquesOnDay(req.day - 1),
+      await tx.accusationsOnDay(req.day - 1),
     );
     return { newspaper: await tx.storeNewspaper(req.day, fresh) };
   },
@@ -221,4 +292,7 @@ export const MUTATING: HandlerName[] = [
   'daily_puzzle',
   'object_puzzle',
   'settings',
+  'set_theory',
+  'set_note',
+  'accuse',
 ];

@@ -2,10 +2,14 @@ import { useMemo, useState } from 'react';
 import { useSession } from '../store';
 import { emptyFilter, filterFinds, options, type FindFilter } from '../filters';
 import { FindCard } from './FindCard';
+import { Grid } from './Grid';
+import { Timeline } from './Timeline';
 
-type Tab = 'funde' | 'gegenstaende' | 'hotelbuch';
+type Tab = 'funde' | 'raster' | 'zeitstrahl' | 'gegenstaende' | 'hotelbuch';
 const TABS: [Tab, string][] = [
   ['funde', 'Funde'],
+  ['raster', 'Raster'],
+  ['zeitstrahl', 'Zeitstrahl'],
   ['gegenstaende', 'Gegenstände'],
   ['hotelbuch', 'Hotelbuch'],
 ];
@@ -100,6 +104,9 @@ export function Dossier() {
           )}
         </section>
       )}
+
+      {tab === 'raster' && <Grid />}
+      {tab === 'zeitstrahl' && <Timeline />}
 
       {tab === 'gegenstaende' && (
         <section role="tabpanel" aria-label="Gegenstände">

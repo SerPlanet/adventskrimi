@@ -53,3 +53,23 @@ import_map = "./functions/deno.json"
 [functions.object_puzzle]
 verify_jwt = false
 import_map = "./functions/deno.json"
+
+[functions.get_theory]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.set_theory]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.set_note]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.fits]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.accuse]
+verify_jwt = false
+import_map = "./functions/deno.json"

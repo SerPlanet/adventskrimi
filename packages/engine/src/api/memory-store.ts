@@ -1,5 +1,5 @@
 import type { LoadedCase } from '../loader';
-import { totalPoints, type PlayerState } from '../game/state';
+import { normalizeState, totalPoints, type PlayerState } from '../game/state';
 import {
   ApiError,
   type DayActivity,
@@ -43,6 +43,11 @@ export class MemoryStore implements Store {
         return [...self.plaques.values()]
           .filter((p) => p.day === day)
           .map((p) => ({ title: p.title, player: self.players.get(p.playerId)?.name ?? '' }));
+      },
+      async accusationsOnDay(day) {
+        return [...self.players.values()]
+          .filter((p) => p.state.accusedDay === day)
+          .map((p) => p.name);
       },
       async scoreboard(): Promise<ScoreRow[]> {
         return [...self.players.values()].map((p) => ({
@@ -90,7 +95,8 @@ export class MemoryStore implements Store {
       const tx: PlayerTx = {
         ...this.gameTx(),
         get player() {
-          return self.players.get(playerId) as PlayerRecord;
+          const rec = self.players.get(playerId) as PlayerRecord;
+          return { ...rec, state: normalizeState(rec.state) };
         },
         async saved(id) {
           return self.responses.get(`${playerId}:${id}`);

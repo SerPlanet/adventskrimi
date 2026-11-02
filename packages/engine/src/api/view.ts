@@ -1,5 +1,10 @@
 import {
+  accusationFromDay,
   budgetFor,
+  canAccuse,
+  inspectorSentence,
+  notesOf,
+  resolutionOf,
   dailyLevel,
   dailyPuzzleFor,
   dailyView,
@@ -138,6 +143,36 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
           )
         : null,
     theory: st.theory,
+    theory_history: st.theoryHistory ?? [],
+    // public candidate lists (never the solution)
+    options: {
+      who: c.case.categories.who.map((id) => ({ id, name: npcName(id) ?? id })),
+      accomplice: c.case.categories.accomplice.map((id) => ({ id, name: npcName(id) ?? id })),
+      when: c.case.categories.when.map((id) => ({
+        id,
+        name: c.case.windows.find((w) => w.id === id)?.label ?? id,
+      })),
+      where: c.case.categories.where.map((id) => ({ id, name: roomName(id) ?? id })),
+    },
+    people: c.npcs.npcs.map((n) => ({ id: n.id, name: n.name })),
+    notes: notesOf(st, ctx, player.settings.note_level ?? 'half'),
+    reports: Object.entries(st.reports ?? {}).map(([day, right]) => ({
+      day: Number(day),
+      right,
+      sentence: inspectorSentence(right),
+    })),
+    accusation: {
+      can: canAccuse(st, ctx),
+      done: st.accused,
+      from_day: accusationFromDay(ctx),
+      proof_questions: c.case.proof_questions.map((q) => ({
+        id: q.id,
+        text: q.text,
+        options: q.options,
+      })),
+    },
+    // the story: only after the own accusation AND from the real day 24 on
+    story: st.accused && today >= 24 ? resolutionOf(ctx, st) : null,
     newspaper_days: Math.max(0, Math.min(24, today)),
   };
 }

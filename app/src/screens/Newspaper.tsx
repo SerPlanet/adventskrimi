@@ -94,9 +94,12 @@ function Issue({ p }: { p: Paper }) {
           ))}
         </section>
       )}
-      {(p.plaques.length > 0 || p.detective_of_day) && (
+      {(p.plaques.length > 0 || p.detective_of_day || p.accusations?.length) && (
         <section className="card">
           <h2>Gästebuch</h2>
+          {p.accusations?.map((name) => (
+            <p key={name}>⚖️ {name} hat Anklage erhoben.</p>
+          ))}
           {p.plaques.map((x) => (
             <p key={x.title + x.player}>
               🏅 {x.player} hat etwas als Erste/r entdeckt: „{x.title}“.

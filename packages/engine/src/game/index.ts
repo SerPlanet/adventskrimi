@@ -6,3 +6,5 @@ export * from './points';
 export * from './contradictions';
 export * from './daily';
 export * from './dailypuzzle';
+export * from './notes';
+export * from './finale';

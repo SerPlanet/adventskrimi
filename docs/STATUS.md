@@ -1,12 +1,12 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-02 · Phase: M1 auf Staging spielbar (Link `/#/test`). Offen für Prod-M1: Pages einschalten, Prod migrieren. Mensch: siehe unten
+Stand: 2026-11-02 · Phase: WP08 + WP09 Teil 2 fertig, WP04 (Simulator) läuft. Staging: Functions neu deployt.
 
 ## Nächstes Work Package
-**M1 erreicht (bis auf Prod-URL).** Danach: WP09 Teil 2 + WP08 → `docs/wp/WP08-raster-zeitstrahl.md`
+WP04 → `docs/wp/WP04-simulator.md`. Danach **M2** (Testfall bis Tag 24 im Zeitraffer), dann WP11.
 
 Reihenfolge (Details: `docs/08-roadmap.md`):
-WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → WP06 ✓ → WP07 ✓ → WP09 (Teil 1 ✓) → **M1** ✓ → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
+WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → WP06 ✓ → WP07 ✓ → WP09 (Teil 1 ✓) → **M1** ✓ → WP08 ✓ → WP09 Teil 2 ✓ → WP04 → WP11 → WP12 → WP13 → WP14
 
 ## Erledigt
 - Doku v0.1 (Spielregeln, Punkte, Architektur, Roadmap)
@@ -19,6 +19,9 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → 
 - WP07: Rätsel des Tages (4 Arten × 3 Stufen, deterministisch, serverseitig geprüft, Tipp-Leiter, Überspringen) und Objekt-Rätsel (Endpunkt `object_puzzle`). Playwright-Smoke deckt beide ab, Lighthouse 100.
 - WP09 Teil 1: Rangliste mit Plaketten-Sammlung, „Meine Punkte“ (Aufschlüsselung), Ermittler des Tages in der Zeitung.
 - WP10: Fall Berghotel (lokal, per .gitignore nicht im Repo) und Familienprofil; `validate-case` grün für friends und family, Tempo Tag 20. Noch offen: `npm run balance` (WP04), Namen in `insider.yaml`.
+- WP08: Raster (Auto/Halb/Manuell), Zeitstrahl (Tippen, Widersprüche aus eigenen Einträgen, „Passt das zusammen?“), Theorie mit Verlauf, serverseitig pro Spieler. Neue Functions `set_note`, `fits`, `set_theory`, `get_theory`. Playwright + Lighthouse 100 (inkl. Theorie).
+- WP09 Teil 2: Wochenzeugnis (beim Tagesende, einmalig, Inspektor-Satz nach Trefferzahl), Anklage (`accuse`, ab Tag 20, Bestätigung, endgültig), Frühbonus nur pünktlich, Zeitungsnotiz, Auflösung (`story`) nur nach Abgabe und ab echtem Tag 24. Nicht gebaut: Admin-Knopf Zeugnis, „Gemeinsames Finale“ (WP11).
+- Fix: alte Spielerstände ohne neue Felder (z. B. `daily`) führten zu HTTP 500; `normalizeState` beim Laden.
 
 ## In Arbeit
 - –
@@ -32,7 +35,7 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → 
 - [x] Supabase `advent-staging` angelegt, verknüpft, leere Migration angewendet (2026-11-02)
 - [x] Supabase `advent-prod` angelegt (2026-11-02), noch ohne Migration
 - [x] Repo ist öffentlich, Pages läuft über GitHub Actions (kein Pro nötig)
-- [ ] Optional: Repo → Settings → Secrets and variables → Actions → Variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (anon-Key ist öffentlich, kein Service-Key!)
+- [x] Repo-Variablen gesetzt: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (anon-Key ist öffentlich, kein Service-Key!)
 - [ ] Spieler-Namen und Profilwahl (Familie/Freunde) bereitstellen, siehe WP14
 
 ## Meilensteine

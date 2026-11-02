@@ -10,6 +10,7 @@ export function generateNewspaper(
   day: number,
   yesterday: DayActivity[],
   plaques: { title: string; player: string }[],
+  accusations: string[] = [],
 ): NewspaperContent {
   const { c, profile } = ctx;
   const ev = c.events.events.find((e) => e.day === day);
@@ -46,6 +47,7 @@ export function generateNewspaper(
     filler,
     rumors,
     plaques,
+    accusations,
     detective_of_day: best && best.points > 0 ? { name: best.name, points: best.points } : null,
   };
 }

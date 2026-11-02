@@ -46,6 +46,14 @@ interface Session {
     answer?: string,
   ): Promise<{ correct?: boolean; hint?: string } | null>;
   say(msg: string): void;
+  setTheory(theory: Record<string, string | null>): Promise<boolean>;
+  setNote(
+    n:
+      | { kind: 'grid'; cat: string; candidate: string; mark: 'yes' | 'no' | null }
+      | { kind: 'timeline'; key: string; put: boolean },
+  ): Promise<boolean>;
+  fits(a: string, b: string): Promise<boolean | null>;
+  accuse(theory: Record<string, string>, proof: Record<string, string[]>): Promise<boolean>;
 }
 
 const Ctx = createContext<Session | null>(null);
@@ -149,6 +157,23 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
       },
       async objectPuzzle(id, op, answer) {
         return run('object_puzzle', { request_id: newRequestId(), puzzle_id: id, op, answer });
+      },
+      async setTheory(theory) {
+        const r = await run('set_theory', { theory });
+        if (r) setNotice('Deine Theorie ist gespeichert.');
+        return r !== null;
+      },
+      async setNote(n) {
+        return (await run('set_note', n)) !== null;
+      },
+      async fits(a, b) {
+        const r = await run<{ fits: boolean }>('fits', { a, b });
+        return r ? r.fits : null;
+      },
+      async accuse(theory, proof) {
+        const r = await run('accuse', { request_id: newRequestId(), theory, proof });
+        if (r) setNotice('Deine Anklage ist abgegeben.');
+        return r !== null;
       },
       async saveSettings(s) {
         await run('settings', { settings: s });

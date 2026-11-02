@@ -137,3 +137,28 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   // ranking shows me
   await expect(page.getByText(/\(du\)/)).toBeVisible();
 });
+
+test('timeline: place two cards, the contradiction shows; theory is saved', async ({ page }) => {
+  const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
+  await sql`update players set state = jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb) where name = ${NAME}`;
+  await sql.end();
+
+  await page.goto(`/?now=${NOW}#/test`);
+  await page.getByRole('button', { name: new RegExp(NAME) }).click();
+  await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
+  await page.getByRole('tab', { name: 'Zeitstrahl' }).click();
+
+  for (const card of [/Fakt: In Keller/, /Aussage: In Halle/]) {
+    await page.getByRole('button', { name: card }).click();
+    await page.getByRole('button', { name: /Hierhin legen/ }).click();
+  }
+  await expect(page.getByRole('alert').getByText(/Passt nicht: Cora/)).toBeVisible();
+
+  await page
+    .getByRole('navigation')
+    .getByRole('button', { name: /Theorie/ })
+    .click();
+  await page.getByLabel('Wer war der Dieb?').selectOption({ label: 'Anna' });
+  await page.getByRole('button', { name: 'Theorie speichern' }).click();
+  await expect(page.getByText('Deine Theorie ist gespeichert.')).toBeVisible();
+});

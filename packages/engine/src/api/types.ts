@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { LoadedCase } from '../loader';
-import { Id, type Profile, type Scoring } from '../schemas';
+import { Category, Id, type Profile, type Scoring } from '../schemas';
 import type { PlayerState } from '../game/state';
 
 export const SettingsSchema = z
@@ -55,6 +55,8 @@ export interface NewspaperContent {
   filler: string[];
   rumors: string[];
   plaques: { title: string; player: string }[];
+  /** names of players who accused the day before (no verdict, no content) */
+  accusations?: string[];
   detective_of_day: { name: string; points: number } | null;
 }
 
@@ -74,6 +76,8 @@ export interface GameTx {
   caseData(): Promise<LoadedCase>;
   activity(day: number): Promise<DayActivity[]>;
   plaquesOnDay(day: number): Promise<{ title: string; player: string }[]>;
+  /** names of players who handed in their accusation on their own day `day` */
+  accusationsOnDay(day: number): Promise<string[]>;
   scoreboard(): Promise<ScoreRow[]>;
   newspaper(day: number): Promise<NewspaperContent | undefined>;
   /** Insert once; on a race the first writer wins and its content is returned. */
@@ -159,6 +163,42 @@ export const Requests = {
   scoreboard: z.object({ slug: Slug, player_id: PlayerId }),
   newspaper: z.object({ slug: Slug, player_id: PlayerId, day: z.number().int().min(1).max(24) }),
   settings: z.object({ slug: Slug, player_id: PlayerId, settings: SettingsSchema }),
+  get_theory: z.object({ slug: Slug, player_id: PlayerId }),
+  set_theory: z.object({
+    slug: Slug,
+    player_id: PlayerId,
+    theory: z.partialRecord(Category, Id.nullable()),
+  }),
+  set_note: z.discriminatedUnion('kind', [
+    z.object({
+      slug: Slug,
+      player_id: PlayerId,
+      kind: z.literal('grid'),
+      cat: Category,
+      candidate: Id,
+      mark: z.enum(['yes', 'no']).nullable(),
+    }),
+    z.object({
+      slug: Slug,
+      player_id: PlayerId,
+      kind: z.literal('timeline'),
+      key: z.string().min(1).max(80),
+      put: z.boolean(),
+    }),
+  ]),
+  fits: z.object({
+    slug: Slug,
+    player_id: PlayerId,
+    a: z.string().min(1).max(80),
+    b: z.string().min(1).max(80),
+  }),
+  accuse: z.object({
+    slug: Slug,
+    player_id: PlayerId,
+    request_id: RequestId,
+    theory: z.record(Category, Id),
+    proof: z.record(Id, z.array(Id).max(4)),
+  }),
 } as const;
 
 export class ApiError extends Error {

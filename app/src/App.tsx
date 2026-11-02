@@ -5,6 +5,7 @@ import { Pick } from './screens/Pick';
 import { Newspaper } from './screens/Newspaper';
 import { Hotel } from './screens/Hotel';
 import { Dossier } from './screens/Dossier';
+import { Theory } from './screens/Theory';
 import { Ranking } from './screens/Ranking';
 import { Settings } from './screens/Settings';
 import { PageBubble } from './screens/PageBubble';
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'zeitung', label: 'Zeitung', icon: '📰' },
   { id: 'hotel', label: 'Hotel', icon: '🏨' },
   { id: 'akte', label: 'Akte', icon: '🗂️' },
+  { id: 'theorie', label: 'Theorie', icon: '💡' },
   { id: 'rangliste', label: 'Rangliste', icon: '🏆' },
 ] as const;
 
@@ -40,6 +42,8 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
         return <Hotel />;
       case 'akte':
         return <Dossier />;
+      case 'theorie':
+        return <Theory />;
       case 'rangliste':
         return <Ranking />;
       case 'einstellungen':

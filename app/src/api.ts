@@ -12,6 +12,8 @@ const MESSAGES: Record<string, string> = {
   blocked: 'Dieser Raum ist morgen gesperrt.',
   bad_room: 'Diesen Raum gibt es nicht.',
   no_hint: 'Hier gibt es keinen Tipp.',
+  already_accused: 'Du hast schon Anklage erhoben. Danach kann man nichts mehr ändern.',
+  too_early: 'Die Anklage ist für dich noch nicht möglich.',
 };
 export const OFFLINE = 'Das Hotel ist gerade nicht erreichbar, versuche es gleich noch einmal.';
 
