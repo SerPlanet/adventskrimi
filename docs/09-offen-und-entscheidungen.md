@@ -46,3 +46,8 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D26 | Loader (`packages/engine/src/loader.ts`) ist Node-only und nicht in `index.ts` exportiert, damit der Browser-Bundle keine fs/YAML-Abhängigkeit zieht |
 | D27 | `load-case` verbindet über den Supabase-Pooler (aus `supabase link`) mit `SUPABASE_<ENV>_DB_PASSWORD` aus `.env`; Testfall wird nie nach prod geladen |
 | D28 | Profil `family.yaml` hat bis WP10 keine konkreten Raum-/NPC-IDs (leeres `include`); Satzlänge-Grenze 18 Wörter in `quality.json` |
+| D29 | Solver: Tupel = (Wer, Komplize, Wann, Wo). Dieb ist im Zeitfenster am Tatort, Komplize am Ablenkungsort (aus `world.crime`), Dieb ≠ Komplize. Wahre Aussagen zählen wie Fakten, falsche liefern keine Information |
+| D30 | Schlüssel-Fakt = Fakt, dessen Entfernung die Zahl der konsistenten Tupel erhöht. Redundanz zählt unterschiedliche erreichbare Quellen |
+| D31 | Widerlegbarkeit: direkter Positionskonflikt mit einem erreichbaren Fakt ODER Widerspruch zur aus allen erreichbaren Funden folgenden Lösung |
+| D32 | Tempo-Planer ist ein Beam-Search (greedy je Raum) und damit eine Heuristik: „zu früh lösbar“ ist verlässlich, „zu spät“ kann pessimistisch sein. Zeitung ist kostenlos, Rätselräume lösen das Rätsel ohne Aktion, Gegenstände (`requires` auf Item) gelten als erfüllt |
+| D33 | Neue optionale Felder `red_herring`, `reinterpreted_on` an Fakten/Aussagen für die Mindestmengen. Fallweise Qualitäts-Overrides in `<fall>/quality.override.json` (nur `_test`) |

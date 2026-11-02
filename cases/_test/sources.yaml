@@ -47,3 +47,36 @@ sources:
       auffaellig: true,
       yields: [f_kiste_offen, f_ben_keller],
     }
+  - {
+      id: src_lampe2,
+      kind: inspect,
+      room: halle,
+      object: lampe,
+      days: [2, 3],
+      yields: [f_lampe_an],
+    }
+  - { id: src_news_a, kind: newspaper, days: [1, 2, 3], yields: [f_excl_ben, f_lampe_an] }
+  - {
+      id: src_book_a,
+      kind: hotelbook,
+      room: halle,
+      days: [1, 2, 3],
+      yields: [f_excl_ben, f_excl_ben_acc],
+    }
+  - { id: src_news_b, kind: newspaper, days: [2, 3], yields: [f_excl_ben_acc, f_kiste_offen] }
+  - {
+      id: src_book_b,
+      kind: hotelbook,
+      room: keller,
+      days: [2, 3],
+      yields: [f_lampe_an, f_kiste_offen],
+    }
+  - {
+      id: src_ben2,
+      kind: talk,
+      room: keller,
+      npc: ben,
+      topic: nacht,
+      days: [3],
+      yields: [f_lampe_an, f_excl_ben],
+    }

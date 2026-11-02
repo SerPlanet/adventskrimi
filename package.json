@@ -20,7 +20,8 @@
     "check-bundle": "node tools/check-bundle/index.mjs",
     "db:push:staging": "supabase db push --linked",
     "validate-schema": "tsx tools/validate-schema/index.ts",
-    "load-case": "tsx tools/load-case/index.ts"
+    "load-case": "tsx tools/load-case/index.ts",
+    "validate-case": "tsx tools/validate-case/index.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

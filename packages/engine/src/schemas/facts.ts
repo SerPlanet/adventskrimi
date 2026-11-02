@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CardText, Category, Days, Id, listFile } from './common';
+import { CardText, Category, Day, Days, Id, listFile } from './common';
 
 /** Solver-capable fact bodies (docs/04 §4). Shared by facts and statement claims. */
 export const FactBody = z.discriminatedUnion('type', [
@@ -20,7 +20,13 @@ export const FactBody = z.discriminatedUnion('type', [
   }),
 ]);
 
-export const Fact = z.intersection(z.object({ id: Id, text: CardText }), FactBody);
+/** Optional content tags used by validator minimums (docs/04 §7). */
+const Tags = {
+  red_herring: z.boolean().default(false),
+  reinterpreted_on: Day.optional(),
+};
+
+export const Fact = z.intersection(z.object({ id: Id, text: CardText, ...Tags }), FactBody);
 
 export const Statement = z.object({
   id: Id,
@@ -28,6 +34,7 @@ export const Statement = z.object({
   text: CardText,
   claims: z.array(FactBody).min(1),
   truth: z.boolean(),
+  ...Tags,
 });
 
 export const SOURCE_KINDS = ['talk', 'inspect', 'use', 'newspaper', 'hotelbook'] as const;
