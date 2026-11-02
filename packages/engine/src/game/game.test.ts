@@ -12,7 +12,10 @@ import {
   bonusDay,
   canPlayDay,
   dayOf,
+  confirmLink,
   endDay,
+  exploreProgress,
+  linksOf,
   findContradictions,
   fitsTogether,
   isOnTime,
@@ -48,7 +51,7 @@ const ctx = mk();
 const talkAnna: Action = { type: 'talk', npc: 'anna', topic: 'nacht' };
 const at = (day: number, room: string, st = newPlayer(ctx)): PlayerState => ({ ...st, day, room });
 
-describe('actions: only new finds use up budget', () => {
+describe('exploring is free: only new finds change anything', () => {
   test('empty action costs nothing', () => {
     const { state, result } = resolveAction(newPlayer(ctx), ctx, {
       type: 'talk',
@@ -60,21 +63,42 @@ describe('actions: only new finds use up budget', () => {
     expect(state.ledger).toEqual([]);
   });
 
-  test('new find uses one action and gives points; repeat costs nothing', () => {
+  test('new find gives points; repeat changes nothing', () => {
     const first = resolveAction(newPlayer(ctx), ctx, talkAnna);
     expect(first.result.status).toBe('found');
-    expect(first.state.actionsUsed).toBe(1);
     expect(totalPoints(first.state)).toBe(scoring.day.played + scoring.day.find);
     const again = resolveAction(first.state, ctx, talkAnna);
     expect(again.result.status).toBe('known');
     expect(again.state).toBe(first.state);
   });
 
-  test('budget limit blocks a new find without consuming anything', () => {
-    const used = resolveAction(newPlayer(ctx), ctx, talkAnna).state; // day 1 budget = 1
-    const r = resolveAction(used, ctx, { type: 'talk', npc: 'cora', topic: 'nacht' });
-    expect(r.result.status).toBe('no_budget');
-    expect(r.state).toBe(used);
+  test('there is no action limit: a second new find in a row works', () => {
+    const one = resolveAction(newPlayer(ctx), ctx, talkAnna).state;
+    const r = resolveAction(one, ctx, { type: 'talk', npc: 'cora', topic: 'nacht' });
+    expect(r.result.status).toBe('found');
+  });
+
+  test('progress counts things that brought a find, and links give points once', () => {
+    const here = newPlayer(ctx);
+    const before = exploreProgress(here, ctx);
+    expect(before.found).toBe(0);
+    expect(before.total).toBeGreaterThan(0);
+    const after = exploreProgress(resolveAction(here, ctx, talkAnna).state, ctx);
+    expect(after.found).toBe(1);
+    expect(after.total).toBe(before.total);
+    const withLink = mk((c) => {
+      c.case.links = [
+        { id: 'l1', a: 'f_excl_ben', b: 's_cora_halle', text: 'Das erinnert dich an die Halle.' },
+      ];
+    });
+    let st = resolveAction(newPlayer(withLink), withLink, talkAnna).state;
+    expect(linksOf(st, withLink)).toEqual([]);
+    expect(confirmLink(st, withLink, 'l1')).toBeNull();
+    st = resolveAction(st, withLink, { type: 'talk', npc: 'cora', topic: 'nacht' }).state;
+    expect(linksOf(st, withLink).map((l) => l.id)).toEqual(['l1']);
+    const done = confirmLink(st, withLink, 'l1') as PlayerState;
+    expect(totalPoints(done) - totalPoints(st)).toBe(scoring.link);
+    expect(confirmLink(done, withLink, 'l1')).toBe(done);
   });
 
   test('person who is not here today is unavailable', () => {
@@ -144,7 +168,7 @@ describe('movement', () => {
     expect(endDay(newPlayer(c2), c2, 'keller')).toEqual({ ok: false, reason: 'blocked' });
   });
 
-  test('ending the day moves on in order and resets the budget; skipping keeps the position', () => {
+  test('ending the day moves on in order; skipping keeps the position', () => {
     const played = resolveAction(newPlayer(ctx), ctx, talkAnna).state;
     const r = endDay(played, ctx, 'keller');
     expect(r.ok && r.state.day).toBe(2);
@@ -300,7 +324,6 @@ describe('full run, day 1 to 24 on the test case', () => {
       st = readNewspaper(st, ctx).state;
       for (const p of ctx.c.puzzles.puzzles) st = solvePuzzle(st, ctx, p.id, p.answer).state;
       for (const a of actions) st = resolveAction(st, ctx, a).state;
-      expect(st.actionsUsed).toBeLessThanOrEqual(4);
       const r = endDay(st, ctx, rooms[day % rooms.length]);
       if (!r.ok) throw new Error(r.reason);
       st = r.state;

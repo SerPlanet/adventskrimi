@@ -54,6 +54,7 @@ interface Session {
       | { kind: 'timeline'; key: string; put: boolean },
   ): Promise<boolean>;
   fits(a: string, b: string): Promise<boolean | null>;
+  link(id: string): Promise<boolean>;
   accuse(theory: Record<string, string>, proof: Record<string, string[]>): Promise<boolean>;
 }
 
@@ -169,6 +170,11 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
       },
       async setNote(n) {
         return (await run('set_note', n)) !== null;
+      },
+      async link(id) {
+        const r = await run('link', { link_id: id });
+        if (r) setNotice('Verknüpft. Gut aufgepasst!');
+        return r !== null;
       },
       async fits(a, b) {
         const r = await run<{ fits: boolean }>('fits', { a, b });

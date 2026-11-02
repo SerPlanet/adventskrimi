@@ -29,3 +29,16 @@ proof_questions:
       - { id: c, text: Cora }
       - { id: d, text: Keine }
     correct: [c]
+links:
+  - id: l_cora
+    a: f_cora_keller
+    b: s_cora_halle
+    text: Das erinnert dich an Coras Weg durch das Haus.
+beats:
+  - {
+      day: 1,
+      title: Ankunft,
+      aha: Der erste Eindruck,
+      insight: Die Halle ist der Mittelpunkt.,
+      thread: Wer war nachts unterwegs?,
+    }

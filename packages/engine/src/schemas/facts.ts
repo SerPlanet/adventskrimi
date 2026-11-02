@@ -54,6 +54,14 @@ export const Source = z.object({
   /** neutral first-discoverer title, must not reveal place or content */
   plaque: z.string().optional(),
   /** how the UI shows the find (WP06b); the whole popup text is at most 60 words */
+  /** document found here (02b §3): readable again in full from the inventory */
+  document: z
+    .object({ title: z.string().min(1), kind: z.enum(['zettel', 'brief', 'foto', 'quittung']) })
+    .optional(),
+  /** talk: the find that must be shown to get these answers (also expressible via requires) */
+  shows: Id.optional(),
+  /** talk: points the player to this figure as a witness */
+  witness_of: Id.optional(),
   presentation: z.enum(['dialog', 'note', 'object', 'ambient']).optional(),
   lines: z.array(z.object({ speaker: z.string().min(1), text: z.string().min(1) })).optional(),
   note: z

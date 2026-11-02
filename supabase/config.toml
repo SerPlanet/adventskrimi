@@ -73,3 +73,7 @@ import_map = "./functions/deno.json"
 [functions.accuse]
 verify_jwt = false
 import_map = "./functions/deno.json"
+
+[functions.link]
+verify_jwt = false
+import_map = "./functions/deno.json"

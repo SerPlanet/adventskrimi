@@ -1,6 +1,7 @@
 import {
   accusationFromDay,
-  budgetFor,
+  exploreProgress,
+  linksOf,
   canAccuse,
   inspectorSentence,
   notesOf,
@@ -26,7 +27,7 @@ import type { GameTx, PlayerRecord } from './types';
  */
 export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: Date) {
   const st: PlayerState = player.state;
-  const { c, profile, scoring } = ctx;
+  const { c, scoring } = ctx;
   const startDate = tx.game.startDate;
   const today = dayOf(now, startDate);
   const roomName = (id?: string) => c.rooms.rooms.find((r) => r.id === id)?.name;
@@ -39,6 +40,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       presentation: src?.presentation,
       lines: src?.lines,
       note: src?.note,
+      document: src?.document,
       kind: src?.kind,
       room: roomName(src?.room),
       npc: npcName(src?.npc),
@@ -81,7 +83,8 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     day: st.day,
     can_play: canPlay,
     finished: st.day > 24,
-    actions: { used: st.actionsUsed, budget: budgetFor(profile, Math.min(st.day, 24)) },
+    explore: exploreProgress(st, ctx),
+    links: linksOf(st, ctx).map(({ id, text, done }) => ({ id, text, done })),
     points: totalPoints(st),
     breakdown: breakdown(st),
     rank: rankOf(totalPoints(st), scoring),

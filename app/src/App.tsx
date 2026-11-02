@@ -8,7 +8,6 @@ import { Dossier } from './screens/Dossier';
 import { Theory } from './screens/Theory';
 import { Ranking } from './screens/Ranking';
 import { Settings } from './screens/Settings';
-import { Candles } from './ui/Candles';
 import { PageBubble } from './screens/PageBubble';
 
 const TABS = [
@@ -69,9 +68,7 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
         </button>
         {view && (
           <p className="status" aria-label="Tagesstatus">
-            Tag {Math.min(view.day, 24)} ·{' '}
-            <Candles left={view.actions.budget - view.actions.used} budget={view.actions.budget} />{' '}
-            · {view.points} Punkte
+            Tag {Math.min(view.day, 24)} · {view.points} Punkte
           </p>
         )}
       </header>

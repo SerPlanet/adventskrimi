@@ -11,6 +11,7 @@ import {
   awardPlaque,
   bonusDay,
   canAccuse,
+  confirmLink,
   canPlayDay,
   changeTheory,
   closeDay,
@@ -113,6 +114,15 @@ export const handlers = {
       await tx.save(next);
       return { state: view(tx, ctx, now, next) };
     });
+  },
+
+  /** "Verknüpfen": two finds that belong together; points once per link. */
+  async link(tx: PlayerTx, req: Req<'link'>, now: Date) {
+    const ctx = await ctxOf(tx);
+    const next = confirmLink(tx.player.state, ctx, req.link_id);
+    if (!next) throw new ApiError('bad_request', 400);
+    if (next !== tx.player.state) await tx.save(next);
+    return { state: view(tx, ctx, now, next) };
   },
 
   async get_theory(tx: PlayerTx, _req: Req<'get_theory'>) {
@@ -294,5 +304,6 @@ export const MUTATING: HandlerName[] = [
   'settings',
   'set_theory',
   'set_note',
+  'link',
   'accuse',
 ];

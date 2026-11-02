@@ -47,7 +47,7 @@ export function options(st: PlayerState, ctx: GameCtx, info: Info): Option[] {
   const before = count(combine(info, st.found));
   const out: Option[] = [];
   for (const action of actionsHere(st, ctx)) {
-    const r = resolveAction({ ...st, actionsUsed: 0 }, ctx, action);
+    const r = resolveAction(st, ctx, action);
     if (r.result.status !== 'found') continue;
     const after = count(combine(info, [...st.found, ...r.result.newItems]));
     out.push({ action, gain: before - after, newItems: r.result.newItems });
@@ -73,25 +73,27 @@ function roomValue(
 
 const desc = (o: Option[]) => o.map((x) => x.gain).sort((a, b) => b - a);
 
-/** Next action for the bot, or null when it wants to stop for today. */
-export function chooseAction(
+/**
+ * What the bot explores in today's room (no action budget since WP06c).
+ * optimal/greedy: everything that brings a find; random: as many random picks as there are things;
+ * casual: a random 60 %; worst: everything, but in the least informative rooms (see chooseRoom).
+ */
+export function planDay(
   bot: BotName,
   st: PlayerState,
   ctx: GameCtx,
   info: Info,
   rng: Rng,
-): Action | null {
-  if (bot === 'newspaper_only') return null;
-  if (bot === 'random' || bot === 'casual') {
-    if (bot === 'casual' && st.actionsUsed >= 1) return null;
-    const all = actionsHere(st, ctx);
-    return all.length ? (all[Math.floor(rng() * all.length)] as Action) : null;
+): Action[] {
+  if (bot === 'newspaper_only') return [];
+  const all = actionsHere(st, ctx);
+  if (bot === 'random') return all.map(() => all[Math.floor(rng() * all.length)] as Action);
+  if (bot === 'casual') {
+    const mixed = [...all].sort(() => rng() - 0.5);
+    return mixed.slice(0, Math.ceil(all.length * 0.6));
   }
   const opts = options(st, ctx, info);
-  if (!opts.length) return null;
-  if (bot === 'greedy') return opts[0]?.action ?? null;
-  const sorted = [...opts].sort((a, b) => (bot === 'optimal' ? b.gain - a.gain : a.gain - b.gain));
-  return sorted[0]?.action ?? null;
+  return opts.map((o) => o.action);
 }
 
 /** Room for the next day. */

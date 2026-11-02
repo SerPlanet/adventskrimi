@@ -22,7 +22,23 @@ export const CaseFile = z.object({
   /** Candidate ids per category (who/accomplice: npc ids, when: window ids, where: room ids). */
   categories: z.record(Category, z.array(Id).min(2)),
   solution: z.record(Category, Id),
+  /** "explore" turns on the lie-web and day-beat checks (docs/07 §2b); "legacy" is the old format */
+  format: z.enum(['legacy', 'explore']).default('legacy'),
   proof_questions: z.array(ProofQuestion).length(2),
+  /** pairs of finds that belong together; the hint never states a verdict */
+  links: z.array(z.object({ id: Id, a: Id, b: Id, text: z.string().min(1) })).default([]),
+  /** story of each day: what the player should understand, the planned aha moment */
+  beats: z
+    .array(
+      z.object({
+        day: z.number().int().min(1).max(24),
+        title: z.string().min(1),
+        aha: z.string().min(1),
+        insight: z.string().min(1),
+        thread: z.string().optional(),
+      }),
+    )
+    .default([]),
 });
 
 /** world.yaml: ground truth. SPOILER. */

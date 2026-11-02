@@ -4,7 +4,6 @@ import { ObjectPuzzles } from './ObjectPuzzles';
 import { FindCard } from './FindCard';
 import { EndDay } from './EndDay';
 import { Popup } from '../ui/Popup';
-import { Candles } from '../ui/Candles';
 import { HotelMap } from '../ui/HotelMap';
 import { RoomScene, spotsOf, type Spot } from '../ui/RoomScene';
 import { SourceCard } from '../ui/Bubbles';
@@ -24,7 +23,6 @@ export function Hotel() {
 
   const play = view.can_play && !view.finished;
   const room = view.room;
-  const left = view.actions.budget - view.actions.used;
 
   if (view.finished)
     return (
@@ -75,9 +73,15 @@ export function Hotel() {
         <section aria-labelledby="room-h">
           <h1 id="room-h">{room.name}</h1>
           <p>{room.description}</p>
-          <p className="row">
-            <Candles left={left} budget={view.actions.budget} />
-            <span className="small">Eine Aktion zählt nur, wenn sie etwas Neues bringt.</span>
+          <p className="row" role="status">
+            <strong>
+              Entdeckt {view.explore.found} von {view.explore.total}
+            </strong>
+            <span className="small">
+              {view.explore.found >= view.explore.total
+                ? 'Hier gibt es heute nichts Neues mehr.'
+                : 'Sieh dir alles in Ruhe an. Es kostet nichts.'}
+            </span>
           </p>
           {room.blocked && (
             <p className="card">
@@ -186,7 +190,7 @@ export function Hotel() {
       )}
       {open?.kind === 'night' && (
         <Popup title="Gute Nacht" onClose={close}>
-          <EndDay left={left} close={close} />
+          <EndDay close={close} />
         </Popup>
       )}
     </>

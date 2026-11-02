@@ -17,11 +17,14 @@ export const Profile = z.object({
       window_groups: z.record(Id, z.array(Id)).optional(),
     })
     .default({ exclude_facts: [], exclude_sources: [] }),
-  actions_per_day: z.object({
-    default: z.number().int().min(1),
-    /** prolog overrides by day */
-    prolog: z.record(z.coerce.number().pipe(Day), z.number().int().min(1)).default({}),
-  }),
+  /** retired by WP06c (02b), ignored */
+  actions_per_day: z
+    .object({
+      default: z.number().int().min(1),
+      /** prolog overrides by day */
+      prolog: z.record(z.coerce.number().pipe(Day), z.number().int().min(1)).default({}),
+    })
+    .optional(),
   movement: z.enum(['free', 'neighbors']),
   hints: z.object({ tip_ladder: z.boolean().default(true), max_tips: z.number().int().default(2) }),
   early_accusation: z.boolean(),
@@ -46,6 +49,8 @@ export const Scoring = z.object({
   }),
   prolog_mini_case: NonNeg,
   first_discoverer: NonNeg,
+  /** confirmed link between two finds (02b §6), once per link */
+  link: NonNeg,
   report_card: z.object({ per_category: NonNeg, days: z.array(Day).min(1) }),
   finale: z.object({ who: NonNeg, accomplice: NonNeg, when: NonNeg, where: NonNeg, proof: NonNeg }),
   early_accusation: z.object({ factor: NonNeg, last_day: Day }),

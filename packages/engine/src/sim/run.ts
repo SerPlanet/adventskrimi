@@ -1,6 +1,5 @@
 import {
   answerQuestion,
-  budgetFor,
   closeDay,
   endDay,
   fileAccusation,
@@ -18,7 +17,7 @@ import {
 import { dailyPuzzleFor } from '../game/dailypuzzle';
 import type { Category } from '../schemas';
 import { buildInfo, combine, count, reachableItems, remaining, type Info } from '../solver';
-import { chooseAction, chooseRoom, makeRng, type BotName, type Rng } from './bots';
+import { planDay, chooseRoom, makeRng, type BotName, type Rng } from './bots';
 
 const CATS: Category[] = ['who', 'accomplice', 'when', 'where'];
 const MIND = [
@@ -102,13 +101,19 @@ export function simulate(
       st = submitDaily(st, ctx, p, p.answer).state;
     }
 
-    const budget = budgetFor(ctx.profile, day);
-    for (let tries = 0; st.actionsUsed < budget && tries < budget * 4; tries++) {
-      const a = chooseAction(bot, st, ctx, info, rng);
-      if (!a) break;
-      const r = resolveAction(st, ctx, a);
-      st = r.state;
-      if (r.result.status !== 'found') res.emptyActions++;
+    // things can unlock further things (item, then use it), so the careful bots go round again
+    const rounds = bot === 'greedy' || bot === 'optimal' ? 6 : 1;
+    for (let round = 0; round < rounds; round++) {
+      const todo = planDay(bot, st, ctx, info, rng);
+      if (!todo.length) break;
+      let gained = false;
+      for (const a of todo) {
+        const r = resolveAction(st, ctx, a);
+        st = r.state;
+        if (r.result.status === 'found') gained = true;
+        else res.emptyActions++;
+      }
+      if (!gained) break;
     }
     const everything = [...reachableItems(info)].every((i) => st.found.includes(i));
     if (
@@ -161,8 +166,8 @@ export function simulate(
     }
 
     res.pointsByDay.push(totalPoints(st));
-    const ended = endDay(st, ctx, chooseRoom(bot, st, ctx, info, rng, budget));
-    st = closeDay(ended.ok ? ended.state : { ...st, day: day + 1, actionsUsed: 0 }, ctx, day);
+    const ended = endDay(st, ctx, chooseRoom(bot, st, ctx, info, rng, 99));
+    st = closeDay(ended.ok ? ended.state : { ...st, day: day + 1 }, ctx, day);
   }
 
   res.state = st;

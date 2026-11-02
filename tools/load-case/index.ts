@@ -89,6 +89,8 @@ try {
       night: c.case.night,
       windows: c.case.windows,
       categories: c.case.categories,
+      links: c.case.links,
+      beats: c.case.beats,
     }),
   ];
   const known = await client.query('select 1 from case_meta where case_id = $1', [c.case.id]);

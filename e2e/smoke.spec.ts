@@ -49,9 +49,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: new RegExp(NAME) }).click();
   await expect(page.getByRole('heading', { name: 'Der Bergbote' })).toBeVisible();
   await expect(page.getByText('Ausgabe Nr. 1')).toBeVisible();
-  await expect(
-    page.getByLabel('Tagesstatus').getByRole('img', { name: 'Aktionen: 1 von 1 übrig' }),
-  ).toBeVisible();
+  await expect(page.getByLabel('Tagesstatus')).toContainText('Tag 1');
 
   // question of the day
   await page.getByRole('button', { name: 'Schnee' }).click();
@@ -77,9 +75,8 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.locator('.bubble')).toHaveCount(2);
   await page.getByRole('button', { name: 'Schließen' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(
-    page.getByLabel('Tagesstatus').getByRole('img', { name: 'Aktionen: 0 von 1 übrig' }),
-  ).toBeVisible();
+  // exploring is free: progress counts finds, no action budget any more
+  await expect(page.getByText(/Entdeckt [0-9]+ von [0-9]+/)).toBeVisible();
 
   await page.keyboard.press('Escape');
 

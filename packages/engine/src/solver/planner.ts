@@ -98,7 +98,7 @@ export function planTempo(info: Info, budgetOf: (day: number) => number, beam = 
   return { solveDay, remainingByDay };
 }
 
-export function profileBudget(info: Info): (day: number) => number {
-  const { default: base, prolog } = info.profile.actions_per_day;
-  return (day) => (prolog as Record<number, number>)[day] ?? base;
+/** No action budget since WP06c: a visited room gives everything it holds that day. */
+export function profileBudget(_info: Info): (day: number) => number {
+  return () => 99;
 }

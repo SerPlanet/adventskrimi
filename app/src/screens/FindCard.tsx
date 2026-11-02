@@ -1,4 +1,5 @@
 import type { View } from '../api';
+import { SourceCard } from '../ui/Bubbles';
 
 export type Find = View['finds'][number];
 
@@ -10,10 +11,21 @@ export function FindCard({ f }: { f: Find }) {
       : f.type === 'statement'
         ? { icon: '💬', label: 'Aussage', note: 'Das kann falsch sein.' }
         : { icon: '🎒', label: 'Gegenstand', note: '' };
+  const doc = f.source.document;
   const who = f.type === 'statement' ? `${f.npc ?? 'Jemand'}: ` : '';
   const src = [f.source.npc, f.source.room, f.source.day ? `Tag ${f.source.day}` : '']
     .filter(Boolean)
     .join(', ');
+  if (doc)
+    return (
+      <details className={`find ${f.type}`}>
+        <summary>
+          <span aria-hidden="true">📄</span> <strong>{doc.title}</strong>{' '}
+          <span className="small">({src})</span>
+        </summary>
+        <SourceCard s={f.source} text={f.text} />
+      </details>
+    );
   return (
     <article className={`find ${f.type}`}>
       <p className="kind">

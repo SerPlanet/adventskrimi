@@ -42,6 +42,7 @@ export interface PlayerState {
   /** day being played; 25 = all days finished */
   day: number;
   room: string;
+  /** unused since WP06c (no action budget); kept so saved states still load */
   actionsUsed: number;
   /** player did something that counts as "played" on the current day */
   started: boolean;
@@ -125,11 +126,6 @@ export function normalizeState(raw: PlayerState): PlayerState {
     questions: s.questions ?? {},
     daily: s.daily ?? {},
   };
-}
-
-export function budgetFor(profile: Profile, day: number): number {
-  const prolog = profile.actions_per_day.prolog as Record<number, number>;
-  return prolog[day] ?? profile.actions_per_day.default;
 }
 
 /** Appends a ledger entry. Idempotent per (kind, ref); points are never negative. */

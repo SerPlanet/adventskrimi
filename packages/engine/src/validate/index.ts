@@ -10,6 +10,7 @@ import {
   checkRiddle,
   checkUnique,
 } from './content';
+import { checkExplore } from './explore';
 import { checkTempo, checkTexts } from './texts';
 import { checkTruth } from './truth';
 import { CHECK_NAMES, type CheckName, type CheckResult } from './types';
@@ -38,6 +39,7 @@ export function runChecks(
     minimums: () => checkMinimums(info, quality),
     texts: () => checkTexts(info, quality),
     tempo: () => checkTempo(info, quality),
+    explore: () => checkExplore(info),
   };
   return CHECK_NAMES.filter((n) => !only || n === only).map((n) => all[n]());
 }

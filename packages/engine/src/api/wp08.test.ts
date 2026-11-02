@@ -215,3 +215,17 @@ describe('players saved by an older version', () => {
     }
   });
 });
+
+describe('links (Verknüpfen)', () => {
+  test('visible only with both finds, points once, never in the first view without them', async () => {
+    expect(out(await call('state', {})).state.links).toEqual([]);
+    expect((await call('link', { link_id: 'l_cora' })).status).toBe(400);
+    patch(() => ({ found: ['f_cora_keller', 's_cora_halle'] }));
+    const v = out(await call('state', {})).state;
+    expect(v.links).toEqual([expect.objectContaining({ id: 'l_cora', done: false })]);
+    const r = out(await call('link', { link_id: 'l_cora' }));
+    expect(r.state.points).toBe(scoring.link);
+    expect(r.state.links[0].done).toBe(true);
+    expect(out(await call('link', { link_id: 'l_cora' })).state.points).toBe(scoring.link);
+  });
+});

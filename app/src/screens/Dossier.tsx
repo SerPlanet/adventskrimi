@@ -35,7 +35,7 @@ function Select(props: {
 
 /** Akte: all finds with filters and search, inventory, and the hotel book (finds by day). */
 export function Dossier() {
-  const { view } = useSession();
+  const { view, link, busy } = useSession();
   const [tab, setTab] = useState<Tab>('funde');
   const [flt, setFlt] = useState<FindFilter>(emptyFilter);
   const finds = useMemo(() => view?.finds ?? [], [view?.finds]);
@@ -63,6 +63,23 @@ export function Dossier() {
 
       {tab === 'funde' && (
         <section role="tabpanel" aria-label="Funde">
+          {(view?.links ?? []).length > 0 && (
+            <div className="card">
+              <h2>Das erinnert dich an …</h2>
+              {view?.links.map((l) => (
+                <div key={l.id} className="row between">
+                  <span>{l.text}</span>
+                  {l.done ? (
+                    <span>✓ verknüpft</span>
+                  ) : (
+                    <button disabled={busy} onClick={() => void link(l.id)}>
+                      Verknüpfen
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
           <div className="filters">
             <label>
               Suche

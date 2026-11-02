@@ -163,6 +163,7 @@ export const Requests = {
   scoreboard: z.object({ slug: Slug, player_id: PlayerId }),
   newspaper: z.object({ slug: Slug, player_id: PlayerId, day: z.number().int().min(1).max(24) }),
   settings: z.object({ slug: Slug, player_id: PlayerId, settings: SettingsSchema }),
+  link: z.object({ slug: Slug, player_id: PlayerId, link_id: Id }),
   get_theory: z.object({ slug: Slug, player_id: PlayerId }),
   set_theory: z.object({
     slug: Slug,

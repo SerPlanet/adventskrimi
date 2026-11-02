@@ -1,6 +1,6 @@
 import { normalize } from '../puzzles';
 import type { Source } from '../schemas';
-import { addLedger, budgetFor, type GameCtx, type PlayerState } from './state';
+import { addLedger, type GameCtx, type PlayerState } from './state';
 
 export type Action =
   | { type: 'talk'; npc: string; topic: string }
@@ -16,14 +16,13 @@ export type ActionResult =
       plaques: { sourceId: string; title: string }[];
       points: number;
     }
-  | { status: 'empty' | 'known' | 'locked' | 'unavailable' | 'no_budget'; message: string };
+  | { status: 'empty' | 'known' | 'locked' | 'unavailable'; message: string };
 
 const MSG = {
   empty: 'Dazu gibt es nichts zu holen.',
   known: 'Das weißt du schon.',
   locked: 'Hier ist etwas verschlossen. Vielleicht hilft ein Rätsel oder ein Gegenstand.',
   unavailable: 'Das geht hier und heute nicht.',
-  no_budget: 'Für heute sind deine Aktionen aufgebraucht.',
 } as const;
 
 const fail = (status: keyof typeof MSG, st: PlayerState) => ({
@@ -68,7 +67,7 @@ function unlocked(s: Source, st: PlayerState, ctx: GameCtx): boolean {
   return st.inventory.includes(s.requires);
 }
 
-/** Pure: returns the new state and what happened. Only actions with a new find use up budget. */
+/** Pure: returns the new state and what happened. Exploring is free (02b); only new finds change anything. */
 export function resolveAction(
   st: PlayerState,
   ctx: GameCtx,
@@ -86,13 +85,11 @@ export function resolveAction(
 
   const newItems = [...new Set(open.flatMap((s) => s.yields))].filter((y) => !st.found.includes(y));
   if (!newItems.length) return fail('known', st);
-  if (st.actionsUsed >= budgetFor(ctx.profile, st.day)) return fail('no_budget', st);
 
   const gaining = open.filter((s) => s.yields.some((y) => newItems.includes(y)));
   const itemIds = new Set(ctx.c.puzzles.items.map((i) => i.id));
   let next: PlayerState = {
     ...st,
-    actionsUsed: st.actionsUsed + 1,
     started: true,
     found: [...st.found, ...newItems],
     inventory: [...st.inventory, ...newItems.filter((i) => itemIds.has(i))],
