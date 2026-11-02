@@ -126,7 +126,9 @@ export function checkRefs(c: LoadedCase): string[] {
     if (s.object) need('sources.yaml', s.id, objects, s.object, 'object');
     if (s.requires && !items.has(s.requires) && !puzzles.has(s.requires))
       errs.push(`sources.yaml: ${s.id}: unknown requires "${s.requires}"`);
-    for (const y of s.yields) need('sources.yaml', s.id, factIds, y, 'fact/statement');
+    // a source may also hand out an inventory item
+    for (const y of s.yields)
+      if (!items.has(y)) need('sources.yaml', s.id, factIds, y, 'fact/statement/item');
   }
   for (const p of c.puzzles.puzzles) {
     need('puzzles.yaml', p.id, rooms, p.room, 'room');

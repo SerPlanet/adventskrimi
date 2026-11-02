@@ -27,7 +27,7 @@ describe('loadCase', () => {
     expect(res.ok).toBe(false);
     if (!res.ok)
       expect(res.errors.join('\n')).toContain(
-        'sources.yaml: src_anna: unknown fact/statement "f_gibt_es_nicht"',
+        'sources.yaml: src_anna: unknown fact/statement/item "f_gibt_es_nicht"',
       );
   });
 

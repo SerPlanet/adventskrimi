@@ -1,18 +1,19 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-02 · Phase: WP02 fertig, WP03 als Nächstes. Mensch-Schritte (Prod-Migration, Pages) offen
+Stand: 2026-11-02 · Phase: WP03 fertig, WP05 als Nächstes, WP10 (Sub-Agent) läuft. Mensch: Prod-Migration, Pages
 
 ## Nächstes Work Package
-**WP03** → `docs/wp/WP03-engine.md`
+**WP05** → `docs/wp/WP05-backend.md` (WP10 läuft als Sub-Agent)
 
 Reihenfolge (Details: `docs/08-roadmap.md`):
-WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 → (WP10 als Sub-Agent parallel) → WP05 → WP06 → WP07 → WP09 → **M1** → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
+WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 als Sub-Agent parallel) → WP05 → WP06 → WP07 → WP09 → **M1** → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
 
 ## Erledigt
 - Doku v0.1 (Spielregeln, Punkte, Architektur, Roadmap)
 - WP00: Workspaces, TS strict, ESLint/Prettier/Vitest, Hello-App, check-bundle-Stub, CI + Pages-Workflow, Supabase-Config + leere Migration. `npm run lint && npm test && npm run build` grün.
 - WP01: Zod-Schemas, Loader mit Referenzprüfung, Migration (27 Tabellen, RLS gesperrt), `load-case`, `validate-schema`, Testfall `cases/_test`, Configs. Auf Staging angewendet und geladen.
 - WP02: Solver (Kandidatenraum, Fakt-Auswertung, Tempo-Planer), Profilanwendung, Validator `npm run validate-case -- <fall> --profile <p> [--only <check>]` mit 9 Prüfungen, Mini-Fall-Tests. `_test` besteht beide Profile.
+- WP03: Engine-Kern `packages/engine/src/game/` (Aktionen, Bewegung, Tage/Gnadenfrist, Punkte, Zeugnis, Anklage, Widersprüche). Vollständiger 24-Tage-Lauf auf `_test` als Test.
 
 ## In Arbeit
 - –

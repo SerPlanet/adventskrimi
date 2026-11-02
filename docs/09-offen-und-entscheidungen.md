@@ -51,3 +51,5 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D31 | Widerlegbarkeit: direkter Positionskonflikt mit einem erreichbaren Fakt ODER Widerspruch zur aus allen erreichbaren Funden folgenden Lösung |
 | D32 | Tempo-Planer ist ein Beam-Search (greedy je Raum) und damit eine Heuristik: „zu früh lösbar“ ist verlässlich, „zu spät“ kann pessimistisch sein. Zeitung ist kostenlos, Rätselräume lösen das Rätsel ohne Aktion, Gegenstände (`requires` auf Item) gelten als erfüllt |
 | D33 | Neue optionale Felder `red_herring`, `reinterpreted_on` an Fakten/Aussagen für die Mindestmengen. Fallweise Qualitäts-Overrides in `<fall>/quality.override.json` (nur `_test`) |
+| D34 | WP03: Engine ist reiner Zustand (`PlayerState`) + `GameCtx`; Funktionen geben neuen Zustand zurück. Quellen dürfen auch Gegenstände (`items`) in `yields` liefern. Zeitung ist gratis und zählt nicht als gespielter Tag; Hotelbuch ist eine normale Aktion |
+| D35 | Erstentdecker entscheidet der Server (Unique-Insert), die Engine liefert nur Plaketten-Kandidaten und bucht Punkte. Frühanklage-Bonus bekommt nur, wem der Aufrufer `earlyDay` (aus `isOnTime`) übergibt |

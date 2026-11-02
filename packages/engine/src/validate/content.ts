@@ -1,6 +1,7 @@
 import { andInto, count, maskOf } from '../solver/space';
 import { combine, reachableItems, type Info } from '../solver/info';
-import { expandDays, type FactBody, type Quality } from '../schemas';
+import { conflicts } from '../solver/conflict';
+import { expandDays, type Quality } from '../schemas';
 import type { CheckResult } from './types';
 
 export function checkUnique(info: Info): CheckResult {
@@ -55,15 +56,6 @@ export function checkRiddle(info: Info): CheckResult {
     .filter((id) => waysTo(info, id, true) === 0)
     .map((id) => `key item ${id}: only reachable through an object puzzle`);
   return { name: 'riddle', ok: errors.length === 0, errors };
-}
-
-/** Direct position conflict between a claim and a fact (same person + window). */
-function conflicts(a: FactBody, b: FactBody): boolean {
-  const pa = a.type === 'presence' || a.type === 'absence';
-  const pb = b.type === 'presence' || b.type === 'absence';
-  if (!pa || !pb || a.person !== b.person || a.window !== b.window) return false;
-  if (a.type === 'presence' && b.type === 'presence') return a.room !== b.room;
-  return a.room === b.room && a.type !== b.type;
 }
 
 /** false statement id -> refuting reason (undefined = not refutable) */
