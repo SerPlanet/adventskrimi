@@ -48,3 +48,10 @@ Warm-winterlich (Holz, Schnee, Kerzenlicht), ruhige Animationen (≤300 ms, absc
 
 ## Fehlerverhalten
 Offline/Server-Fehler: freundliche Meldung („Das Hotel ist gerade nicht erreichbar, versuche es gleich noch einmal.“), nichts geht verloren. Aktionen sind idempotent (siehe `06`).
+
+## Redesign (WP06b)
+- **Hotel** ist ein Querschnitt-Raster aller Räume mit Markern (Person, auffällig, erreichbar, du). **Raum** ist eine Szene mit antippbaren Hotspots; jeder Hotspot steht zusätzlich in einer Liste „Was gibt es hier?“.
+- **Popups:** Dialog (Sprechblasen + Themen-Chips), Notiz (Zettel mit Absender/Empfänger), Gegenstand, Atmosphäre. ≤60 Wörter, Fokus-Falle, Esc/Schließen-Knopf, Fokus kehrt zurück.
+- **Aktionen** als drei Kerzen (mit Text-Alternative). Tag beenden über die Karte.
+- **Zeitung** im Zeitungslayout, mobil einspaltig.
+- Nie nur durch Tippen auf Bildbereiche bedienbar: Liste und Tastatur sind Pflicht.

@@ -46,6 +46,8 @@ Regeln:
 - Atmosphäre-Objekte kosten nie eine Aktion (siehe `02`, §5).
 - Quellen am selben Ort an verschiedenen Tagen dürfen unterschiedliche Funde liefern (Tagesplan).
 
+Präsentation (optional, für das UI-Redesign `WP06b`): `presentation` = `dialog` (mit `lines`: Liste aus `speaker` + `text`), `note` (mit `note: {from, to, text}`, z. B. ein Zettel), `object` (Gegenstandskarte) oder `ambient` (Atmosphäre ohne Fund). Der gesamte Popup-Text einer Quelle ≤60 Wörter. Räume erhalten `floor`, `col`, `scene` und `objects[].spot {x,y}` für Karte und Szene.
+
 ## 6. Aussagen und Lügen
 Aussage: `id`, `npc`, `text`, `claims` (Fakt-ähnlich), `truth: true|false`. NPCs dürfen lügen, aber:
 - Jede falsche Aussage muss durch mindestens einen erreichbaren Fakt widerlegbar sein (Validator prüft).
