@@ -6,7 +6,7 @@ Stand: 2026-11-02 · Phase: WP02 fertig, WP03 als Nächstes. Mensch-Schritte (Pr
 **WP03** → `docs/wp/WP03-engine.md`
 
 Reihenfolge (Details: `docs/08-roadmap.md`):
-WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 → WP03 → (WP10 als Sub-Agent parallel) → WP05 → WP06 → WP07 → WP09 → **M1** → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
+WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 → (WP10 als Sub-Agent parallel) → WP05 → WP06 → WP07 → WP09 → **M1** → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
 
 ## Erledigt
 - Doku v0.1 (Spielregeln, Punkte, Architektur, Roadmap)
