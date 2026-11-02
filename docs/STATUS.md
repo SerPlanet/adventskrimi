@@ -1,12 +1,12 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-02 · Phase: WP07 fertig, WP09 als Nächstes (dann M1). Mensch: Prod-Migration, Pages, Namen
+Stand: 2026-11-02 · Phase: M1 auf Staging spielbar (Link `/#/test`). Offen für Prod-M1: Pages einschalten, Prod migrieren. Mensch: siehe unten
 
 ## Nächstes Work Package
-**WP09** → `docs/wp/WP09-wertung.md`
+**M1 erreicht (bis auf Prod-URL).** Danach: WP09 Teil 2 + WP08 → `docs/wp/WP08-raster-zeitstrahl.md`
 
 Reihenfolge (Details: `docs/08-roadmap.md`):
-WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → WP06 ✓ → WP07 ✓ → WP09 → **M1** → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
+WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → WP06 ✓ → WP07 ✓ → WP09 (Teil 1 ✓) → **M1** ✓ → WP08 → WP04 → WP11 → WP12 → WP13 → WP14
 
 ## Erledigt
 - Doku v0.1 (Spielregeln, Punkte, Architektur, Roadmap)
@@ -17,6 +17,7 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → 
 - WP05: Edge Functions (state, open_day, act, end_day, answer_daily, scoreboard, newspaper, settings, admin_players) auf Staging, Integrationstests grün. Spieler anlegen: `admin_players`; Spiel anlegen: `npm run create-game`.
 - WP06: Frontend-Kern (Namenswahl per Link `/#/<slug>`, Zeitung, Hotel, Akte, Rangliste, Einstellungen, Page). Playwright-Smoke grün, Lighthouse-A11y 100 auf allen Screens, kein Überlauf bei 360 px und Schrift „sehr groß“.
 - WP07: Rätsel des Tages (4 Arten × 3 Stufen, deterministisch, serverseitig geprüft, Tipp-Leiter, Überspringen) und Objekt-Rätsel (Endpunkt `object_puzzle`). Playwright-Smoke deckt beide ab, Lighthouse 100.
+- WP09 Teil 1: Rangliste mit Plaketten-Sammlung, „Meine Punkte“ (Aufschlüsselung), Ermittler des Tages in der Zeitung.
 - WP10: Fall Berghotel (lokal, per .gitignore nicht im Repo) und Familienprofil; `validate-case` grün für friends und family, Tempo Tag 20. Noch offen: `npm run balance` (WP04), Namen in `insider.yaml`.
 
 ## In Arbeit

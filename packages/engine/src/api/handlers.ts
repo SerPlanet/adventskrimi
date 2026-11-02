@@ -190,6 +190,7 @@ export const handlers = {
         avatar: r.avatar,
         points: r.points,
         plaques: r.plaques,
+        plaque_titles: r.plaqueTitles,
         rank: rankOf(r.points, ranks),
         is_you: r.playerId === tx.player.id,
       }));

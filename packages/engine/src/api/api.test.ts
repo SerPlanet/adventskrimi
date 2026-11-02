@@ -420,3 +420,33 @@ describe('object puzzle', () => {
     expect(t3).toBe('123');
   });
 });
+
+describe('ranking and my points', () => {
+  test('breakdown adds up to the points and never has a negative entry', async () => {
+    await call('answer_daily', { slug: 'test', player_id: a, request_id: rid(), option_id: 'b' });
+    await call('act', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      action: { type: 'inspect', object: 'lampe' },
+    });
+    const s = bodyOf(await call('state', { slug: 'test', player_id: a })).state;
+    const sum = s.breakdown.reduce((n: number, b: { points: number }) => n + b.points, 0);
+    expect(sum).toBe(s.points);
+    expect(s.breakdown.every((b: { points: number }) => b.points > 0)).toBe(true);
+    expect(s.breakdown.map((b: { kind: string }) => b.kind)).toContain('plaque');
+  });
+
+  test('the plaque collection is public in the ranking, without places or contents', async () => {
+    await call('act', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      action: { type: 'inspect', object: 'lampe' },
+    });
+    const rows = bodyOf(await call('scoreboard', { slug: 'test', player_id: b })).rows;
+    const anna = rows.find((r: { name: string }) => r.name === 'Anna-Spielerin');
+    expect(anna.plaque_titles).toEqual(['Sehr aufmerksam']);
+    expect(rows.find((r: { is_you: boolean }) => r.is_you).plaque_titles).toEqual([]);
+  });
+});

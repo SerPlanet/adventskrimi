@@ -64,6 +64,8 @@ export interface ScoreRow {
   avatar: string | null;
   points: number;
   plaques: number;
+  /** public plaque collection */
+  plaqueTitles: string[];
 }
 
 /** Read access to one game. Everything the handlers need beyond the player itself. */

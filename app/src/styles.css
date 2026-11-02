@@ -421,3 +421,17 @@ fieldset {
   font-weight: 700;
   background: var(--card);
 }
+
+.rank .titles {
+  grid-column: 3 / -1;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+ul.plain {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0;
+}
+ul.plain li {
+  padding: 0.2rem 0;
+}

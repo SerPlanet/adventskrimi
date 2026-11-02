@@ -74,6 +74,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     finished: st.day > 24,
     actions: { used: st.actionsUsed, budget: budgetFor(profile, Math.min(st.day, 24)) },
     points: totalPoints(st),
+    breakdown: breakdown(st),
     rank: rankOf(totalPoints(st), scoring),
     room: room && {
       id: room.id,
@@ -139,6 +140,29 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     theory: st.theory,
     newspaper_days: Math.max(0, Math.min(24, today)),
   };
+}
+
+const LABELS: Record<string, string> = {
+  day_played: 'Tag gespielt',
+  find: 'Neue Funde',
+  question: 'Frage des Tages',
+  puzzle: 'Rätsel des Tages',
+  plaque: 'Plaketten (Erste/r)',
+  mini_case: 'Stollen-Übungsfall',
+  report_card: 'Wochenzeugnis',
+  finale: 'Anklage',
+  proof: 'Beweisfragen',
+  early_accusation: 'Frühanklage-Bonus',
+};
+
+/** Where the points came from, grouped by source (the "Meine Punkte" list). */
+export function breakdown(st: PlayerState) {
+  const by = new Map<string, { points: number; count: number }>();
+  for (const l of st.ledger) {
+    const e = by.get(l.kind) ?? { points: 0, count: 0 };
+    by.set(l.kind, { points: e.points + l.points, count: e.count + 1 });
+  }
+  return [...by].map(([kind, v]) => ({ kind, label: LABELS[kind] ?? kind, ...v }));
 }
 
 const startSalt = (tx: GameTx) => tx.game.slug;

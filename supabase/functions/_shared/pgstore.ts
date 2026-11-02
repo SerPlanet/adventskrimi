@@ -133,7 +133,8 @@ function gameTx(sql: Sql | Q, game: GameRecord, base: Sql): GameTx {
       const rows = await sql`
         select p.id, p.name, p.avatar,
                coalesce((select sum(points) from score_ledger l where l.player_id = p.id), 0)::int as points,
-               (select count(*) from plaques x where x.player_id = p.id)::int as plaques
+               (select count(*) from plaques x where x.player_id = p.id)::int as plaques,
+               coalesce((select array_agg(x.title order by x.ts) from plaques x where x.player_id = p.id), '{}') as titles
         from players p where p.game_id = ${game.id}`;
       return rows.map((r) => ({
         playerId: r.id,
@@ -141,6 +142,7 @@ function gameTx(sql: Sql | Q, game: GameRecord, base: Sql): GameTx {
         avatar: r.avatar,
         points: r.points,
         plaques: r.plaques,
+        plaqueTitles: r.titles as string[],
       }));
     },
     async newspaper(day) {

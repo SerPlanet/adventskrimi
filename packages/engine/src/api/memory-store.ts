@@ -51,6 +51,9 @@ export class MemoryStore implements Store {
           avatar: p.avatar,
           points: totalPoints(p.state),
           plaques: [...self.plaques.values()].filter((x) => x.playerId === p.id).length,
+          plaqueTitles: [...self.plaques.values()]
+            .filter((x) => x.playerId === p.id)
+            .map((x) => x.title),
         }));
       },
       async newspaper(day) {

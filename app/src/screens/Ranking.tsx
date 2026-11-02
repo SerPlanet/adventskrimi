@@ -7,6 +7,7 @@ interface Row {
   avatar: string | null;
   points: number;
   plaques: number;
+  plaque_titles: string[];
   rank: string;
   is_you: boolean;
 }
@@ -54,10 +55,40 @@ export function Ranking() {
               <span className="pts">
                 {r.points} Punkte{r.plaques > 0 ? ` · 🏅 ${r.plaques}` : ''}
               </span>
+              {r.plaque_titles.length > 0 && (
+                <span className="titles">Plaketten: {r.plaque_titles.join(', ')}</span>
+              )}
             </li>
           ))}
         </ol>
       )}
+      <MyPoints />
     </>
+  );
+}
+
+/** "Meine Punkte": where the points came from. */
+function MyPoints() {
+  const { view } = useSession();
+  if (!view) return null;
+  return (
+    <section className="card" aria-labelledby="mp">
+      <h2 id="mp">Meine Punkte: {view.points}</h2>
+      {view.breakdown.length === 0 ? (
+        <p>Noch keine Punkte. Sie kommen beim Spielen von allein.</p>
+      ) : (
+        <ul className="plain">
+          {view.breakdown.map((b) => (
+            <li key={b.kind}>
+              {b.label}: <strong>{b.points}</strong>
+              {b.count > 1 ? <small> ({b.count}×)</small> : null}
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="small">
+        Es gibt nie Minuspunkte. Ein Tipp halbiert nur die Punkte dieser einen Sache.
+      </p>
+    </section>
   );
 }
