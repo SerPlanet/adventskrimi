@@ -5,6 +5,7 @@ import { parse } from 'yaml';
 import type { z } from 'zod';
 import * as S from './schemas';
 import { checkRefs } from './refs';
+import { NamesFile, type Names } from './names';
 
 export const CASE_FILES = {
   case: ['case.yaml', S.CaseFile],
@@ -64,3 +65,16 @@ function loadConfigFile<T>(path: string, schema: z.ZodType<T>): T {
 export const loadProfile = (path: string) => loadConfigFile(path, S.Profile);
 export const loadScoring = (path: string) => loadConfigFile(path, S.Scoring);
 export const loadQuality = (path: string) => loadConfigFile(path, S.Quality);
+
+/** Reads `names:` from an insider.yaml; missing file or empty template = no renames. */
+export function loadNames(path: string): Names {
+  let text: string;
+  try {
+    text = readFileSync(path, 'utf8');
+  } catch {
+    return {};
+  }
+  const res = NamesFile.safeParse(parse(text) ?? {});
+  if (!res.success) throw new Error(formatIssues(path, res.error).join('\n'));
+  return res.data.names;
+}

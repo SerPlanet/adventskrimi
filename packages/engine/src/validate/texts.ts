@@ -1,4 +1,5 @@
 import type { Info } from '../solver/info';
+import { placeholderErrors } from '../names';
 import { wordCount, type Quality } from '../schemas';
 import { planTempo, profileBudget } from '../solver/planner';
 import type { CheckResult } from './types';
@@ -55,6 +56,9 @@ export function checkTexts(info: Info, q: Quality): CheckResult {
     const hit = names.find((n) => text.toLowerCase().includes(n));
     if (hit) errors.push(`${where}: names "${hit}" (spoiler)`);
   }
+  errors.push(...placeholderErrors(c));
+  for (const [where, text] of spoilerTexts)
+    if (text.includes('{')) errors.push(`${where}: contains a name placeholder (spoiler)`);
   return { name: 'texts', ok: errors.length === 0, errors };
 }
 

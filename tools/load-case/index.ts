@@ -3,7 +3,8 @@
 // Connection: pooler URL from `supabase link` (supabase/.temp/pooler-url) + password from .env.
 import { existsSync, readFileSync } from 'node:fs';
 import pg from 'pg';
-import { loadCase } from '../../packages/engine/src/loader';
+import { loadCase, loadNames } from '../../packages/engine/src/loader';
+import { renameCase } from '../../packages/engine/src/names';
 
 const args = process.argv.slice(2);
 const dir = args.find((a) => !a.startsWith('--'));
@@ -19,7 +20,8 @@ if (!res.ok) {
   res.errors.slice(0, 10).forEach((e) => console.error('  ' + e));
   process.exit(1);
 }
-const c = res.data;
+const names = loadNames(`${dir}/insider.yaml`);
+const c = Object.keys(names).length ? renameCase(res.data, names) : res.data;
 if (envName === 'prod' && c.case.id === 'test') {
   console.error('✗ refusing to load the test case into prod');
   process.exit(1);
