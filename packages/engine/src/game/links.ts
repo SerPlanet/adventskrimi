@@ -2,7 +2,7 @@ import { addLedger, type GameCtx, type PlayerState } from './state';
 
 /** Links whose two finds the player has both. The hint says what it reminds of, never a verdict. */
 export function linksOf(st: PlayerState, ctx: GameCtx) {
-  return ctx.c.case.links
+  return (ctx.c.case.links ?? [])
     .filter((l) => st.found.includes(l.a) && st.found.includes(l.b))
     .map((l) => ({
       id: l.id,

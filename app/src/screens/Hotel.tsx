@@ -7,6 +7,7 @@ import { Popup } from '../ui/Popup';
 import { HotelMap } from '../ui/HotelMap';
 import { RoomScene, spotsOf, type Spot } from '../ui/RoomScene';
 import { SourceCard } from '../ui/Bubbles';
+import { Prop } from '../ui/props';
 
 type Open =
   | { kind: 'spot'; spot: Spot }
@@ -166,6 +167,10 @@ export function Hotel() {
       )}
       {open?.kind === 'spot' && obj && (
         <Popup title={obj.name} onClose={close}>
+          <Prop className="closeup" name={obj.name} prop={obj.prop} open={obj.explored} />
+          <p className="small">
+            {obj.explored ? 'Du hast es genau untersucht.' : 'Du siehst es dir an.'}
+          </p>
           <p>{obj.text}</p>
           <button
             disabled={!play || busy}

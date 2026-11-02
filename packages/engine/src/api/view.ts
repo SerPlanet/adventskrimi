@@ -101,6 +101,11 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
         text: o.text,
         auffaellig: o.auffaellig,
         spot: o.spot,
+        prop: o.prop,
+        // state of the thing: opened once everything its inspect sources hold has been found
+        explored: c.sources.sources
+          .filter((x) => x.kind === 'inspect' && x.object === o.id)
+          .some((x) => x.yields.length > 0 && x.yields.every((y) => st.found.includes(y))),
       })),
       npcs: blockedToday
         ? []

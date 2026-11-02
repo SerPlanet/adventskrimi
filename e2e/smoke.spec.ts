@@ -135,6 +135,8 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  // WP06d: the chest is drawn as a prop and now shows its open state
+  await expect(page.locator('.scene svg[data-prop="truhe"][data-state="auf"]')).toBeVisible();
 
   // no horizontal scrolling at 360 px, also with the biggest font
   const overflow = () =>
