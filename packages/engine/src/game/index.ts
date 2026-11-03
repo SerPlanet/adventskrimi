@@ -1,6 +1,7 @@
 export * from './state';
 export * from './days';
 export * from './actions';
+export * from './dialog';
 export * from './budget';
 export * from './things';
 export * from './narrative';

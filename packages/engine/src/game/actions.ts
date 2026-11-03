@@ -61,6 +61,17 @@ function targetHere(a: Action, st: PlayerState, ctx: GameCtx): boolean {
   return room ? room === st.room : npcAt(target) === st.room;
 }
 
+/** Sources of an action that exist in the player's room today (open or still locked). */
+export function hereSources(st: PlayerState, ctx: GameCtx, a: Action): Source[] {
+  return ctx.c.sources.sources.filter(
+    (s) => matches(s, a) && [st.room, '*'].includes(ctx.reach.roomOn(s.id, st.day) ?? ''),
+  );
+}
+
+/** The sources of an action the player can use right now. */
+export const openSources = (st: PlayerState, ctx: GameCtx, a: Action): Source[] =>
+  hereSources(st, ctx, a).filter((s) => unlocked(s, st, ctx));
+
 /** A source is unlocked if its puzzle is solved (inspect/talk) or its item is carried (use). */
 function unlocked(s: Source, st: PlayerState, ctx: GameCtx): boolean {
   if (!s.requires) return true;
@@ -78,9 +89,7 @@ export function resolveAction(
   if (st.day > 24) return fail('unavailable', st);
   if (!targetHere(a, st, ctx)) return fail('unavailable', st);
 
-  const here = ctx.c.sources.sources.filter(
-    (s) => matches(s, a) && [st.room, '*'].includes(ctx.reach.roomOn(s.id, st.day) ?? ''),
-  );
+  const here = hereSources(st, ctx, a);
   if (!here.length) return fail('empty', st);
   const open = here.filter((s) => unlocked(s, st, ctx));
   if (!open.length) return fail('locked', st);

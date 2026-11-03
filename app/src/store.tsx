@@ -21,6 +21,8 @@ export interface ActResult {
   message?: string;
   new_items?: string[];
   points?: number;
+  /** the bubbles of a conversation and the finds they hold (02c §6) */
+  answer?: { lines: { speaker: string; text: string }[]; finds: string[] };
 }
 
 interface Session {

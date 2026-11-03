@@ -545,3 +545,23 @@ ul.plain li {
   font-size: 1.2rem;
   line-height: 1.7;
 }
+
+.dialog {
+  display: grid;
+  gap: 0.8rem;
+}
+.dialog .figure {
+  text-align: center;
+}
+.dialog .figure svg {
+  width: 4.5rem;
+  height: 7.5rem;
+}
+.dialog .exchange {
+  margin-bottom: 0.8rem;
+}
+@media (min-width: 600px) {
+  .dialog {
+    grid-template-columns: 7rem 1fr;
+  }
+}

@@ -23,6 +23,7 @@ import {
   isOnTime,
   makeCtx,
   setMark,
+  answerOf,
   fileArticle,
   fileFind,
   unfile,
@@ -122,10 +123,12 @@ export const handlers = {
         }
       }
       if (next !== tx.player.state) await tx.save(next);
+      // every question gets an answer, also "Dazu weiß ich nichts." (02c §6)
+      const answer = result.status === 'unavailable' ? undefined : answerOf(next, ctx, req.action);
       const out =
         result.status === 'found'
-          ? { status: 'found', new_items: result.newItems, points: result.points }
-          : { status: result.status, message: result.message };
+          ? { status: 'found', new_items: result.newItems, points: result.points, answer }
+          : { status: result.status, message: result.message, answer };
       return { result: out, plaque, state: view(tx, ctx, now, next) };
     });
   },

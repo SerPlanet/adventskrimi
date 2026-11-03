@@ -4,6 +4,7 @@ import { FindCard } from './FindCard';
 import { FileFind } from '../ui/file/FileButton';
 import { EndDay } from './EndDay';
 import { Popup } from '../ui/Popup';
+import { Dialog } from '../ui/Dialog';
 import { HotelPlan } from '../ui/HotelPlan';
 import { RoomScene, spotsOf, type Spot } from '../ui/RoomScene';
 import { SourceCard } from '../ui/Bubbles';
@@ -11,6 +12,7 @@ import { Prop } from '../ui/props';
 
 type Open =
   | { kind: 'spot'; spot: Spot }
+  | { kind: 'dialog'; npc: string }
   | { kind: 'found'; result: ActResult; plaque: string | null }
   | { kind: 'doc'; id: string }
   | { kind: 'night' };
@@ -103,14 +105,17 @@ export function Tag({ onNext }: { onNext: () => void }) {
   const onSpot = (s: Spot) => {
     setMsg('');
     setNote('');
-    if (armed) {
+    // a tap on a person starts the conversation at once; things open their close-up
+    if (s.kind === 'npc') {
+      setArmed(null);
+      setOpen({ kind: 'dialog', npc: s.id });
+    } else if (armed) {
       void run({ type: 'use', item: armed, target: s.id });
       setArmed(null);
     } else setOpen({ kind: 'spot', spot: s });
   };
 
   const close = () => setOpen(null);
-  const npc = open?.kind === 'spot' ? room?.npcs.find((n) => n.id === open.spot.id) : undefined;
   const obj = open?.kind === 'spot' ? room?.objects.find((o) => o.id === open.spot.id) : undefined;
   const newFinds =
     open?.kind === 'found' ? view.finds.filter((f) => open.result.new_items?.includes(f.id)) : [];
@@ -228,24 +233,7 @@ export function Tag({ onNext }: { onNext: () => void }) {
         </section>
       )}
 
-      {open?.kind === 'spot' && npc && (
-        <Popup title={npc.name} onClose={close}>
-          <p className="small">{npc.role}</p>
-          <p>Worüber willst du sprechen?</p>
-          <div className="row wrap">
-            {npc.topics.map((t) => (
-              <button
-                key={t.id}
-                className="chip"
-                disabled={!play || busy}
-                onClick={() => void run({ type: 'talk', npc: npc.id, topic: t.id })}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </Popup>
-      )}
+      {open?.kind === 'dialog' && <Dialog npcId={open.npc} play={play} onClose={close} />}
       {open?.kind === 'spot' && obj && (
         <Popup title={obj.name} onClose={close}>
           <Prop className="closeup" name={obj.name} prop={obj.prop} open={obj.explored} />

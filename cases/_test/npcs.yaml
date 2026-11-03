@@ -2,7 +2,7 @@ npcs:
   - id: anna
     name: Anna
     role: Hausdame
-    topics: [{ id: nacht, label: Die Nacht }]
+    topics: [{ id: nacht, label: Die Nacht }, { id: wetter, label: Das Wetter }]
     schedule: { 1: halle, 2: halle, 3: halle }
   - id: ben
     name: Ben

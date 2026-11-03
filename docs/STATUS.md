@@ -15,6 +15,9 @@ Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/
 
 - WP16: Akte nur mit Eingelegtem (`game/file.ts`, Endpunkte `file_add`/`file_remove`, Reiter Personen/Dokumente/Orte/Zeit/Raster/Verlauf), „In die Akte legen“ an Artikeln und Antworten, Zeitstrahl als Tabelle (`set_note` kind `cell`). Gelöscht: Verknüpfen, Déjà-vu, Notizstufen, `fits`, Widerspruchs-Markierung, `scoring.link`, `puzzle_level`. Zeitung liefert `articles` (Lead, Klatsch, Fall-Artikel).
 
+- WP17: Gespräche wie im Videospiel (`ui/Dialog.tsx`, `game/dialog.ts`): Tippen auf eine Person öffnet den Dialog, jede Frage hat eine Antwort („Dazu weiß ich nichts.“), Zeigen eines Gegenstands, „In die Akte legen“ je Antwort. Validator: jedes Thema hat eine Gesprächsquelle, Zeilen ≤60 Wörter.
+- WP19 (Sub-Agent): 72 Artikel (3 je Tag), `abgang`/`ankunft` je Raum, `morgen` je Tag, 3 Relationsfakten; Validator `paper` grün, `balance` grün, Lösetag 20.
+
 ## Offen im Inhalt (WP10b-Nacharbeit, später)
 - Je Raum/Tag mehr untersuchbare Funde als Aktionen nur in Salon, Küche, Lobby; Tage 1–5 haben fast keine Untersuchen-Funde, Dachboden erst ab Tag 20 (Grenzen und Bots neu kalibrieren, `docs/07`).
 - Namen in `insider.yaml`; Stichprobe der Dialogtexte lesen.

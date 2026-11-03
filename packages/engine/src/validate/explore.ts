@@ -39,8 +39,20 @@ export function checkExplore(info: Info, quality: Quality): CheckResult {
       if (words > 60) errors.push(`document ${s.id}: ${words} words`);
     }
 
+  // answers are speech bubbles: every line of a dialog stays short (02c §6)
+  for (const s of c.sources.sources)
+    for (const l of s.lines ?? [])
+      if (wordCount(l.text) > 60)
+        errors.push(`source ${s.id}: a line has ${wordCount(l.text)} words`);
+
   if (!quality.lie_web)
     return { name: 'explore', ok: errors.length === 0, errors, note: 'lie web off' };
+
+  // every topic of every figure has an answer somewhere (a talk source); elsewhere "Dazu weiß ich nichts."
+  for (const n of c.npcs.npcs)
+    for (const t of n.topics)
+      if (!c.sources.sources.some((s) => s.kind === 'talk' && s.npc === n.id && s.topic === t.id))
+        errors.push(`npc ${n.id}: topic ${t.id} has no answer`);
 
   // lie web: every figure keeps something back, with a reason; mentioned by at least two others
   const stmts = c.statements.statements;

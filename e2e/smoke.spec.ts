@@ -87,14 +87,19 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.locator('details.help summary').focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('details.help')).toHaveAttribute('open', '');
+  // a tap on a person starts the conversation at once; every question has an answer
+  await page.getByRole('button', { name: /Anna/ }).last().click();
+  await expect(page.getByRole('dialog', { name: /Gespräch mit Anna/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Das Wetter' }).click();
+  await expect(page.getByText('Dazu weiß ich nichts.')).toBeVisible();
+  await page.getByRole('button', { name: 'Schließen' }).click();
   // Anna's find already came with the newspaper, so only Cora's statement is new
   await page.getByRole('button', { name: /Cora/ }).last().click();
   await page
     .getByRole('dialog')
     .getByRole('button', { name: /Die Nacht/ })
     .click();
-  await expect(page.getByRole('heading', { name: 'Neu entdeckt' })).toBeVisible();
-  // dialog popup: speech bubbles, closed with the button
+  // dialog: speech bubbles, closed with the button
   await expect(page.locator('.bubble')).toHaveCount(2);
   // every answer can be put into the dossier on its own
   await page

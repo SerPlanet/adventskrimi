@@ -153,7 +153,7 @@ const SKINS = ['#f1c9a0', '#e0b088', '#c58f66', '#8a5a3c'];
 const pick = <T,>(xs: T[], n: number) => xs[n % xs.length] as T;
 
 /** A small figure: coat, hair and face differ by name, so people can be told apart. */
-function Person({ name }: { name: string }) {
+export function Person({ name }: { name: string }) {
   const h = hue(name);
   const hairStyle = h % 3;
   return (
