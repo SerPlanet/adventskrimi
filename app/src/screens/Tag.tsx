@@ -5,6 +5,7 @@ import { FileFind } from '../ui/file/FileButton';
 import { EndDay } from './EndDay';
 import { Popup } from '../ui/Popup';
 import { Dialog } from '../ui/Dialog';
+import { LockPanel } from '../ui/LockPanel';
 import { HotelPlan } from '../ui/HotelPlan';
 import { RoomScene, spotsOf, type Spot } from '../ui/RoomScene';
 import { SourceCard } from '../ui/Bubbles';
@@ -243,6 +244,7 @@ export function Tag({ onNext }: { onNext: () => void }) {
               : 'Du siehst es dir an. Das kostet nichts.'}
           </p>
           <p>{obj.text}</p>
+          {obj.lock && <LockPanel lock={obj.lock} play={play} />}
           {obj.klasse === 'ansehen' && (
             <p className="small">Hier gibt es etwas anzusehen, aber nichts zu untersuchen.</p>
           )}

@@ -63,6 +63,20 @@ export const Source = z.object({
   shows: Id.optional(),
   /** talk: points the player to this figure as a witness */
   witness_of: Id.optional(),
+  /**
+   * A lock in front of this source (02c §5): what the attempt says, where the way to it can be
+   * found (a room and thing, or deliberately nowhere) and how much waits behind it.
+   */
+  lock: z
+    .object({
+      versuchstext: CardText,
+      hinweis_quelle: z.union([
+        z.literal('ohne_hinweis'),
+        z.object({ room: Id, ding: Id.optional() }),
+      ]),
+      belohnung: z.enum(['wichtig', 'bedeutend']),
+    })
+    .optional(),
   presentation: z.enum(['dialog', 'note', 'object', 'ambient']).optional(),
   lines: z.array(z.object({ speaker: z.string().min(1), text: z.string().min(1) })).optional(),
   note: z

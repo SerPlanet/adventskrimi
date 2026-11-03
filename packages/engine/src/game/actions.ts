@@ -92,7 +92,28 @@ export function resolveAction(
   const here = hereSources(st, ctx, a);
   if (!here.length) return fail('empty', st);
   const open = here.filter((s) => unlocked(s, st, ctx));
-  if (!open.length) return fail('locked', st);
+  if (!open.length) {
+    // the attempt: the lock tells its text, and a puzzle lock shows its puzzle from now on
+    const lock = here[0]?.lock;
+    const pid = here
+      .map((s) => s.requires)
+      .find((r) => ctx.c.puzzles.puzzles.some((p) => p.id === r));
+    const prev = pid ? st.puzzles[pid] : undefined;
+    const state =
+      pid && !prev?.seen
+        ? {
+            ...st,
+            puzzles: {
+              ...st.puzzles,
+              [pid]: { attempts: 0, hints: 0, solved: false, ...prev, seen: true },
+            },
+          }
+        : st;
+    return {
+      state,
+      result: { status: 'locked' as const, message: lock?.versuchstext ?? MSG.locked },
+    };
+  }
 
   const newItems = [...new Set(open.flatMap((s) => s.yields))].filter((y) => !st.found.includes(y));
   if (!newItems.length) return fail('known', st);

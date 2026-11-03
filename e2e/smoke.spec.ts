@@ -194,15 +194,21 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: /Kiste/ }).last().click();
   await expect(page.getByText('Du siehst es dir an. Das kostet nichts.')).toBeVisible();
   await page.getByRole('button', { name: /Genauer untersuchen \(kostet 1 Aktion\)/ }).click();
-  await expect(page.getByText(/verschlossen/).first()).toBeVisible();
+  await expect(page.getByText(/Zahlenschloss/).first()).toBeVisible();
   // a locked chest brought nothing: no action spent
   await expect(page.locator('.bar .actions')).toContainText('(2/2)');
+  // the lock tells where its key can be found; its puzzle shows on the thing only after the try
+  await expect(page.getByText(/Zettel in der Halle/).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Das Schloss/ })).toBeVisible();
+  await page.getByLabel('Deine Antwort').fill('000');
+  await page.getByRole('button', { name: 'Ausprobieren' }).click();
+  await expect(page.getByText(/Das passt noch nicht/)).toBeVisible();
+  await page.getByLabel('Deine Antwort').fill('123');
+  await page.getByRole('button', { name: 'Ausprobieren' }).click();
+  await expect(
+    page.getByText(/Das Schloss springt auf|Das Schloss ist offen/).first(),
+  ).toBeVisible();
   await page.keyboard.press('Escape');
-  // (the lock itself comes back as a thing in the scene with WP18: open it for now)
-  const sql2 = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
-  await sql2`update players set state = jsonb_set(state, '{puzzles}', '{"p_code":{"solved":true,"hints":0,"attempts":1}}'::jsonb) where name = ${NAME}`;
-  await sql2.end();
-  await page.reload();
   await page.getByRole('button', { name: /Kiste/ }).last().click();
   await page.getByRole('button', { name: /Genauer untersuchen/ }).click();
   await expect(page.getByRole('heading', { name: 'Neu entdeckt' })).toBeVisible();

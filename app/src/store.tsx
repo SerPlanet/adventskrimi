@@ -46,6 +46,11 @@ interface Session {
     op: 'check' | 'hint' | 'skip',
     answer?: string,
   ): Promise<{ outcome?: string; hint?: string; solution?: boolean } | null>;
+  objectPuzzle(
+    id: string,
+    op: 'check' | 'hint',
+    answer?: string,
+  ): Promise<{ correct?: boolean; hint?: string } | null>;
   say(msg: string): void;
   setTheory(theory: Record<string, string | null>): Promise<boolean>;
   setNote(
@@ -170,6 +175,9 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
       },
       async daily(op, answer) {
         return run('daily_puzzle', { request_id: newRequestId(), op, answer });
+      },
+      async objectPuzzle(id, op, answer) {
+        return run('object_puzzle', { request_id: newRequestId(), puzzle_id: id, op, answer });
       },
       async setTheory(theory) {
         const r = await run('set_theory', { theory });

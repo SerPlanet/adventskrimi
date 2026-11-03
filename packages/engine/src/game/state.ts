@@ -36,6 +36,8 @@ export interface PuzzleProgress {
   attempts: number;
   hints: number;
   solved: boolean;
+  /** the player tried the lock: its puzzle is now shown on the thing */
+  seen?: boolean;
 }
 
 /** Everything the engine knows about one player. Plain data, no I/O. */

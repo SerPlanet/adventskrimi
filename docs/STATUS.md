@@ -18,6 +18,8 @@ Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/
 - WP17: Gespräche wie im Videospiel (`ui/Dialog.tsx`, `game/dialog.ts`): Tippen auf eine Person öffnet den Dialog, jede Frage hat eine Antwort („Dazu weiß ich nichts.“), Zeigen eines Gegenstands, „In die Akte legen“ je Antwort. Validator: jedes Thema hat eine Gesprächsquelle, Zeilen ≤60 Wörter.
 - WP19 (Sub-Agent): 72 Artikel (3 je Tag), `abgang`/`ankunft` je Raum, `morgen` je Tag, 3 Relationsfakten; Validator `paper` grün, `balance` grün, Lösetag 20.
 
+- WP18: Schlösser (`Source.lock`, `game/locks.ts`, `ui/LockPanel.tsx`): Versuch zeigt den Versuchstext mit Hinweis auf die Fundstelle, das Rätsel erscheint erst nach dem Versuch (kein „Rätsel im Raum“). Validator `locks` (Hinweis, Belohnung, Hälfte cross-room). 22 Schlösser im Berghotel (Sub-Agent), `balance` grün.
+
 ## Offen im Inhalt (WP10b-Nacharbeit, später)
 - Je Raum/Tag mehr untersuchbare Funde als Aktionen nur in Salon, Küche, Lobby; Tage 1–5 haben fast keine Untersuchen-Funde, Dachboden erst ab Tag 20 (Grenzen und Bots neu kalibrieren, `docs/07`).
 - Namen in `insider.yaml`; Stichprobe der Dialogtexte lesen.

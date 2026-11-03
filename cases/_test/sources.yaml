@@ -48,6 +48,12 @@ sources:
       object: kiste,
       days: [2, 3],
       requires: p_code,
+      lock:
+        {
+          versuchstext: Die Kiste hat ein Zahlenschloss. Auf dem Zettel in der Halle steht vielleicht die Zahl.,
+          hinweis_quelle: { room: halle, ding: lampe },
+          belohnung: wichtig,
+        },
       yields: [f_kiste_offen, f_ben_keller],
       presentation: note,
       document: { title: Zettel aus der Kiste, kind: zettel },

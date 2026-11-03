@@ -4,6 +4,7 @@ export * from './actions';
 export * from './dialog';
 export * from './budget';
 export * from './things';
+export * from './locks';
 export * from './narrative';
 export * from './movement';
 export * from './points';
