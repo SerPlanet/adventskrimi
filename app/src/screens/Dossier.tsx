@@ -47,6 +47,7 @@ export function Dossier() {
   const [tab, setTab] = useState<Tab>('personen');
   const [flt, setFlt] = useState<FindFilter>(emptyFilter);
   const [reading, setReading] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
   const all = useMemo(() => view?.finds ?? [], [view?.finds]);
   const opt = useMemo(() => options(all), [all]);
   const finds = useMemo(() => filterFinds(all, flt), [all, flt]);
@@ -55,6 +56,13 @@ export function Dossier() {
 
   const doc = all.find((f) => f.source.id === reading && f.source.document);
   const pocketed = view.documents.some((d) => d.id === reading);
+  const active = [
+    flt.q.trim(),
+    flt.type !== 'all' ? flt.type : '',
+    flt.person,
+    flt.room,
+    flt.day,
+  ].filter(Boolean).length;
   const filtered = tab === 'personen' || tab === 'dokumente' || tab === 'orte';
 
   return (
@@ -79,44 +87,60 @@ export function Dossier() {
       <div className="sheetfile" role="tabpanel" aria-label={TABS.find((t) => t[0] === tab)?.[1]}>
         {filtered && (
           <>
-            <div className="filters">
-              <label>
-                Suche
-                <input type="search" value={flt.q} onChange={(e) => set('q', e.target.value)} />
-              </label>
-              <label>
-                Art
-                <select
-                  value={flt.type}
-                  onChange={(e) => set('type', e.target.value as FindFilter['type'])}
-                >
-                  <option value="all">Alle</option>
-                  <option value="fact">Fakten</option>
-                  <option value="statement">Aussagen</option>
-                </select>
-              </label>
-              <Select
-                label="Person"
-                value={flt.person}
-                onChange={(v) => set('person', v)}
-                items={opt.persons}
-              />
-              <Select
-                label="Raum"
-                value={flt.room}
-                onChange={(v) => set('room', v)}
-                items={opt.rooms}
-              />
-              <Select
-                label="Tag"
-                value={flt.day}
-                onChange={(v) => set('day', v)}
-                items={opt.days}
-              />
-            </div>
-            <p role="status" className="small">
-              {finds.length} von {all.filter((f) => f.type !== 'item').length} Funden
+            <p className="row">
+              <button
+                aria-expanded={showFilters}
+                aria-controls="dossier-filters"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                🔍 Filter{active ? ` (${active} aktiv)` : ''} {showFilters ? '▴' : '▾'}
+              </button>
+              <span role="status" className="small">
+                {finds.length} von {all.filter((f) => f.type !== 'item').length} Funden
+              </span>
+              {active > 0 && (
+                <button className="link" onClick={() => setFlt(emptyFilter)}>
+                  Zurücksetzen
+                </button>
+              )}
             </p>
+            <div id="dossier-filters" hidden={!showFilters}>
+              <div className="filters">
+                <label>
+                  Suche
+                  <input type="search" value={flt.q} onChange={(e) => set('q', e.target.value)} />
+                </label>
+                <label>
+                  Art
+                  <select
+                    value={flt.type}
+                    onChange={(e) => set('type', e.target.value as FindFilter['type'])}
+                  >
+                    <option value="all">Alle</option>
+                    <option value="fact">Fakten</option>
+                    <option value="statement">Aussagen</option>
+                  </select>
+                </label>
+                <Select
+                  label="Person"
+                  value={flt.person}
+                  onChange={(v) => set('person', v)}
+                  items={opt.persons}
+                />
+                <Select
+                  label="Raum"
+                  value={flt.room}
+                  onChange={(v) => set('room', v)}
+                  items={opt.rooms}
+                />
+                <Select
+                  label="Tag"
+                  value={flt.day}
+                  onChange={(v) => set('day', v)}
+                  items={opt.days}
+                />
+              </div>
+            </div>
             {view.links.some((l) => !l.done) && (
               <p className="linkhint">
                 🔗 Es warten Verknüpfungen auf dich. Du findest sie auf den Karten.

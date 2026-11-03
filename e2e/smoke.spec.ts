@@ -100,6 +100,11 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
 
   // dossier shows the find, tagged as fact
   await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
+  // the filters are folded away so that the cards start high; the button opens them
+  await expect(page.getByLabel('Suche')).toBeHidden();
+  await page.getByRole('button', { name: /Filter/ }).click();
+  await expect(page.getByLabel('Suche')).toBeVisible();
+  await page.getByRole('button', { name: /Filter/ }).click();
   // folder with index cards: open a person, read the fact and the statement from the talks
   await page.getByRole('button', { name: /^Cora/ }).click();
   await expect(page.getByText('Ich war die ganze Nacht in der Halle.')).toBeVisible();
