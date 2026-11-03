@@ -204,6 +204,10 @@
   .cols2.wide-right {
     grid-template-columns: 1fr 2fr;
   }
+}
+
+/* One row for the bar only where everything fits; below it is two rows (info, menu). */
+@media (min-width: 1200px) {
   .bar {
     display: flex;
     align-items: center;

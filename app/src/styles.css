@@ -217,9 +217,10 @@ html {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 0.8rem;
+  justify-content: space-between;
+  gap: 0 0.6rem;
   padding: 0.1rem 0.6rem 0;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 .bar-info p,
 .bar-info button {
@@ -231,8 +232,19 @@ html {
   padding-inline: 0.2rem;
 }
 .bar-info .actions {
-  margin-left: auto;
   font-weight: 700;
+}
+.bar-info .ue {
+  display: none;
+}
+@media (min-width: 480px) {
+  .bar-info {
+    font-size: 0.9rem;
+    padding-inline: 1rem;
+  }
+  .bar-info .ue {
+    display: inline;
+  }
 }
 .bar nav {
   display: flex;

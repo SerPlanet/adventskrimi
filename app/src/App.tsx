@@ -104,8 +104,8 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
               </p>
               {!view.finished && (
                 <p className="actions" aria-label="Aktionen übrig">
-                  Aktionen übrig ({Math.max(0, view.actions.budget - view.actions.used)}/
-                  {view.actions.budget})
+                  Aktionen<span className="ue"> übrig</span> (
+                  {Math.max(0, view.actions.budget - view.actions.used)}/{view.actions.budget})
                 </p>
               )}
             </>
