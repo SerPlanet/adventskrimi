@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { goTo } from './route';
 import { useSession } from './store';
 import { Pick } from './screens/Pick';
@@ -31,6 +31,7 @@ const FONT_PX = { normal: 18, large: 22, xl: 26 } as const;
 export function App({ slug, tab: route }: { slug: string; tab: string }) {
   const { view, playerId, notice, busy } = useSession();
   const go = (tab: string) => goTo(slug, tab);
+  const bar = useRef<HTMLElement>(null);
   const settings = view?.player.settings ?? {};
 
   // apply the player's display settings to the page
@@ -47,6 +48,21 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
   useEffect(() => {
     document.body.className = playerId ? skin : '';
   }, [skin, playerId]);
+
+  // the content starts below the fixed bar, whatever its height (font size, wrapping)
+  useLayoutEffect(() => {
+    const el = bar.current;
+    const set = () =>
+      document.documentElement.style.setProperty('--bar-h', `${el?.offsetHeight ?? 0}px`);
+    set();
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      document.documentElement.style.removeProperty('--bar-h');
+    };
+  }, [playerId, view?.finished]);
 
   if (!playerId) return <Pick slug={slug} />;
 
@@ -72,19 +88,46 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
       <a className="skip" href="#main">
         Zum Inhalt springen
       </a>
-      <header className="top">
-        <button
-          className="link"
-          onClick={() => go('einstellungen')}
-          aria-label="Einstellungen und Spieler wechseln"
-        >
-          <span aria-hidden="true">{view?.player.avatar ?? '🙂'}</span> {view?.player.name ?? '…'}
-        </button>
-        {view && (
-          <p className="status" aria-label="Tagesstatus">
-            Tag {Math.min(view.day, 24)} · {view.points} Punkte
-          </p>
-        )}
+      <header className="bar" ref={bar}>
+        <div className="bar-info">
+          <button
+            className="link"
+            onClick={() => go('einstellungen')}
+            aria-label="Einstellungen und Spieler wechseln"
+          >
+            <span aria-hidden="true">{view?.player.avatar ?? '🙂'}</span> {view?.player.name ?? '…'}
+          </button>
+          {view && (
+            <>
+              <p className="status" aria-label="Tagesstatus">
+                Tag {Math.min(view.day, 24)} · {view.points} Punkte
+              </p>
+              {!view.finished && (
+                <p className="actions" aria-label="Aktionen übrig">
+                  Aktionen übrig ({Math.max(0, view.actions.budget - view.actions.used)}/
+                  {view.actions.budget})
+                </p>
+              )}
+            </>
+          )}
+        </div>
+        <nav aria-label="Hauptmenü">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              className={
+                route === t.id || (t.id === 'zeitung' && !TABS.some((x) => x.id === route))
+                  ? 'on'
+                  : ''
+              }
+              aria-current={route === t.id ? 'page' : undefined}
+              onClick={() => go(t.id)}
+            >
+              <span aria-hidden="true">{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </nav>
       </header>
       <main id="main" tabIndex={-1} className={`wrap ${skin}`}>
         {view?.prolog && settings.explanations !== false && route !== 'einstellungen' && (
@@ -95,23 +138,6 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
       <div className="live" role="status" aria-live="polite">
         {busy ? 'Einen Moment …' : notice}
       </div>
-      <nav className="bottom" aria-label="Hauptmenü">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            className={
-              route === t.id || (t.id === 'zeitung' && !TABS.some((x) => x.id === route))
-                ? 'on'
-                : ''
-            }
-            aria-current={route === t.id ? 'page' : undefined}
-            onClick={() => go(t.id)}
-          >
-            <span aria-hidden="true">{t.icon}</span>
-            {t.label}
-          </button>
-        ))}
-      </nav>
     </>
   );
 }

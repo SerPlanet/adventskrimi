@@ -30,6 +30,11 @@ type Room = NonNullable<View['room']>;
 const WALL = 58; // wall height, percent of the scene (the floor line)
 const HUNG = new Set(['pinnwand', 'zettel', 'schluessel', 'alarm']);
 
+const HALF = 7.5; // half of the base width (15 %)
+// a tappable thing is at least 48 px wide: about 16.5 % of a 360 px phone scene
+const MIN_HALF = 8.25;
+const half = (t: Spot) => Math.max(t.scale * HALF * (t.kind === 'npc' ? 2 / 3 : 1), MIN_HALF);
+
 /**
  * Hotspots of the room, composed: a case spot {x,y} places the thing (y < 35 = against the wall,
  * below that = on the floor, nearer to us the lower it is); `scale` and `layer` override the
@@ -61,20 +66,19 @@ export function spotsOf(room: Room): Spot[] {
   });
   // people stand next to the furniture: in the gaps of the floor, smaller the farther away
   // blocked stretches: floor furniture (half its width each side), people already placed
-  const blocked = things
-    .filter((t) => !t.hung && t.y > 70)
-    .map((t) => ({ x: t.x, half: t.scale * 7.5 }));
+  // (the middle of things further back must stay free as well)
+  const blocked = things.map((t) => ({ x: t.x, half: !t.hung && t.y > 70 ? half(t) : 1 }));
   const people: Spot[] = room.npcs.map((n, i) => {
     let x = 50;
     let best = -99;
     for (let c = 8; c <= 92; c += 2) {
-      const gap = Math.min(...blocked.map((b) => Math.abs(b.x - c) - b.half - 4), 99);
+      const gap = Math.min(...blocked.map((b) => Math.abs(b.x - c) - b.half - MIN_HALF), 99);
       if (gap > best) {
         best = gap;
         x = c;
       }
     }
-    blocked.push({ x, half: 4 });
+    blocked.push({ x, half: MIN_HALF });
     const y = 76 + (i % 2) * 9;
     return {
       key: `npc-${n.id}`,
@@ -92,10 +96,54 @@ export function spotsOf(room: Room): Spot[] {
       hung: false,
     };
   });
+  return place([...things, ...people]);
+}
+
+const box = (t: Spot) => {
+  const w = 2 * half(t);
+  const h = ((w * 100) / 62) * (t.kind === 'npc' ? 5 / 3 : 1); // the scene is 100 x 62; props are square, people 3 : 5
+  const top = t.hung ? t.y - h / 2 : t.y - h;
+  return { l: t.x - w / 2, r: t.x + w / 2, t: top, b: top + h, cy: top + h / 2 };
+};
+const covers = (a: Spot, b: Spot) => {
+  const B = box(b);
+  const A = box(a);
+  return a.x > B.l && a.x < B.r && A.cy > B.t && A.cy < B.b;
+};
+
+/**
+ * Keeps every thing tappable: nobody's middle may lie under another thing. A thing that would be
+ * covered moves sideways, and if that is not enough a little toward us, to the nearest free spot.
+ * Things keep their order of importance (the case's list), people come last.
+ */
+function place(all: Spot[]): Spot[] {
+  const done: Spot[] = [];
+  for (const t of all) {
+    const home = { x: t.x, y: t.y };
+    const ys = t.hung ? [0, 10, -8] : t.kind === 'npc' ? [0, 6, 12, 18] : [0, 8, 16];
+    let best: { x: number; y: number; cost: number } | null = null;
+    for (const dy of ys)
+      for (let dx = 0; dx <= 100; dx += 1.5)
+        for (const sx of dx === 0 ? [1] : [1, -1]) {
+          const c = {
+            ...t,
+            x: home.x + dx * sx,
+            y: Math.min(94, Math.max(t.hung ? 20 : WALL + 1, home.y + dy)),
+          };
+          const m = half(c);
+          if (c.x < m || c.x > 100 - m) continue;
+          if (done.some((d) => covers(c, d) || covers(d, c))) continue;
+          const cost = dx + Math.abs(dy) * 1.5;
+          if (!best || cost < best.cost) best = { x: c.x, y: c.y, cost };
+        }
+    if (best) {
+      t.x = best.x;
+      t.y = best.y;
+    }
+    done.push(t);
+  }
   // far things first, so that near ones cover them
-  return [...things, ...people].sort(
-    (a, b) => Number(a.hung) * -1 - Number(b.hung) * -1 || a.y - b.y,
-  );
+  return [...done].sort((a, b) => Number(a.hung) * -1 - Number(b.hung) * -1 || a.y - b.y);
 }
 
 const hue = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);

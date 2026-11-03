@@ -22,6 +22,9 @@ export function Hotel() {
   const [armed, setArmed] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
   const [glint, setGlint] = useState(false);
+  // result of the last examination that brought nothing, and things already tried today
+  const [note, setNote] = useState('');
+  const [tried, setTried] = useState<string[]>([]);
   useEffect(() => {
     if (!glint) return;
     const t = setTimeout(() => setGlint(false), 2200);
@@ -43,18 +46,29 @@ export function Hotel() {
 
   const run = async (a: Action) => {
     setMsg('');
+    setNote('');
     const r = await act(a);
     if (!r) return;
-    if (r.result.status === 'found') setOpen({ kind: 'found', ...r });
-    else {
-      const free = a.type === 'inspect' && r.result.status !== 'budget';
-      setMsg((r.result.message ?? '') + (free ? ' Das hat keine Aktion gekostet.' : ''));
-      setOpen(null);
+    if (r.result.status === 'found') {
+      setOpen({ kind: 'found', ...r });
+      return;
     }
+    if (a.type === 'inspect') {
+      // stay in the close-up and say why nothing happened
+      const st = r.result.status;
+      if (st === 'empty' || st === 'known') {
+        setTried((t) => [...t, `${view.day}:${a.object}`]);
+        setNote('Hier gibt es heute nichts mehr zu finden. Das hat keine Aktion gekostet.');
+      } else setNote(r.result.message ?? '');
+      return;
+    }
+    setMsg(r.result.message ?? '');
+    setOpen(null);
   };
 
   const onSpot = (s: Spot) => {
     setMsg('');
+    setNote('');
     if (armed) {
       void run({ type: 'use', item: armed, target: s.id });
       setArmed(null);
@@ -201,18 +215,42 @@ export function Hotel() {
               : 'Du siehst es dir an. Das kostet nichts.'}
           </p>
           <p>{obj.text}</p>
+          {obj.klasse === 'ansehen' && (
+            <p className="small">Hier gibt es etwas anzusehen, aber nichts zu untersuchen.</p>
+          )}
+          {obj.klasse === 'untersuchbar' && obj.explored && (
+            <>
+              <p>
+                <strong>Schon untersucht.</strong> Das hast du gefunden:
+              </p>
+              {[
+                ...new Map(
+                  view.finds
+                    .filter((f) => f.source.object === obj.id && f.source.kind === 'inspect')
+                    .map((f) => [f.source.id, f]),
+                ).values(),
+              ].map((f) => (
+                <SourceCard key={f.source.id} s={f.source} text={f.text} />
+              ))}
+            </>
+          )}
           {obj.klasse === 'untersuchbar' && !obj.explored && (
             <>
               <button
-                disabled={!play || busy || left === 0}
+                disabled={!play || busy || left === 0 || tried.includes(`${view.day}:${obj.id}`)}
                 onClick={() => void run({ type: 'inspect', object: obj.id })}
               >
                 🔎 Genauer untersuchen (kostet 1 Aktion)
               </button>
               <p className="small" role="status">
-                {left === 0
-                  ? 'Für heute genug untersucht. Gespräche und Lesen sind weiter frei.'
-                  : `Aktionen übrig (${left}/${view.actions.budget})`}
+                {note ||
+                  (tried.includes(`${view.day}:${obj.id}`)
+                    ? 'Hier gibt es heute nichts mehr zu finden.'
+                    : left === 0
+                      ? 'Für heute genug untersucht (0 Aktionen übrig). Gespräche und Lesen sind weiter frei.'
+                      : !play
+                        ? 'Dieser Tag ist noch nicht freigeschaltet.'
+                        : `Aktionen übrig (${left}/${view.actions.budget})`)}
               </p>
             </>
           )}
