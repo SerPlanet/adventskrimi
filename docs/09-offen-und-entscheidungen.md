@@ -77,3 +77,4 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D57 | Zeitung: eine scrollbare Seite im echten Zeitungslook, Kachel-Artikel, einfache Überblendung zwischen Tagen, kein Seitenblättern. Zugriff nur bis min(heute, eigener Spieltag), serverseitig. |
 | D58 | Akte als Aktenordner mit Reitern und Karteikarten (keine Tafel mit Schnüren). Verknüpfungen auf den Karten. |
 | D59 | Schriften werden lokal gebündelt (OFL, WOFF2), kein CDN. Eintrag der konkreten Fonts erfolgt in WP06e. |
+| D60 | Beim Ersetzen wird der alte Weg im selben WP gelöscht. Übergangscode (D53, `normalizeState`, Fallbacks) wird in `WP06i` vor dem Freeze entfernt. `knip` prüft in der CI auf tote Teile. |

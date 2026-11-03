@@ -23,6 +23,7 @@ Nie den ganzen `docs/`-Ordner lesen. Landkarte: `docs/00-index.md`. Arbeitsablau
 - Keine neue Dependency ohne Eintrag im Entscheidungslog (`docs/09`). Nichts ohne Anlass neu installieren oder bauen.
 - Keine unaufgeforderten Zusatzdateien (Zusammenfassungen, Reports, Plan-Dokumente, README-Varianten). Doku nur dort ändern, wo sie veraltet ist.
 - Kein Refactoring außerhalb des WP, keine spekulativen Abstraktionen, kein Aufräumen nebenbei.
+- **Beim Ersetzen löschen:** Wird ein Mechanismus, ein Feld oder ein Layout ersetzt, wird der alte Weg im selben WP entfernt. Keine zwei Systeme nebeneinander, keine „vorsichtshalber“ behaltenen Altpfade. Übergangscode nur mit Eintrag im Entscheidungslog und Entfernungs-WP (`WP06i`). Nach jedem WP `knip` laufen lassen, sobald es eingerichtet ist.
 - Pro Fehler höchstens 2 Versuche mit demselben Ansatz. Danach Ursache analysieren oder als Blocker in `STATUS.md` eintragen und stoppen.
 - Browser/Screenshots nur zur UI-Abnahme am Ende eines UI-WP. Sonst Text/DOM lesen.
 - Fall-Inhalte (`cases/`) nie komplett neu erzeugen. Nur ändern, was der Validator beanstandet.
