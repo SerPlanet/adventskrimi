@@ -3,8 +3,7 @@ rooms:
     name: Halle
     description: Eine große Halle mit Kamin und einer alten Lampe.
     neighbors: [keller]
-    floor: 1
-    col: 0
+    plan: { x: 0, y: 0, w: 6, h: 4 }
     scene: halle
     objects:
       - {
@@ -18,8 +17,7 @@ rooms:
     name: Keller
     description: Ein kühler Keller mit einer schweren Kiste.
     neighbors: [halle]
-    floor: 0
-    col: 0
+    plan: { x: 0, y: 4, w: 6, h: 4 }
     scene: keller
     objects:
       - {
@@ -29,3 +27,9 @@ rooms:
           auffaellig: true,
           spot: { x: 35, y: 48 },
         }
+doors:
+  - { a: halle, b: keller, at: { x: 3, y: 4 } }
+outside:
+  - { kind: entrance, x: 1.5, y: -1.5, w: 3, h: 1.5, label: Eingang }
+stairs:
+  - { room: keller, dir: down }

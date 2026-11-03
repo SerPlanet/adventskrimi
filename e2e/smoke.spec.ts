@@ -64,6 +64,21 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
 
   // hotel: an empty topic costs nothing is covered by unit tests; here a real action
   await page.getByRole('button', { name: 'Hotel' }).click();
+  // floor plan: every room of the test case, you are in one, a tap only previews (no move)
+  await expect(page.locator('.hotelplan .rm')).toHaveCount(2);
+  await expect(page.locator('.hotelplan .rm.here')).toHaveCount(1);
+  await page
+    .getByRole('button', { name: /^Keller/ })
+    .first()
+    .click();
+  await expect(page.getByText('Wähle den Raum bei „Gute Nacht“.')).toBeVisible();
+  await expect(page.locator('.hotelplan .rm.here')).toHaveCount(1);
+  // room scene: props at their spots, the list of things is folded but reachable
+  await expect(page.locator('.scene .spot').first()).toBeVisible();
+  await expect(page.locator('details.help')).not.toHaveAttribute('open', '');
+  await page.locator('details.help summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('details.help')).toHaveAttribute('open', '');
   // Anna's find already came with the newspaper, so only Cora's statement is new
   await page.getByRole('button', { name: /Cora/ }).last().click();
   await page

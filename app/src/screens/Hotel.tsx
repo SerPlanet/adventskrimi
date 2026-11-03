@@ -4,7 +4,7 @@ import { ObjectPuzzles } from './ObjectPuzzles';
 import { FindCard } from './FindCard';
 import { EndDay } from './EndDay';
 import { Popup } from '../ui/Popup';
-import { HotelMap } from '../ui/HotelMap';
+import { HotelPlan } from '../ui/HotelPlan';
 import { RoomScene, spotsOf, type Spot } from '../ui/RoomScene';
 import { SourceCard } from '../ui/Bubbles';
 import { Prop } from '../ui/props';
@@ -68,28 +68,33 @@ export function Hotel() {
           früherer Tage kannst du jederzeit lesen.
         </p>
       )}
-      <h2>Das Hotel</h2>
-      <HotelMap />
+      <div className="cols2 wide-left">
+        <section aria-labelledby="plan-h">
+          <h2 id="plan-h">Das Hotel</h2>
+          <HotelPlan />
+        </section>
+        {room && (
+          <aside aria-labelledby="room-h">
+            <h1 id="room-h">{room.name}</h1>
+            <p>{room.description}</p>
+            {room.blocked && (
+              <p className="card">
+                ⛔ Dieser Raum ist heute gesperrt. Du kannst nur den Tag beenden.
+              </p>
+            )}
+            <button
+              className="primary"
+              disabled={!play || busy}
+              onClick={() => setOpen({ kind: 'night' })}
+            >
+              🌙 Gute Nacht (Tag beenden)
+            </button>
+          </aside>
+        )}
+      </div>
 
       {room && (
-        <section aria-labelledby="room-h">
-          <h1 id="room-h">{room.name}</h1>
-          <p>{room.description}</p>
-          <p className="row" role="status">
-            <strong>
-              Entdeckt {view.explore.found} von {view.explore.total}
-            </strong>
-            <span className="small">
-              {view.explore.found >= view.explore.total
-                ? 'Hier gibt es heute nichts Neues mehr.'
-                : 'Sieh dir alles in Ruhe an. Es kostet nichts.'}
-            </span>
-          </p>
-          {room.blocked && (
-            <p className="card">
-              ⛔ Dieser Raum ist heute gesperrt. Du kannst nur den Tag beenden.
-            </p>
-          )}
+        <section className="roomwrap skin-room" aria-label={`Raum: ${room.name}`}>
           {armed && (
             <p className="card" role="status">
               Gegenstand gewählt. Tippe jetzt Person oder Ding an.{' '}
@@ -100,28 +105,40 @@ export function Hotel() {
           )}
           {!room.blocked && <RoomScene room={room} onSpot={onSpot} armed={!!armed} />}
 
-          <h2>Was gibt es hier?</h2>
-          <ul className="plain">
-            {spotsOf(room).map((s) => (
-              <li key={s.key}>
-                <button disabled={!play || busy} onClick={() => onSpot(s)}>
-                  <span aria-hidden="true">{s.icon}</span> {s.label}
-                  {s.bang && <span className="sr"> (auffällig)</span>}
-                </button>
-              </li>
-            ))}
-            {room.book && (
-              <li>
-                <button disabled={!play || busy} onClick={() => void run({ type: 'hotelbook' })}>
-                  📖 Hotelbuch lesen
-                </button>
-              </li>
-            )}
-          </ul>
+          <details className="help">
+            <summary>Liste der Dinge (Hilfe für Tastatur und Vorlesen)</summary>
+            <ul className="plain">
+              {spotsOf(room).map((s) => (
+                <li key={s.key}>
+                  <button disabled={!play || busy} onClick={() => onSpot(s)}>
+                    <span aria-hidden="true">{s.icon}</span> {s.label}
+                    {s.bang && <span className="sr"> (auffällig)</span>}
+                  </button>
+                </li>
+              ))}
+              {room.book && (
+                <li>
+                  <button disabled={!play || busy} onClick={() => void run({ type: 'hotelbook' })}>
+                    📖 Hotelbuch lesen
+                  </button>
+                </li>
+              )}
+            </ul>
+          </details>
           <p role="status">{msg}</p>
 
           <ObjectPuzzles disabled={!play || busy} />
 
+          <p className="row" role="status">
+            <strong>
+              Entdeckt {view.explore.found} von {view.explore.total}
+            </strong>
+            <span className="small">
+              {view.explore.found >= view.explore.total
+                ? 'Hier gibt es heute nichts Neues mehr.'
+                : 'Sieh dir alles in Ruhe an. Es kostet nichts.'}
+            </span>
+          </p>
           {(view.inventory.length > 0 || view.documents.length > 0) && (
             <div className="inv" role="group" aria-label="Dein Inventar">
               {view.documents.map((d) => (
@@ -144,14 +161,6 @@ export function Hotel() {
           )}
         </section>
       )}
-
-      <button
-        className="primary"
-        disabled={!play || busy}
-        onClick={() => setOpen({ kind: 'night' })}
-      >
-        🌙 Gute Nacht (Tag beenden)
-      </button>
 
       {open?.kind === 'spot' && npc && (
         <Popup title={npc.name} onClose={close}>

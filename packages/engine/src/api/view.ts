@@ -110,6 +110,8 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
           ),
         spot: o.spot,
         prop: o.prop,
+        scale: o.scale,
+        layer: o.layer,
         // state of the thing: opened once everything its inspect sources hold has been found
         explored: c.sources.sources
           .filter((x) => x.kind === 'inspect' && x.object === o.id)
@@ -126,9 +128,11 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
         id: r.id,
         name: r.name,
         neighbors: r.neighbors,
-        floor: r.floor,
-        col: r.col,
+        plan: r.plan,
       })),
+      doors: c.rooms.doors,
+      outside: c.rooms.outside,
+      stairs: c.rooms.stairs,
       next_rooms: st.day <= 24 ? nextRooms(st, ctx) : [],
     },
     finds,

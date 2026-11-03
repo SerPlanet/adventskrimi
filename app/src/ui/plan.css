@@ -1,0 +1,239 @@
+/* WP06f: floor plan (skin-plan) and room scene (skin-room) */
+.hotelplan .plan {
+  position: relative;
+  width: 100%;
+  max-width: 62rem;
+  margin: 0.4rem auto;
+  border: 2px solid var(--line);
+  border-radius: 0.8rem;
+  overflow: hidden;
+}
+.plan svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.plan .snow {
+  fill: #f2f7fa;
+}
+.plan .floor {
+  fill: #f6efe2;
+}
+.plan .stairs .floor {
+  fill: #e2d4bb;
+}
+.plan .stairs line {
+  stroke: #8a6a3a;
+  stroke-width: 0.12;
+}
+.plan .wall {
+  fill: none;
+  stroke: #4a3a2a;
+  stroke-width: 0.35;
+}
+.plan .door {
+  fill: #f6efe2;
+  stroke: #8a5a2b;
+  stroke-width: 0.12;
+}
+.plan .tree path {
+  fill: #3f6b4f;
+  stroke: #234535;
+  stroke-width: 0.12;
+}
+.plan .tree rect {
+  fill: #5e3b1b;
+}
+.plan .entrance {
+  fill: #c9a070;
+}
+.plan .terrace {
+  fill: #d8c9a8;
+  stroke: #8a6a3a;
+  stroke-width: 0.1;
+}
+.plan .path {
+  fill: #dfe6ea;
+}
+.plan .olabel {
+  font-size: 0.8px;
+  text-anchor: middle;
+  fill: #3a2616;
+  font-family: system-ui, sans-serif;
+}
+:root[data-theme='dark'] .plan .snow {
+  fill: #25343b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .plan .snow {
+    fill: #25343b;
+  }
+}
+.hotelplan .rm {
+  border-radius: 0.3rem;
+  position: absolute;
+  display: grid;
+  align-content: start;
+  gap: 0.1rem;
+  padding: 0.15rem 0.25rem;
+  min-width: 0;
+  min-height: 0;
+  border: 2px solid transparent;
+  border-radius: 0.3rem;
+  background: transparent;
+  color: #2a2118;
+  font-size: clamp(9px, 2.6vw, 13px);
+  line-height: 1.15;
+  text-align: left;
+  overflow: hidden;
+  hyphens: auto;
+}
+.rm .rn {
+  font-weight: 700;
+  overflow-wrap: normal;
+}
+.rm .sub {
+  font-size: 0.9em;
+}
+.rm.near {
+  border: 2px dashed var(--accent);
+}
+.rm.far {
+  opacity: 0.8;
+}
+.rm.here {
+  background: rgb(255 214 74 / 0.6);
+  border-color: #8a4b00;
+}
+.rm.picked {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+.rm:disabled {
+  opacity: 0.55;
+}
+.rm .marks {
+  display: flex;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+}
+.rm .you {
+  background: #ffd24a;
+  border: 1px solid #8a4b00;
+  border-radius: 999px;
+  padding: 0 0.3rem;
+  font-size: 0.6rem;
+}
+.rm .who {
+  font-style: normal;
+  background: #3f6b4f;
+  color: #fff;
+  border-radius: 50%;
+  width: 1rem;
+  height: 1rem;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.6rem;
+}
+.rm .bang {
+  color: #3a2616;
+  background: #ffd24a;
+  border: 1px solid #3a2616;
+  border-radius: 50%;
+  width: 1rem;
+  height: 1rem;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.65rem;
+}
+@media (min-width: 900px) {
+  .rm {
+    font-size: 15px;
+    padding: 0.3rem 0.5rem;
+  }
+  .rm .sub {
+    font-size: 0.9em;
+  }
+}
+
+/* room scene */
+.roomwrap {
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-top: 1rem;
+}
+.scene {
+  position: relative;
+  aspect-ratio: 100 / 62;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  margin: 0.6rem 0;
+  max-width: 62rem;
+  margin-inline: auto;
+}
+.scene > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.scene .shadow {
+  position: absolute;
+  aspect-ratio: 6 / 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.35);
+  pointer-events: none;
+}
+.scene .spot {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  min-width: 48px;
+  aspect-ratio: 1;
+  height: auto;
+  border: none;
+  border-radius: 0.4rem;
+  background: transparent;
+  padding: 0;
+}
+.scene .spot.hung {
+  transform: translate(-50%, -50%);
+}
+.scene .spot.target {
+  outline: 3px dashed var(--focus);
+}
+.scene .spot svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.scene .spot:hover,
+.scene .spot:focus-visible {
+  background: rgb(255 255 255 / 0.18);
+}
+.scene .spot .bang {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 1.2rem;
+  height: 1.2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffd24a;
+  color: #3a2616;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border: 2px solid #3a2616;
+}
+details.help {
+  margin: 0.6rem 0;
+}
+details.help summary {
+  cursor: pointer;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}

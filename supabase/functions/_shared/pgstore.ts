@@ -72,7 +72,7 @@ async function loadCaseData(sql: Sql | Q, caseId: string): Promise<LoadedCase> {
       proof_questions: sol.proof_questions,
     },
     world: sol.world,
-    rooms: { rooms },
+    rooms: { rooms, doors: meta.data.doors, outside: meta.data.outside, stairs: meta.data.stairs },
     npcs: { npcs },
     facts: { facts },
     statements: { statements },

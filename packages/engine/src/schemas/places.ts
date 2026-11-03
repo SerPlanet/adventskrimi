@@ -11,6 +11,16 @@ export const RoomObject = z.object({
   states: z.array(z.string()).optional(),
   /** hotspot position in the room scene, percent of width/height */
   spot: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100) }).optional(),
+  /** size factor and depth layer in the scene (WP06f); defaults follow the spot */
+  scale: z.number().min(0.3).max(3).optional(),
+  layer: z.enum(['back', 'front']).optional(),
+});
+
+const Rect = z.object({
+  x: z.number(),
+  y: z.number(),
+  w: z.number().positive(),
+  h: z.number().positive(),
 });
 
 export const Room = z.object({
@@ -19,9 +29,8 @@ export const Room = z.object({
   description: CardText,
   neighbors: z.array(Id),
   objects: z.array(RoomObject).default([]),
-  /** position in the hotel cross-section and scene id (WP06b, optional) */
-  floor: z.number().int().optional(),
-  col: z.number().int().optional(),
+  /** rectangle in the floor plan, grid units (WP06f) */
+  plan: Rect,
   scene: z.string().optional(),
 });
 
@@ -47,7 +56,20 @@ export const Npc = z.object({
   schedule: z.record(z.coerce.number().pipe(Day), Id),
 });
 
-export const RoomsFile = listFile('rooms', Room);
+/** Door in the floor plan; `at` lies on the shared wall. Must match an edge of the room graph. */
+export const Door = z.object({ a: Id, b: Id, at: z.object({ x: z.number(), y: z.number() }) });
+export const Outside = Rect.extend({
+  kind: z.enum(['entrance', 'terrace', 'tree', 'snow', 'path']),
+  label: z.string().optional(),
+});
+/** Rooms drawn as a staircase at the rim of the plan (still normal rooms in the graph). */
+export const Stairs = z.object({ room: Id, dir: z.enum(['up', 'down']) });
+
+export const RoomsFile = listFile('rooms', Room).extend({
+  doors: z.array(Door),
+  outside: z.array(Outside).default([]),
+  stairs: z.array(Stairs).default([]),
+});
 export const NpcsFile = listFile('npcs', Npc);
 
 export type Room = z.infer<typeof Room>;

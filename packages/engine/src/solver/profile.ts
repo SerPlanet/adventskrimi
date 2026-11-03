@@ -101,6 +101,9 @@ export function applyProfile(full: LoadedCase, p: Profile): LoadedCase {
       rooms: full.rooms.rooms
         .filter((r) => rooms.has(r.id))
         .map((r) => ({ ...r, neighbors: r.neighbors.filter((n) => rooms.has(n)) })),
+      doors: full.rooms.doors.filter((d) => rooms.has(d.a) && rooms.has(d.b)),
+      outside: full.rooms.outside,
+      stairs: full.rooms.stairs.filter((st) => rooms.has(st.room)),
     },
     npcs: { npcs: full.npcs.npcs.filter((n) => npcs.has(n.id)) },
     facts: { facts },

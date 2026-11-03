@@ -141,3 +141,21 @@ describe('performance', () => {
     expect(Date.now() - t).toBeLessThan(2000);
   });
 });
+
+describe('plan check', () => {
+  const plan = (c: LoadedCase) => runChecks(c, friends, quality, 'plan' as CheckName)[0]!;
+
+  test('doors match the room graph', () => {
+    expect(plan(good).ok).toBe(true);
+  });
+  test('a missing or a doubled door is rejected', () => {
+    const noDoor = plan(broken((c) => (c.rooms.doors = [])));
+    expect(noDoor.errors.join()).toMatch(/0 doors/);
+    const extra = plan(broken((c) => c.rooms.doors.push({ ...c.rooms.doors[0]! })));
+    expect(extra.errors.join()).toMatch(/2 doors/);
+  });
+  test('a door away from the shared wall is rejected', () => {
+    const off = plan(broken((c) => (c.rooms.doors[0]!.at = { x: 20, y: 20 })));
+    expect(off.errors.join()).toMatch(/shared wall/);
+  });
+});

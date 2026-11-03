@@ -153,6 +153,7 @@ describe('movement', () => {
         description: 'Windig.',
         neighbors: [],
         objects: [],
+        plan: { x: 0, y: 20, w: 4, h: 4 },
       });
     });
     const st = newPlayer(c2);

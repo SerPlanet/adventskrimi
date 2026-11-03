@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSession } from '../store';
-import { HotelMap } from '../ui/HotelMap';
+import { HotelPlan } from '../ui/HotelPlan';
 
 /** End of day: pick tomorrow's room on the map. Nothing is lost by going to bed early. */
 export function EndDay({ close }: { close: () => void }) {
@@ -11,7 +11,7 @@ export function EndDay({ close }: { close: () => void }) {
     <>
       <p>Danach kannst du diesen Tag nicht mehr ändern.</p>
       <p>Wo willst du morgen sein?</p>
-      <HotelMap pick={room} onPick={setRoom} />
+      <HotelPlan pick={room} onPick={setRoom} />
       <p role="status">
         Morgen: <strong>{name}</strong>
         {room === view?.room?.id ? ' (hier bleiben)' : ''}

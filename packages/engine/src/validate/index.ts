@@ -11,6 +11,7 @@ import {
   checkUnique,
 } from './content';
 import { checkExplore } from './explore';
+import { checkPlan } from './plan';
 import { checkTempo, checkTexts } from './texts';
 import { checkTruth } from './truth';
 import { CHECK_NAMES, type CheckName, type CheckResult } from './types';
@@ -40,6 +41,7 @@ export function runChecks(
     texts: () => checkTexts(info, quality),
     tempo: () => checkTempo(info, quality),
     explore: () => checkExplore(info),
+    plan: () => checkPlan(c),
   };
   return CHECK_NAMES.filter((n) => !only || n === only).map((n) => all[n]());
 }
