@@ -1,6 +1,6 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-03 · Lauf WP15–WP18, WP19 (Sub-Agent), danach WP06i erneut prüfen. Danach WP11 (Admin).
+Stand: 2026-11-03 · WP15–WP19 und Aufräumen (WP06i) erledigt. Nächstes: WP11 (Admin) → `docs/wp/WP11-admin.md`, dann WP12, WP13, WP14.
 
 Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/Feinschliff → WP13 Testlauf → WP14 Launch. Code-Freeze 29.11., Start 1.12.
 
