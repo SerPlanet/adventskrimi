@@ -24,6 +24,8 @@ export const FactBody = z.discriminatedUnion('type', [
 const Tags = {
   red_herring: z.boolean().default(false),
   reinterpreted_on: Day.optional(),
+  /** a relation between figures that the case tells as a story, never names (02c §3) */
+  relation: z.string().optional(),
 };
 
 export const Fact = z.intersection(z.object({ id: Id, text: CardText, ...Tags }), FactBody);
