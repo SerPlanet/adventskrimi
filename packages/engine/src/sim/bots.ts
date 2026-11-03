@@ -1,4 +1,13 @@
-import { nextRooms, resolveAction, type Action, type GameCtx, type PlayerState } from '../game';
+import {
+  actionsLeft,
+  budgetOf,
+  costsAction,
+  nextRooms,
+  resolveAction,
+  type Action,
+  type GameCtx,
+  type PlayerState,
+} from '../game';
 import { combine, count, type Info } from '../solver';
 
 export const BOTS = ['optimal', 'greedy', 'random', 'casual', 'newspaper_only', 'worst'] as const;
@@ -55,7 +64,7 @@ export function options(st: PlayerState, ctx: GameCtx, info: Info): Option[] {
   return out;
 }
 
-/** Sum of the best `n` gains one could collect in `room` on `day` (used to choose where to walk). */
+/** What a day in `room` is worth: every free option plus the `n` best examinations. */
 function roomValue(
   st: PlayerState,
   ctx: GameCtx,
@@ -63,20 +72,23 @@ function roomValue(
   room: string,
   day: number,
   n: number,
-  pick: (o: Option[]) => number[],
+  value: (o: Option) => number,
 ): number {
   const opts = options({ ...st, day, room }, ctx, info);
-  return pick(opts)
-    .slice(0, n)
-    .reduce((a, b) => a + b, 0);
+  const free = opts.filter((o) => !costsAction(o.action)).map(value);
+  const costly = opts
+    .filter((o) => costsAction(o.action))
+    .map(value)
+    .sort((a, b) => b - a)
+    .slice(0, n);
+  return [...free, ...costly].reduce((a, b) => a + b, 0);
 }
 
-const desc = (o: Option[]) => o.map((x) => x.gain).sort((a, b) => b - a);
-
 /**
- * What the bot explores in today's room (no action budget since WP06c).
- * optimal/greedy: everything that brings a find; random: as many random picks as there are things;
- * casual: a random 60 %; worst: everything, but in the least informative rooms (see chooseRoom).
+ * What the bot does in today's room. Everything free (talk, show, read) is always done; the
+ * budget goes to examinations: optimal takes the most informative, greedy the first in line,
+ * worst the least informative; random picks as many random things as there are things;
+ * casual a random 60 %.
  */
 export function planDay(
   bot: BotName,
@@ -93,7 +105,11 @@ export function planDay(
     return mixed.slice(0, Math.ceil(all.length * 0.6));
   }
   const opts = options(st, ctx, info);
-  return opts.map((o) => o.action);
+  const free = opts.filter((o) => !costsAction(o.action));
+  const costly = opts.filter((o) => costsAction(o.action));
+  if (bot === 'optimal') costly.sort((a, b) => b.gain - a.gain);
+  if (bot === 'worst') costly.sort((a, b) => a.gain - b.gain);
+  return [...free, ...costly.slice(0, actionsLeft(st, ctx))].map((o) => o.action);
 }
 
 /** Room for the next day. */
@@ -103,20 +119,20 @@ export function chooseRoom(
   ctx: GameCtx,
   info: Info,
   rng: Rng,
-  budget: number,
 ): string | undefined {
   const rooms = nextRooms(st, ctx);
   if (!rooms.length || bot === 'newspaper_only') return undefined;
   if (bot === 'random' || bot === 'casual') return rooms[Math.floor(rng() * rooms.length)];
   const day = st.day + 1;
+  const budget = budgetOf(ctx, day);
   const scored = rooms.map((r) => ({
     r,
     // optimal: most information; greedy: most things to do; worst: least, but at least one find
     v:
       bot === 'greedy'
-        ? roomValue(st, ctx, info, r, day, budget, (o) => o.map(() => 1))
-        : roomValue(st, ctx, info, r, day, budget, desc),
-    any: roomValue(st, ctx, info, r, day, budget, (o) => o.map(() => 1)) > 0,
+        ? roomValue(st, ctx, info, r, day, budget, () => 1)
+        : roomValue(st, ctx, info, r, day, budget, (o) => o.gain),
+    any: roomValue(st, ctx, info, r, day, budget, () => 1) > 0,
   }));
   const usable = scored.filter((s) => s.any);
   const pool = usable.length ? usable : scored;

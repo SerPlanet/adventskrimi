@@ -19,15 +19,6 @@ export function confirmLink(st: PlayerState, ctx: GameCtx, id: string): PlayerSt
   return addLedger(st, { kind: 'link', ref: id, points: ctx.scoring.link, day: st.day });
 }
 
-/** "Entdeckt x von y" for the room the player is in today: counts things that bring a find. */
-export function exploreProgress(st: PlayerState, ctx: GameCtx) {
-  const here = ctx.c.sources.sources.filter(
-    (s) => s.kind !== 'newspaper' && ctx.reach.roomOn(s.id, st.day) === st.room && s.yields.length,
-  );
-  const done = here.filter((s) => s.yields.every((y) => st.found.includes(y))).length;
-  return { found: done, total: here.length };
-}
-
 /** "Einstecken": a found document goes into the inventory. null = not a document of this player. */
 export function pocketDocument(
   st: PlayerState,

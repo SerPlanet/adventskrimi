@@ -5,7 +5,8 @@ export const RoomObject = z.object({
   id: Id,
   name: z.string().min(1),
   text: CardText,
-  auffaellig: z.boolean().default(false),
+  /** deko: not clickable, ansehen: look only, untersuchbar: can be examined for 1 action. Derived when absent. */
+  klasse: z.enum(['deko', 'ansehen', 'untersuchbar']).optional(),
   /** vector prop and its states, e.g. ["zu", "auf"] (WP06d) */
   prop: z.string().optional(),
   states: z.array(z.string()).optional(),

@@ -8,7 +8,9 @@ export interface Spot {
   id: string;
   label: string;
   icon: string;
-  bang: boolean;
+  /** can be tapped (people and things that are not decoration) */
+  clickable: boolean;
+  untersuchbar: boolean;
   /** explicit prop of the case, else chosen from the name */
   prop?: string;
   /** the thing has been examined: shown in its open state */
@@ -45,8 +47,9 @@ export function spotsOf(room: Room): Spot[] {
       kind: 'object',
       id: o.id,
       label: o.name,
-      icon: o.auffaellig ? '❗' : '🔹',
-      bang: o.auffaellig,
+      icon: o.klasse === 'untersuchbar' ? '🔎' : '👁',
+      clickable: o.klasse !== 'deko',
+      untersuchbar: o.klasse === 'untersuchbar',
       prop: o.prop,
       open: o.explored,
       x: o.spot?.x ?? row(room.objects.length, i),
@@ -79,7 +82,8 @@ export function spotsOf(room: Room): Spot[] {
       id: n.id,
       label: n.name,
       icon: '🧑',
-      bang: false,
+      clickable: true,
+      untersuchbar: false,
       open: false,
       x,
       y,
@@ -273,7 +277,13 @@ function Backdrop({ scene, avoid }: { scene: string; avoid: number[] }) {
  * Scene of a room, composed by hand: things stand where the case puts them, at their size and
  * depth. Every hotspot is a real button; the list of things is an extra help below the scene.
  */
-export function RoomScene(props: { room: Room; onSpot: (s: Spot) => void; armed: boolean }) {
+export function RoomScene(props: {
+  room: Room;
+  onSpot: (s: Spot) => void;
+  armed: boolean;
+  /** "Umsehen": everything tappable glints for a moment */
+  glint: boolean;
+}) {
   const spots = spotsOf(props.room);
   return (
     <div className="scene" role="group" aria-label={`Szene: ${props.room.name}`}>
@@ -294,35 +304,43 @@ export function RoomScene(props: { room: Room; onSpot: (s: Spot) => void; armed:
             }}
           />
         ))}
-      {spots.map((s) => (
-        <button
-          key={s.key}
-          className={`spot ${s.kind}${props.armed ? ' target' : ''}${s.open ? ' open' : ''}${s.hung ? ' hung' : ''}`}
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: `${s.scale * (s.kind === 'npc' ? 10 : 15)}%`,
-          }}
-          aria-label={s.label + (s.bang ? ' (auffällig)' : '') + (s.open ? ' (untersucht)' : '')}
-          onClick={() => props.onSpot(s)}
-        >
-          {s.kind === 'npc' ? (
+      {spots.map((s) => {
+        const style = {
+          left: `${s.x}%`,
+          top: `${s.y}%`,
+          width: `${s.scale * (s.kind === 'npc' ? 10 : 15)}%`,
+        };
+        const cls = `spot ${s.kind}${s.hung ? ' hung' : ''}${s.open ? ' open' : ''}`;
+        const art =
+          s.kind === 'npc' ? (
             <Person name={s.label} />
           ) : (
             <Prop name={s.label} prop={s.prop} open={s.open} />
-          )}
-          {s.kind === 'npc' && (
-            <span className="tag" aria-hidden="true">
-              {s.label}
+          );
+        // decoration is only a picture: not tappable, not announced
+        if (!s.clickable)
+          return (
+            <span key={s.key} className={`${cls} deco`} style={style} aria-hidden="true">
+              {art}
             </span>
-          )}
-          {s.bang && !s.open && (
-            <span className="bang" aria-hidden="true">
-              !
-            </span>
-          )}
-        </button>
-      ))}
+          );
+        return (
+          <button
+            key={s.key}
+            className={`${cls} clickable${props.armed ? ' target' : ''}${props.glint ? ' glint' : ''}`}
+            style={style}
+            aria-label={s.label + (s.open ? ' (untersucht)' : '')}
+            onClick={() => props.onSpot(s)}
+          >
+            {art}
+            {s.kind === 'npc' && (
+              <span className="tag" aria-hidden="true">
+                {s.label}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

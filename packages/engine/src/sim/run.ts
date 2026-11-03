@@ -42,7 +42,7 @@ export interface SimResult {
   pointsByDay: number[];
   mindShare: number;
   emptyActions: number;
-  /** days (1..24) without any new find although the budget allowed it */
+  /** days (1..24) without any new find although something was left to find */
   idleDays: number[];
   /** reading load of the busiest day in minutes */
   maxMinutes: number;
@@ -111,7 +111,7 @@ export function simulate(
         const r = resolveAction(st, ctx, a);
         st = r.state;
         if (r.result.status === 'found') gained = true;
-        else res.emptyActions++;
+        else if (r.result.status !== 'budget') res.emptyActions++;
       }
       if (!gained) break;
     }
@@ -166,7 +166,7 @@ export function simulate(
     }
 
     res.pointsByDay.push(totalPoints(st));
-    const ended = endDay(st, ctx, chooseRoom(bot, st, ctx, info, rng, 99));
+    const ended = endDay(st, ctx, chooseRoom(bot, st, ctx, info, rng));
     st = closeDay(ended.ok ? ended.state : { ...st, day: day + 1 }, ctx, day);
   }
 

@@ -42,7 +42,7 @@ export interface PlayerState {
   /** day being played; 25 = all days finished */
   day: number;
   room: string;
-  /** unused since WP06c (no action budget); kept so saved states still load */
+  /** "Genauer untersuchen" used today (budget: game/budget.ts), reset when the day ends */
   actionsUsed: number;
   /** player did something that counts as "played" on the current day */
   started: boolean;

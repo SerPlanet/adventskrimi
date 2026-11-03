@@ -1,6 +1,7 @@
 import {
   accusationFromDay,
-  exploreProgress,
+  budgetOf,
+  classOf,
   linksOf,
   canAccuse,
   inspectorSentence,
@@ -83,7 +84,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     day: st.day,
     can_play: canPlay,
     finished: st.day > 24,
-    explore: exploreProgress(st, ctx),
+    actions: { used: st.actionsUsed, budget: budgetOf(ctx, st.day) },
     links: linksOf(st, ctx).map(({ id, text, done }) => ({ id, text, done })),
     points: totalPoints(st),
     breakdown: breakdown(st),
@@ -99,15 +100,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
         id: o.id,
         name: o.name,
         text: o.text,
-        // only things that really bring a find in this room today are marked (02b: nothing else gets a "!")
-        auffaellig:
-          o.auffaellig &&
-          c.sources.sources.some(
-            (x) =>
-              x.object === o.id &&
-              x.yields.length > 0 &&
-              ctx.reach.roomOn(x.id, st.day) === st.room,
-          ),
+        klasse: classOf(o, c),
         spot: o.spot,
         prop: o.prop,
         scale: o.scale,

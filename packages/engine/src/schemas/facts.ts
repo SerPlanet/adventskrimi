@@ -48,7 +48,6 @@ export const Source = z.object({
   topic: Id.optional(),
   days: Days,
   requires: Id.optional(),
-  auffaellig: z.boolean().default(false),
   /** fact or statement ids */
   yields: z.array(Id).min(1),
   /** neutral first-discoverer title, must not reveal place or content */

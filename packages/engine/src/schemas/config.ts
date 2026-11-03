@@ -17,14 +17,12 @@ export const Profile = z.object({
       window_groups: z.record(Id, z.array(Id)).optional(),
     })
     .default({ exclude_facts: [], exclude_sources: [] }),
-  /** retired by WP06c (02b), ignored */
-  actions_per_day: z
-    .object({
-      default: z.number().int().min(1),
-      /** prolog overrides by day */
-      prolog: z.record(z.coerce.number().pipe(Day), z.number().int().min(1)).default({}),
-    })
-    .optional(),
+  /** budget for "Genauer untersuchen" (02b §1, D62) */
+  actions_per_day: z.object({
+    default: z.number().int().min(1),
+    /** prolog overrides by day */
+    prolog: z.record(z.coerce.number().pipe(Day), z.number().int().min(1)).default({}),
+  }),
   movement: z.enum(['free', 'neighbors']),
   hints: z.object({ tip_ladder: z.boolean().default(true), max_tips: z.number().int().default(2) }),
   early_accusation: z.boolean(),

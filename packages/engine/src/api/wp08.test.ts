@@ -243,19 +243,18 @@ describe('visible texts', () => {
   });
 });
 
-describe('the "!" marker', () => {
-  test('only things that bring a find in this room today are marked', async () => {
+describe('classes of things and the action budget in the view', () => {
+  test('things carry a class, never a "!" marker, and the view shows the budget', async () => {
     const view = out(await call('state', {})).state;
-    for (const o of view.room.objects) {
-      const brings = res.data.sources.sources.some(
-        (s) => s.object === o.id && s.room === view.room.id && s.days,
-      );
-      if (o.auffaellig) expect(brings).toBe(true);
-    }
-    // day 1, hall: the lamp has a source on day 1, so it is marked; nothing unrelated is
+    expect(JSON.stringify(view)).not.toContain('auffaellig');
+    const klasse = Object.fromEntries(
+      view.room.objects.map((o: { id: string; klasse: string }) => [o.id, o.klasse]),
+    );
+    expect(klasse.lampe).toBe('untersuchbar');
     expect(
-      view.room.objects.filter((o: { auffaellig: boolean }) => o.auffaellig).length,
-    ).toBeLessThanOrEqual(view.room.objects.length);
+      Object.values(klasse).every((k) => ['deko', 'ansehen', 'untersuchbar'].includes(k as string)),
+    ).toBe(true);
+    expect(view.actions).toEqual({ used: 0, budget: 1 });
   });
 });
 

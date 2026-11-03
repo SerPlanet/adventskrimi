@@ -131,7 +131,6 @@ export function HotelPlan(props: { pick?: string; onPick?: (id: string) => void 
           const state = r.id === here ? 'here' : everywhere || near.has(r.id) ? 'near' : 'far';
           const picked = props.pick === r.id;
           const people = r.id === here ? (view.room?.npcs ?? []) : [];
-          const flagged = r.id === here && view.room?.objects.some((o) => o.auffaellig);
           const st = stairOf(r.id);
           const label = `${r.name}${st ? (st.dir === 'down' ? ', Treppe nach unten' : ', Treppe nach oben') : ''}${people.length ? `, ${people.length} ${people.length === 1 ? 'Person' : 'Personen'}` : ''}${state === 'here' ? ', hier bist du' : state === 'near' ? ', erreichbar' : ', nicht erreichbar'}`;
           const blocked = !!props.onPick && state === 'far';
@@ -169,7 +168,6 @@ export function HotelPlan(props: { pick?: string; onPick?: (id: string) => void 
                     </i>
                   ))
                 )}
-                {flagged && <b className="bang">!</b>}
               </span>
             </button>
           );

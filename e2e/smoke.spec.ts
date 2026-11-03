@@ -91,7 +91,9 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: 'Schließen' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   // exploring is free: progress counts finds, no action budget any more
-  await expect(page.getByText(/Entdeckt [0-9]+ von [0-9]+/)).toBeVisible();
+  // talking is free: the budget of day 1 is untouched
+  await expect(page.getByText('Aktionen übrig (1/1)')).toBeVisible();
+  await expect(page.getByText('!', { exact: true })).toHaveCount(0);
 
   await page.keyboard.press('Escape');
 
@@ -134,9 +136,16 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   // object puzzle: the lock in the cellar opens with the code, then the chest can be examined
   await page.getByRole('button', { name: 'Hotel' }).click();
   await expect(page.getByRole('heading', { name: 'Keller', exact: true })).toBeVisible();
+  // "Umsehen" makes everything tappable glint
+  await page.getByRole('button', { name: /Umsehen/ }).click();
+  await expect(page.locator('.scene .spot.glint').first()).toBeVisible();
+  await expect(page.getByText('Aktionen übrig (2/2)')).toBeVisible();
   await page.getByRole('button', { name: /Kiste/ }).last().click();
-  await page.getByRole('button', { name: /Genau untersuchen/ }).click();
+  await expect(page.getByText('Du siehst es dir an. Das kostet nichts.')).toBeVisible();
+  await page.getByRole('button', { name: /Genauer untersuchen \(kostet 1 Aktion\)/ }).click();
   await expect(page.getByText(/verschlossen/).first()).toBeVisible();
+  // a locked chest brought nothing: no action spent
+  await expect(page.getByText('Aktionen übrig (2/2)')).toBeVisible();
   await page.getByLabel('Deine Antwort').fill('000');
   await page.getByRole('button', { name: 'Ausprobieren' }).click();
   await expect(page.getByText(/Das passt noch nicht/)).toBeVisible();
@@ -144,7 +153,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: 'Ausprobieren' }).click();
   await expect(page.getByText(/Das Schloss springt auf/)).toBeVisible();
   await page.getByRole('button', { name: /Kiste/ }).last().click();
-  await page.getByRole('button', { name: /Genau untersuchen/ }).click();
+  await page.getByRole('button', { name: /Genauer untersuchen/ }).click();
   await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
   // note popup: the little paper with sender and receiver
   await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
@@ -156,6 +165,8 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  // the finding cost one action
+  await expect(page.getByText('Aktionen übrig (1/2)')).toBeVisible();
   // WP06d: the chest is drawn as a prop and now shows its open state
   await expect(page.locator('.scene svg[data-prop="truhe"][data-state="auf"]')).toBeVisible();
 

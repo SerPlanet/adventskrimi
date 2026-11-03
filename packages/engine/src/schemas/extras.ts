@@ -63,7 +63,6 @@ export const PrologFile = z.object({
     z.object({
       day: Day,
       goal: z.string().min(1),
-      actions: z.number().int().min(1),
       intro: CardText,
       tips: z.array(z.string()).default([]),
     }),

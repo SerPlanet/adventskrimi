@@ -6,13 +6,7 @@ rooms:
     plan: { x: 0, y: 0, w: 6, h: 4 }
     scene: halle
     objects:
-      - {
-          id: lampe,
-          name: Alte Lampe,
-          text: Die Lampe flackert leicht.,
-          auffaellig: true,
-          spot: { x: 70, y: 30 },
-        }
+      - { id: lampe, name: Alte Lampe, text: Die Lampe flackert leicht., spot: { x: 70, y: 30 } }
   - id: keller
     name: Keller
     description: Ein kühler Keller mit einer schweren Kiste.
@@ -24,7 +18,6 @@ rooms:
           id: kiste,
           name: Schwere Kiste,
           text: Die Kiste hat ein Zahlenschloss.,
-          auffaellig: true,
           spot: { x: 35, y: 48 },
         }
 doors:

@@ -82,13 +82,13 @@ describe('safe views', () => {
   });
 });
 
-describe('idempotency and costs', () => {
+describe('idempotency and costs (talking is free)', () => {
   test('same request_id twice changes nothing and replays the answer', async () => {
     const body = { slug: 'test', player_id: a, request_id: rid(), action: talk };
     const first = await call('act', body);
     const again = await call('act', body);
     expect(again.body).toEqual(first.body);
-    expect(bodyOf(again).state.explore.found).toBe(1);
+    expect(bodyOf(again).state.actions.used).toBe(0);
     expect(bodyOf(again).state.points).toBe(bodyOf(first).state.points);
   });
 
@@ -96,7 +96,7 @@ describe('idempotency and costs', () => {
     await call('act', { slug: 'test', player_id: a, request_id: rid(), action: talk });
     const r = await call('act', { slug: 'test', player_id: a, request_id: rid(), action: talk });
     expect(bodyOf(r).result.status).toBe('known');
-    expect(bodyOf(r).state.explore.found).toBe(1);
+    expect(bodyOf(r).state.actions.used).toBe(0);
   });
 
   test('empty action and foreign room cost nothing', async () => {
@@ -114,7 +114,7 @@ describe('idempotency and costs', () => {
       action: { type: 'talk', npc: 'ben', topic: 'nacht' },
     });
     expect(bodyOf(away).result.status).toBe('unavailable');
-    expect(bodyOf(away).state.explore.found).toBe(0);
+    expect(bodyOf(away).state.actions.used).toBe(0);
   });
 
   test('a foreign day is refused: before the start and beyond today', async () => {

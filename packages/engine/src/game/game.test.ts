@@ -14,7 +14,9 @@ import {
   dayOf,
   confirmLink,
   endDay,
-  exploreProgress,
+  actionsLeft,
+  budgetOf,
+  classOf,
   linksOf,
   findContradictions,
   fitsTogether,
@@ -51,7 +53,7 @@ const ctx = mk();
 const talkAnna: Action = { type: 'talk', npc: 'anna', topic: 'nacht' };
 const at = (day: number, room: string, st = newPlayer(ctx)): PlayerState => ({ ...st, day, room });
 
-describe('exploring is free: only new finds change anything', () => {
+describe('only new finds change anything', () => {
   test('empty action costs nothing', () => {
     const { state, result } = resolveAction(newPlayer(ctx), ctx, {
       type: 'talk',
@@ -72,20 +74,13 @@ describe('exploring is free: only new finds change anything', () => {
     expect(again.state).toBe(first.state);
   });
 
-  test('there is no action limit: a second new find in a row works', () => {
+  test('talking has no limit: a second new find in a row works', () => {
     const one = resolveAction(newPlayer(ctx), ctx, talkAnna).state;
     const r = resolveAction(one, ctx, { type: 'talk', npc: 'cora', topic: 'nacht' });
     expect(r.result.status).toBe('found');
   });
 
-  test('progress counts things that brought a find, and links give points once', () => {
-    const here = newPlayer(ctx);
-    const before = exploreProgress(here, ctx);
-    expect(before.found).toBe(0);
-    expect(before.total).toBeGreaterThan(0);
-    const after = exploreProgress(resolveAction(here, ctx, talkAnna).state, ctx);
-    expect(after.found).toBe(1);
-    expect(after.total).toBe(before.total);
+  test('links give points once', () => {
     const withLink = mk((c) => {
       c.case.links = [
         { id: 'l1', a: 'f_excl_ben', b: 's_cora_halle', text: 'Das erinnert dich an die Halle.' },
@@ -307,6 +302,48 @@ describe('contradictions come only from the players own entries', () => {
   test('consistent entries do not conflict', () => {
     const entries = timelineFromFound(ctx, ['s_ben_keller', 'f_ben_keller']);
     expect(findContradictions(entries)).toEqual([]);
+  });
+});
+
+describe('action budget: only examining costs, and only with a new find (D62)', () => {
+  const lamp: Action = { type: 'inspect', object: 'lampe' };
+  const lamp2: Action = { type: 'inspect', object: 'lampe' };
+
+  test('budget comes from the profile, prolog days override', () => {
+    expect(budgetOf(ctx, 1)).toBe(friends.actions_per_day.prolog[1]);
+    expect(budgetOf(ctx, 20)).toBe(friends.actions_per_day.default);
+  });
+
+  test('talking and a known or empty examination cost nothing, a new find costs one', () => {
+    let st = resolveAction(newPlayer(ctx), ctx, talkAnna).state;
+    expect(st.actionsUsed).toBe(0);
+    st = resolveAction(st, ctx, { type: 'inspect', object: 'kiste' }).state;
+    expect(st.actionsUsed).toBe(0);
+    const r = resolveAction(st, ctx, lamp);
+    expect(r.result.status).toBe('found');
+    expect(r.state.actionsUsed).toBe(1);
+    expect(resolveAction(r.state, ctx, lamp2).state.actionsUsed).toBe(1);
+  });
+
+  test('without budget the examination is refused and nothing changes; talking still works', () => {
+    const none = { ...newPlayer(ctx), actionsUsed: budgetOf(ctx, 1) };
+    const r = resolveAction(none, ctx, lamp);
+    expect(r.result.status).toBe('budget');
+    expect(r.state).toBe(none);
+    expect(actionsLeft(none, ctx)).toBe(0);
+    expect(resolveAction(none, ctx, talkAnna).result.status).toBe('found');
+  });
+
+  test('the budget is new every day', () => {
+    const used = { ...newPlayer(ctx), actionsUsed: 1 };
+    const r = endDay(used, ctx, 'halle');
+    expect(r.ok && r.state.actionsUsed).toBe(0);
+  });
+
+  test('classes: examinable with a find, look-only as a target, decoration without a source', () => {
+    expect(classOf({ id: 'lampe' }, ctx.c)).toBe('untersuchbar');
+    expect(classOf({ id: 'nichts' }, ctx.c)).toBe('deko');
+    expect(classOf({ id: 'nichts', klasse: 'ansehen' }, ctx.c)).toBe('ansehen');
   });
 });
 

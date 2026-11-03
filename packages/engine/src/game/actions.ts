@@ -1,5 +1,6 @@
 import { normalize } from '../puzzles';
 import type { Source } from '../schemas';
+import { budgetOf, costsAction } from './budget';
 import { addLedger, type GameCtx, type PlayerState } from './state';
 
 export type Action =
@@ -16,13 +17,14 @@ export type ActionResult =
       plaques: { sourceId: string; title: string }[];
       points: number;
     }
-  | { status: 'empty' | 'known' | 'locked' | 'unavailable'; message: string };
+  | { status: 'empty' | 'known' | 'locked' | 'unavailable' | 'budget'; message: string };
 
 const MSG = {
   empty: 'Dazu gibt es nichts zu holen.',
   known: 'Das weißt du schon.',
   locked: 'Hier ist etwas verschlossen. Vielleicht hilft ein Rätsel oder ein Gegenstand.',
   unavailable: 'Das geht hier und heute nicht.',
+  budget: 'Für heute genug untersucht. Gespräche und Lesen sind weiter frei.',
 } as const;
 
 const fail = (status: keyof typeof MSG, st: PlayerState) => ({
@@ -67,7 +69,7 @@ function unlocked(s: Source, st: PlayerState, ctx: GameCtx): boolean {
   return st.inventory.includes(s.requires);
 }
 
-/** Pure: returns the new state and what happened. Exploring is free (02b); only new finds change anything. */
+/** Pure: returns the new state and what happened. Only a new find changes anything; "inspect" then costs one action. */
 export function resolveAction(
   st: PlayerState,
   ctx: GameCtx,
@@ -85,12 +87,15 @@ export function resolveAction(
 
   const newItems = [...new Set(open.flatMap((s) => s.yields))].filter((y) => !st.found.includes(y));
   if (!newItems.length) return fail('known', st);
+  // only a new find costs an action; without budget the thing stays untouched
+  if (costsAction(a) && st.actionsUsed >= budgetOf(ctx, st.day)) return fail('budget', st);
 
   const gaining = open.filter((s) => s.yields.some((y) => newItems.includes(y)));
   const itemIds = new Set(ctx.c.puzzles.items.map((i) => i.id));
   let next: PlayerState = {
     ...st,
     started: true,
+    actionsUsed: costsAction(a) ? st.actionsUsed + 1 : st.actionsUsed,
     found: [...st.found, ...newItems],
     inventory: [...st.inventory, ...newItems.filter((i) => itemIds.has(i))],
     discoveries: [

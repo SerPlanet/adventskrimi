@@ -25,7 +25,6 @@ sources:
       topic: nacht,
       days: { from: 1, to: 3 },
       yields: [s_cora_halle],
-      auffaellig: true,
       presentation: dialog,
       lines:
         [
@@ -39,7 +38,6 @@ sources:
       room: halle,
       object: lampe,
       days: [1, 2, 3],
-      auffaellig: true,
       yields: [f_cora_keller],
       plaque: Sehr aufmerksam,
     }
@@ -50,7 +48,6 @@ sources:
       object: kiste,
       days: [2, 3],
       requires: p_code,
-      auffaellig: true,
       yields: [f_kiste_offen, f_ben_keller],
       presentation: note,
       document: { title: Zettel aus der Kiste, kind: zettel },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession, type ActResult, type Action } from '../store';
 import { ObjectPuzzles } from './ObjectPuzzles';
 import { FindCard } from './FindCard';
@@ -21,9 +21,16 @@ export function Hotel() {
   const [open, setOpen] = useState<Open | null>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
+  const [glint, setGlint] = useState(false);
+  useEffect(() => {
+    if (!glint) return;
+    const t = setTimeout(() => setGlint(false), 2200);
+    return () => clearTimeout(t);
+  }, [glint]);
   if (!view) return null;
 
   const play = view.can_play && !view.finished;
+  const left = Math.max(0, view.actions.budget - view.actions.used);
   const room = view.room;
 
   if (view.finished)
@@ -40,7 +47,8 @@ export function Hotel() {
     if (!r) return;
     if (r.result.status === 'found') setOpen({ kind: 'found', ...r });
     else {
-      setMsg(r.result.message ?? '');
+      const free = a.type === 'inspect' && r.result.status !== 'budget';
+      setMsg((r.result.message ?? '') + (free ? ' Das hat keine Aktion gekostet.' : ''));
       setOpen(null);
     }
   };
@@ -103,19 +111,33 @@ export function Hotel() {
               </button>
             </p>
           )}
-          {!room.blocked && <RoomScene room={room} onSpot={onSpot} armed={!!armed} />}
+          <div className="budget">
+            <p className="row" role="status">
+              <strong>
+                Aktionen übrig ({left}/{view.actions.budget})
+              </strong>
+              {left === 0 && (
+                <span className="small">
+                  Für heute genug untersucht. Gespräche und Lesen sind weiter frei.
+                </span>
+              )}
+            </p>
+            <button onClick={() => setGlint(true)}>👀 Umsehen</button>
+          </div>
+          {!room.blocked && <RoomScene room={room} onSpot={onSpot} armed={!!armed} glint={glint} />}
 
           <details className="help">
             <summary>Liste der Dinge (Hilfe für Tastatur und Vorlesen)</summary>
             <ul className="plain">
-              {spotsOf(room).map((s) => (
-                <li key={s.key}>
-                  <button disabled={!play || busy} onClick={() => onSpot(s)}>
-                    <span aria-hidden="true">{s.icon}</span> {s.label}
-                    {s.bang && <span className="sr"> (auffällig)</span>}
-                  </button>
-                </li>
-              ))}
+              {spotsOf(room)
+                .filter((s) => s.clickable)
+                .map((s) => (
+                  <li key={s.key}>
+                    <button disabled={!play || busy} onClick={() => onSpot(s)}>
+                      <span aria-hidden="true">{s.icon}</span> {s.label}
+                    </button>
+                  </li>
+                ))}
               {room.book && (
                 <li>
                   <button disabled={!play || busy} onClick={() => void run({ type: 'hotelbook' })}>
@@ -129,16 +151,6 @@ export function Hotel() {
 
           <ObjectPuzzles disabled={!play || busy} />
 
-          <p className="row" role="status">
-            <strong>
-              Entdeckt {view.explore.found} von {view.explore.total}
-            </strong>
-            <span className="small">
-              {view.explore.found >= view.explore.total
-                ? 'Hier gibt es heute nichts Neues mehr.'
-                : 'Sieh dir alles in Ruhe an. Es kostet nichts.'}
-            </span>
-          </p>
           {(view.inventory.length > 0 || view.documents.length > 0) && (
             <div className="inv" role="group" aria-label="Dein Inventar">
               {view.documents.map((d) => (
@@ -184,16 +196,26 @@ export function Hotel() {
         <Popup title={obj.name} onClose={close}>
           <Prop className="closeup" name={obj.name} prop={obj.prop} open={obj.explored} />
           <p className="small">
-            {obj.explored ? 'Du hast es genau untersucht.' : 'Du siehst es dir an.'}
+            {obj.explored
+              ? 'Du hast es genau untersucht.'
+              : 'Du siehst es dir an. Das kostet nichts.'}
           </p>
           <p>{obj.text}</p>
-          <button
-            disabled={!play || busy}
-            onClick={() => void run({ type: 'inspect', object: obj.id })}
-          >
-            🔎 Genau untersuchen
-          </button>
-          <p className="small">Nur Ansehen kostet nichts.</p>
+          {obj.klasse === 'untersuchbar' && !obj.explored && (
+            <>
+              <button
+                disabled={!play || busy || left === 0}
+                onClick={() => void run({ type: 'inspect', object: obj.id })}
+              >
+                🔎 Genauer untersuchen (kostet 1 Aktion)
+              </button>
+              <p className="small" role="status">
+                {left === 0
+                  ? 'Für heute genug untersucht. Gespräche und Lesen sind weiter frei.'
+                  : `Aktionen übrig (${left}/${view.actions.budget})`}
+              </p>
+            </>
+          )}
         </Popup>
       )}
       {open?.kind === 'found' && (

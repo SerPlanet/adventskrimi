@@ -1,5 +1,6 @@
 import { andInto, count } from './space';
 import type { Info } from './info';
+import { budgetOf } from '../game/budget';
 
 export interface TempoResult {
   /** first day on which a perfect player can name the single solution (null = never) */
@@ -62,10 +63,12 @@ export function planTempo(info: Info, budgetOf: (day: number) => number, beam = 
         if (reach.blocked(room, day) || !reach.rooms.has(room)) continue;
         let cur: State = { ...base, room };
         for (const [pid, pr] of puzzleRoom) if (pr === room) cur.found.add(`puzzle:${pid}`);
-        for (let a = 0; a < budgetOf(day); a++) {
+        // free finds (talk, show, read) are taken first and again after each examination;
+        // examining ("inspect") costs one of the day's actions and takes the best gain
+        const take = (costly: boolean): boolean => {
           let best: { ids: string[]; n: number; gain: number } | null = null;
           for (const s of sources) {
-            if (s.kind === 'newspaper') continue;
+            if (s.kind === 'newspaper' || (s.kind === 'inspect') !== costly) continue;
             const at = reach.roomOn(s.id, day);
             if (at !== room && at !== '*') continue;
             if (s.requires && puzzleRoom.has(s.requires) && !cur.found.has(`puzzle:${s.requires}`))
@@ -75,14 +78,20 @@ export function planTempo(info: Info, budgetOf: (day: number) => number, beam = 
             const t = apply(cur, ids);
             const gain = cur.n - t.n;
             if (
-              gain > 0 &&
+              (!costly || gain > 0) &&
               (!best || gain > best.gain || (gain === best.gain && ids.length > best.ids.length))
             )
               best = { ids, n: t.n, gain };
           }
-          if (!best) break;
+          if (!best) return false;
           cur = apply(cur, best.ids);
-        }
+          return true;
+        };
+        const freeAll = () => {
+          while (take(false));
+        };
+        freeAll();
+        for (let a = 0; a < budgetOf(day) && take(true); a++) freeAll();
         const k = key(cur);
         if (!next.has(k)) next.set(k, cur);
       }
@@ -98,7 +107,7 @@ export function planTempo(info: Info, budgetOf: (day: number) => number, beam = 
   return { solveDay, remainingByDay };
 }
 
-/** No action budget since WP06c: a visited room gives everything it holds that day. */
-export function profileBudget(_info: Info): (day: number) => number {
-  return () => 99;
+/** The profile's action budget per day (talking, showing and reading are free). */
+export function profileBudget(info: Info): (day: number) => number {
+  return (day) => budgetOf({ profile: info.profile }, day);
 }

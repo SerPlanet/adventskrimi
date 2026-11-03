@@ -143,17 +143,6 @@
   place-items: center;
   font-size: 0.6rem;
 }
-.rm .bang {
-  color: #3a2616;
-  background: #ffd24a;
-  border: 1px solid #3a2616;
-  border-radius: 50%;
-  width: 1rem;
-  height: 1rem;
-  display: inline-grid;
-  place-items: center;
-  font-size: 0.65rem;
-}
 @media (min-width: 900px) {
   .rm {
     font-size: 15px;
@@ -301,20 +290,33 @@
 .scene .spot:focus-visible {
   background: rgb(255 255 255 / 0.18);
 }
-.scene .spot .bang {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 1.2rem;
-  height: 1.2rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #ffd24a;
-  color: #3a2616;
-  font-weight: 700;
-  font-size: 0.8rem;
-  border: 2px solid #3a2616;
+.scene .spot.deco {
+  pointer-events: none;
+}
+.scene .spot.clickable:hover,
+.scene .spot.clickable:focus-visible {
+  background: rgb(255 226 140 / 0.22);
+  box-shadow: 0 0 0 2px #ffd24a;
+}
+.scene .spot.glint {
+  box-shadow: 0 0 0 3px #ffd24a;
+  background: rgb(255 226 140 / 0.28);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .scene .spot.glint {
+    animation: glint 0.9s ease-in-out 2;
+  }
+  @keyframes glint {
+    50% {
+      box-shadow: 0 0 0 7px rgb(255 210 74 / 0.55);
+    }
+  }
+}
+.budget {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
 }
 details.help {
   margin: 0.6rem 0;

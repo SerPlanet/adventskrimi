@@ -3,7 +3,7 @@
 Stand: 2026-11-02 · Phase: **M2 erreicht** (Testfall bis Tag 24 im Zeitraffer, WP08, WP09 Teil 2, WP04 fertig). Offen: Push, Prod-Migration, WP11
 
 ## Nächstes Work Package
-**UI-Redesign:** WP06e ✓, WP06f ✓ (wartet auf Abnahme durch den Menschen) → danach WP06g (Zeitung), WP06h (Akte), WP06i (Aufräumen). Danach WP11.
+**UI-Redesign:** WP06e ✓, WP06f ✓, WP06j ✓ (wartet auf Test durch den Menschen) → danach WP06g (Zeitung), WP06h (Akte), WP06i (Aufräumen). Danach WP11.
 
 **M2 erreicht.** Nächstes: WP11 (Admin) → `docs/wp/WP11-admin.md`; parallel Balance-Verstöße aus `npm run balance` (siehe unten) in WP10/WP13 beheben.
 
@@ -35,6 +35,8 @@ WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → 
 
 - WP06e: Skins (`app/src/skins.css`), lokale Schriften (D61), Desktop-Raster `.wrap`/`.cols2`, Navigation am PC oben.
 - WP06f: Hotelplan als ein Grundriss (`ui/HotelPlan.tsx`, Daten `plan`/`doors`/`outside`/`stairs` in `rooms.yaml`, Validator-Check `plan`: Türen = Raumgraph), komponierte Raumszene (`ui/RoomScene.tsx`, `spot`/`scale`/`layer`), Liste der Dinge eingeklappt. `floor`/`col`/HotelMap entfernt. Fall-Zusatzdaten liegen in `case_meta.data` (kein Schemawechsel). Bekannt: `tools/integration/api.int.ts` ist veraltet (`actions.used`, Int-P-Altlast), nicht Teil von WP06f.
+
+- WP06j: Aktionsbudget neu (`game/budget.ts`, `game/things.ts`): nur „Genauer untersuchen“ kostet 1 und nur bei neuem Fund, Budget je Tag aus `actions_per_day` (Profil, Prolog-Tage). Klassen deko/ansehen/untersuchbar (abgeleitet, `klasse` überschreibt), Ansicht `actions {used,budget}`, `explore` und `auffaellig` gelöscht, kein „!“, Deko nicht klickbar, Knopf „Umsehen“. Planer, Bots, Validator auf B umgestellt; `balance` und `validate-case` grün. Offen (Inhalt, Sub-Agent): fast alle Dinge im Berghotel sind untersuchbar; je Raum/Tag prüfen, dass mehr untersuchbare Funde als Aktionen existieren und die Grenzen kalibrieren.
 
 ## In Arbeit
 - **WP06b (halb fertig, nicht gepusht):** Neu: `app/src/ui/` (Popup, Candles, HotelMap, RoomScene, Bubbles), `screens/EndDay.tsx`, neues Hotel, Zeitungs-Layout, Schema-Felder (`floor/col/scene`, `spot`, `presentation/lines/note`), Popup-Wortprüfung. Functions auf Staging neu deployt. **Offen:** `e2e/smoke.spec.ts` bricht nach dem Fund-Popup ab (das Popup „Neu in deiner Akte" bleibt offen und blockiert den Klick auf „Akte"; im Test vor dem Wechsel `Escape` drücken), danach Lighthouse (`npm run a11y`, Preview muss laufen) und Playwright für Dialog/Notiz/Karte ergänzen.
