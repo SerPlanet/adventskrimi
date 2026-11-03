@@ -199,7 +199,7 @@
     align-items: start;
   }
   .cols2.wide-left {
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 3fr 1fr;
   }
   .cols2.wide-right {
     grid-template-columns: 1fr 2fr;

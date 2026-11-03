@@ -56,20 +56,38 @@ export function spotsOf(room: Room): Spot[] {
       hung,
     };
   });
-  const people: Spot[] = room.npcs.map((n, i) => ({
-    key: `npc-${n.id}`,
-    kind: 'npc',
-    id: n.id,
-    label: n.name,
-    icon: '🧑',
-    bang: false,
-    open: false,
-    x: row(room.npcs.length, i),
-    y: 94,
-    scale: 1.5,
-    layer: 'front',
-    hung: false,
-  }));
+  // people stand next to the furniture: in the gaps of the floor, smaller the farther away
+  // blocked stretches: floor furniture (half its width each side), people already placed
+  const blocked = things
+    .filter((t) => !t.hung && t.y > 70)
+    .map((t) => ({ x: t.x, half: t.scale * 7.5 }));
+  const people: Spot[] = room.npcs.map((n, i) => {
+    let x = 50;
+    let best = -99;
+    for (let c = 8; c <= 92; c += 2) {
+      const gap = Math.min(...blocked.map((b) => Math.abs(b.x - c) - b.half - 4), 99);
+      if (gap > best) {
+        best = gap;
+        x = c;
+      }
+    }
+    blocked.push({ x, half: 4 });
+    const y = 76 + (i % 2) * 9;
+    return {
+      key: `npc-${n.id}`,
+      kind: 'npc',
+      id: n.id,
+      label: n.name,
+      icon: '🧑',
+      bang: false,
+      open: false,
+      x,
+      y,
+      scale: 0.55 + (y - 60) / 60,
+      layer: 'front',
+      hung: false,
+    };
+  });
   // far things first, so that near ones cover them
   return [...things, ...people].sort(
     (a, b) => Number(a.hung) * -1 - Number(b.hung) * -1 || a.y - b.y,
@@ -78,19 +96,48 @@ export function spotsOf(room: Room): Spot[] {
 
 const hue = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
 
+const COATS = ['#3f6b4f', '#8a3b34', '#35557a', '#6b4a86', '#a8782a', '#2f6b6b'];
+const HAIRS = ['#2a1a10', '#8a5a2b', '#d9b45a', '#9a9a9a', '#5a2a18'];
+const SKINS = ['#f1c9a0', '#e0b088', '#c58f66', '#8a5a3c'];
+const pick = <T,>(xs: T[], n: number) => xs[n % xs.length] as T;
+
+/** A small figure: coat, hair and face differ by name, so people can be told apart. */
 function Person({ name }: { name: string }) {
+  const h = hue(name);
+  const hairStyle = h % 3;
   return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 60 100" aria-hidden="true" focusable="false">
+      <ellipse cx="30" cy="96" rx="20" ry="3" fill="#000" opacity="0.3" />
+      <path d="M20 96V70H40V96Z" fill="#3a3a48" stroke="#3a2616" strokeWidth="2" />
       <path
-        d="M26 94 Q26 56 50 56 Q74 56 74 94Z"
-        fill="#3f6b4f"
+        d="M12 76Q12 44 30 44Q48 44 48 76Z"
+        fill={pick(COATS, h)}
         stroke="#3a2616"
-        strokeWidth="2.5"
+        strokeWidth="2"
       />
-      <circle cx="50" cy="34" r="17" fill="#f1c9a0" stroke="#3a2616" strokeWidth="2.5" />
-      <text x="50" y="82" textAnchor="middle" fontSize="22" fill="#f6ecd0">
-        {name.slice(0, 1)}
-      </text>
+      <circle cx="30" cy="30" r="13" fill={pick(SKINS, h >> 2)} stroke="#3a2616" strokeWidth="2" />
+      {hairStyle === 0 && (
+        <path
+          d="M17 28Q18 14 30 14Q42 14 43 28Q36 20 30 21Q23 20 17 28Z"
+          fill={pick(HAIRS, h >> 1)}
+        />
+      )}
+      {hairStyle === 1 && (
+        <path
+          d="M16 34Q14 12 30 13Q46 12 44 34Q42 20 30 20Q18 20 16 34Z"
+          fill={pick(HAIRS, h >> 1)}
+        />
+      )}
+      {hairStyle === 2 && (
+        <path
+          d="M17 24Q30 8 43 24Z"
+          fill={pick(HAIRS, h >> 1)}
+          stroke="#3a2616"
+          strokeWidth="1.5"
+        />
+      )}
+      <circle cx="25" cy="31" r="1.4" fill="#2a1a10" />
+      <circle cx="35" cy="31" r="1.4" fill="#2a1a10" />
     </svg>
   );
 }
@@ -140,6 +187,49 @@ function Backdrop({ scene, avoid }: { scene: string; avoid: number[] }) {
       />
       <path d={`M${wx - 6} 21 Q${wx - 2} 17 ${wx + 2} 19 T${wx + 6} 18V21Z`} fill="#eef4f8" />
       <path d={`M${wx} 4V21M${wx - 6} 12H${wx + 6}`} stroke="#3a2616" strokeWidth="1" />
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <circle
+          key={i}
+          cx={wx - 4.5 + ((i * 37 + h) % 9)}
+          cy={6 + ((i * 53 + h) % 11)}
+          r="0.5"
+          fill="#fff"
+        />
+      ))}
+      {[(wx + 40) % 100, (wx + 70) % 100].map((x, i) => (
+        <g key={x}>
+          <circle cx={x} cy="14" r="5" fill="#ffd98a" opacity="0.18" />
+          <rect x={x - 0.8} y="11" width="1.6" height="4" fill="#5e3b1b" />
+          <path d={`M${x - 1.2} 11Q${x} 7 ${x + 1.2} 11Z`} fill={i ? '#ffd24a' : '#ffb347'} />
+        </g>
+      ))}
+      <rect
+        x={((wx + 22) % 100) - 3}
+        y="9"
+        width="6"
+        height="7"
+        fill={`hsl(${h} 20% 55%)`}
+        stroke="#5e3b1b"
+        strokeWidth="0.8"
+      />
+      <g>
+        <rect
+          x={((wx + 55) % 100) - 1.8}
+          y={floorY - 6}
+          width="3.6"
+          height="5"
+          rx="0.6"
+          fill="#8a5a2b"
+          stroke="#3a2616"
+          strokeWidth="0.4"
+        />
+        <path
+          d={`M${(wx + 55) % 100} ${floorY - 6}q-3 -4 -1 -7M${(wx + 55) % 100} ${floorY - 6}q3 -4 1 -7M${(wx + 55) % 100} ${floorY - 6}v-8`}
+          stroke="#3f6b4f"
+          strokeWidth="1"
+          fill="none"
+        />
+      </g>
       <rect x={wx - 7} y="20.5" width="14" height="1.6" fill="#5e3b1b" />
       <rect y={floorY} width={W} height={H - floorY} fill={`hsl(${h} 22% 24%)`} />
       <g stroke="#000" strokeWidth="0.25" opacity="0.35">
@@ -151,6 +241,29 @@ function Backdrop({ scene, avoid }: { scene: string; avoid: number[] }) {
         ))}
       </g>
       <rect y={floorY} width={W} height={H - floorY} fill={`url(#glow-${scene})`} />
+      <ellipse
+        cx={100 - wx}
+        cy={H - 12}
+        rx="20"
+        ry="4.5"
+        fill={`hsl(${(h + 150) % 360} 35% 32%)`}
+        opacity="0.75"
+      />
+      <ellipse
+        cx={100 - wx}
+        cy={H - 12}
+        rx="14"
+        ry="2.8"
+        fill="none"
+        stroke="#f6ecd0"
+        strokeWidth="0.3"
+        opacity="0.5"
+      />
+      <path
+        d={`M${wx - 6} 21L${wx - 14} ${H - 4}H${wx + 14}L${wx + 6} 21Z`}
+        fill="#ffe9b0"
+        opacity="0.1"
+      />
       <rect y={H - 6} width={W} height="6" fill="#000" opacity="0.18" />
     </svg>
   );
@@ -174,14 +287,22 @@ export function RoomScene(props: { room: Room; onSpot: (s: Spot) => void; armed:
           <span
             key={`sh-${s.key}`}
             className="shadow"
-            style={{ left: `${s.x}%`, top: `${s.y}%`, width: `${s.scale * 11}%` }}
+            style={{
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              width: `${s.scale * (s.kind === 'npc' ? 7 : 11)}%`,
+            }}
           />
         ))}
       {spots.map((s) => (
         <button
           key={s.key}
           className={`spot ${s.kind}${props.armed ? ' target' : ''}${s.open ? ' open' : ''}${s.hung ? ' hung' : ''}`}
-          style={{ left: `${s.x}%`, top: `${s.y}%`, width: `${s.scale * 15}%` }}
+          style={{
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: `${s.scale * (s.kind === 'npc' ? 10 : 15)}%`,
+          }}
           aria-label={s.label + (s.bang ? ' (auffällig)' : '') + (s.open ? ' (untersucht)' : '')}
           onClick={() => props.onSpot(s)}
         >
@@ -189,6 +310,11 @@ export function RoomScene(props: { room: Room; onSpot: (s: Spot) => void; armed:
             <Person name={s.label} />
           ) : (
             <Prop name={s.label} prop={s.prop} open={s.open} />
+          )}
+          {s.kind === 'npc' && (
+            <span className="tag" aria-hidden="true">
+              {s.label}
+            </span>
           )}
           {s.bang && !s.open && (
             <span className="bang" aria-hidden="true">

@@ -31,6 +31,8 @@ export const Room = z.object({
   objects: z.array(RoomObject).default([]),
   /** rectangle in the floor plan, grid units (WP06f) */
   plan: Rect,
+  /** connecting room (hall): drawn as a corridor */
+  corridor: z.boolean().optional(),
   scene: z.string().optional(),
 });
 

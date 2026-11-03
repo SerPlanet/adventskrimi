@@ -129,6 +129,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
         name: r.name,
         neighbors: r.neighbors,
         plan: r.plan,
+        corridor: r.corridor,
       })),
       doors: c.rooms.doors,
       outside: c.rooms.outside,

@@ -25,7 +25,14 @@
 }
 .plan .stairs line {
   stroke: #8a6a3a;
-  stroke-width: 0.12;
+  stroke-width: 0.1;
+}
+.plan .corridor .floor {
+  fill: #ead9c2;
+}
+.plan .runner {
+  fill: #b8433a;
+  opacity: 0.55;
 }
 .plan .wall {
   fill: none;
@@ -157,6 +164,63 @@
   }
 }
 
+.rm .who.count {
+  width: auto;
+  min-width: 1.4rem;
+  border-radius: 999px;
+  padding: 0 0.3rem;
+  background: #2f5a41;
+}
+.legend {
+  list-style: none;
+  margin: 0.4rem 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.2rem;
+  font-size: 0.8rem;
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.legend .you {
+  background: #ffd24a;
+  color: #2a2118;
+  border: 1px solid #8a4b00;
+  border-radius: 999px;
+  padding: 0 0.3rem;
+}
+.legend .who {
+  font-style: normal;
+  background: #3f6b4f;
+  color: #fff;
+  border-radius: 50%;
+  width: 1.1rem;
+  height: 1.1rem;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.7rem;
+}
+.legend .swatch {
+  width: 1.2rem;
+  height: 0.9rem;
+  border: 2px solid #4a3a2a;
+  background: #f6efe2;
+  display: inline-block;
+}
+.legend .swatch.near {
+  border: 2px dashed var(--accent);
+}
+.legend .swatch.stairs {
+  background: repeating-linear-gradient(#e2d4bb 0 3px, #8a6a3a 3px 4px);
+}
+.legend .swatch.door {
+  border-color: #8a5a2b;
+  width: 0.5rem;
+}
+
 /* room scene */
 .roomwrap {
   padding: 1rem;
@@ -197,6 +261,30 @@
   border-radius: 0.4rem;
   background: transparent;
   padding: 0;
+}
+.scene .spot.npc {
+  aspect-ratio: 3 / 5;
+}
+.scene .spot .tag {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 0.4rem;
+  border-radius: 0.3rem;
+  background: #f6ecd0;
+  color: #3a2616;
+  border: 1px solid #3a2616;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+.scene .spot:hover .tag,
+.scene .spot:focus-visible .tag,
+.scene .spot:active .tag {
+  opacity: 1;
 }
 .scene .spot.hung {
   transform: translate(-50%, -50%);

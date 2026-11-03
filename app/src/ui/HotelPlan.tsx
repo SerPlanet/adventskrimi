@@ -6,7 +6,7 @@ type Map = NonNullable<ReturnType<typeof useSession>['view']>['map'];
 type Door = Map['doors'][number];
 type Room = Map['rooms'][number];
 
-const PAD = 2;
+const PAD = 1.2;
 
 /** A door sits on a vertical or horizontal wall; the gap is drawn on that wall. */
 function DoorMark({ d, rooms }: { d: Door; rooms: Room[] }) {
@@ -71,7 +71,10 @@ export function HotelPlan(props: { pick?: string; onPick?: (id: string) => void 
             ),
           )}
           {rooms.map((r) => (
-            <g key={r.id} className={stairOf(r.id) ? 'stairs' : undefined}>
+            <g
+              key={r.id}
+              className={stairOf(r.id) ? 'stairs' : r.corridor ? 'corridor' : undefined}
+            >
               <rect
                 className="floor"
                 x={r.plan.x}
@@ -80,15 +83,27 @@ export function HotelPlan(props: { pick?: string; onPick?: (id: string) => void 
                 height={r.plan.h}
               />
               {stairOf(r.id) &&
-                Array.from({ length: 6 }, (_, i) => (
-                  <line
-                    key={i}
-                    x1={r.plan.x + 0.3}
-                    x2={r.plan.x + r.plan.w - 0.3}
-                    y1={r.plan.y + r.plan.h - 0.6 - i * ((r.plan.h - 1.2) / 5)}
-                    y2={r.plan.y + r.plan.h - 0.6 - i * ((r.plan.h - 1.2) / 5)}
-                  />
-                ))}
+                Array.from({ length: 4 }, (_, i) => {
+                  const y = r.plan.y + r.plan.h * 0.55 + i * ((r.plan.h * 0.4) / 3);
+                  return (
+                    <line
+                      key={i}
+                      x1={r.plan.x + 0.4}
+                      x2={r.plan.x + r.plan.w - 0.4}
+                      y1={y}
+                      y2={y}
+                    />
+                  );
+                })}
+              {r.corridor && (
+                <rect
+                  className="runner"
+                  x={r.plan.x + r.plan.w * 0.3}
+                  y={r.plan.y + 0.5}
+                  width={r.plan.w * 0.4}
+                  height={r.plan.h - 1}
+                />
+              )}
             </g>
           ))}
           {rooms.map((r) => (
@@ -118,7 +133,7 @@ export function HotelPlan(props: { pick?: string; onPick?: (id: string) => void 
           const people = r.id === here ? (view.room?.npcs ?? []) : [];
           const flagged = r.id === here && view.room?.objects.some((o) => o.auffaellig);
           const st = stairOf(r.id);
-          const label = `${r.name}${st ? (st.dir === 'down' ? ', Treppe nach unten' : ', Treppe nach oben') : ''}${state === 'here' ? ', hier bist du' : state === 'near' ? ', erreichbar' : ', nicht erreichbar'}`;
+          const label = `${r.name}${st ? (st.dir === 'down' ? ', Treppe nach unten' : ', Treppe nach oben') : ''}${people.length ? `, ${people.length} ${people.length === 1 ? 'Person' : 'Personen'}` : ''}${state === 'here' ? ', hier bist du' : state === 'near' ? ', erreichbar' : ', nicht erreichbar'}`;
           const blocked = !!props.onPick && state === 'far';
           return (
             <button
@@ -145,17 +160,38 @@ export function HotelPlan(props: { pick?: string; onPick?: (id: string) => void 
               )}
               <span className="marks" aria-hidden="true">
                 {state === 'here' && <b className="you">Du</b>}
-                {people.map((n) => (
-                  <i key={n.id} className="who">
-                    {n.name.slice(0, 1)}
-                  </i>
-                ))}
+                {people.length > 2 ? (
+                  <i className="who count">{people.length}</i>
+                ) : (
+                  people.map((n) => (
+                    <i key={n.id} className="who">
+                      {n.name.slice(0, 1)}
+                    </i>
+                  ))
+                )}
                 {flagged && <b className="bang">!</b>}
               </span>
             </button>
           );
         })}
       </div>
+      <ul className="legend" aria-label="Legende">
+        <li>
+          <b className="you">Du</b> hier bist du
+        </li>
+        <li>
+          <span className="swatch near" aria-hidden="true" /> gestrichelt: morgen erreichbar
+        </li>
+        <li>
+          <i className="who">A</i> Person (Zahl: mehrere Personen)
+        </li>
+        <li>
+          <span className="swatch stairs" aria-hidden="true" /> Treppe zu Keller und Dachboden
+        </li>
+        <li>
+          <span className="swatch door" aria-hidden="true" /> Tür
+        </li>
+      </ul>
       {everywhere && <p className="small">Du kannst überall hin.</p>}
       {peeked && !props.onPick && (
         <p className="card" role="status">
