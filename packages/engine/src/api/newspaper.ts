@@ -1,5 +1,10 @@
 import type { GameCtx } from '../game';
+import { renderAll } from '../names';
 import type { DayActivity, NewspaperContent } from './types';
+
+/** Default display names of the figures, for the placeholders {n:id}. */
+export const namesOf = (ctx: GameCtx): Record<string, string> =>
+  Object.fromEntries(ctx.c.npcs.npcs.map((n) => [n.id, n.name]));
 
 /**
  * Builds the newspaper of a day from case templates and anonymised numbers of the day before.
@@ -35,7 +40,7 @@ export function generateNewspaper(
   }
 
   const best = [...yesterday].sort((a, b) => b.points - a.points)[0];
-  return {
+  const paper: NewspaperContent = {
     day,
     headline: ev?.headline ?? 'Ein ruhiger Tag im Hotel',
     text: ev?.text ?? 'Im Berghotel passiert heute nichts Besonderes.',
@@ -50,4 +55,6 @@ export function generateNewspaper(
     accusations,
     detective_of_day: best && best.points > 0 ? { name: best.name, points: best.points } : null,
   };
+  // every field of the page is rendered, whatever the stored case still holds
+  return renderAll(paper, {}, namesOf(ctx));
 }

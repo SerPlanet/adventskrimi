@@ -33,8 +33,8 @@ import {
   type GameCtx,
 } from '../game';
 import { applyProfile } from '../solver/profile';
-import { renameCase } from '../names';
-import { generateNewspaper } from './newspaper';
+import { renameCase, renderAll } from '../names';
+import { generateNewspaper, namesOf } from './newspaper';
 import { ApiError, Requests, type GameTx, type PlayerTx, type Settings } from './types';
 import { buildView } from './view';
 
@@ -301,9 +301,10 @@ export const handlers = {
     // readable up to min(today, the day this player is playing): nobody reads ahead of their own game
     if (req.day > readableDays(tx.player.state, now, tx.game.startDate))
       throw new ApiError('not_yet', 403);
-    const existing = await tx.newspaper(req.day);
-    if (existing) return { newspaper: existing };
     const ctx = await ctxOf(tx);
+    // a paper stored earlier may still hold placeholders: render on the way out
+    const existing = await tx.newspaper(req.day);
+    if (existing) return { newspaper: renderAll(existing, {}, namesOf(ctx)) };
     const fresh = generateNewspaper(
       ctx,
       req.day,

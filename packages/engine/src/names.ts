@@ -25,6 +25,18 @@ export function renderText(text: string, names: Names, defaults: Record<string, 
   });
 }
 
+/** Every string inside `v` rendered (deep copy). For content that may still hold placeholders. */
+export function renderAll<T>(v: T, names: Names, defaults: Record<string, string>): T {
+  const walk = (x: unknown): unknown => {
+    if (typeof x === 'string') return renderText(x, names, defaults);
+    if (Array.isArray(x)) return x.map(walk);
+    if (x && typeof x === 'object')
+      return Object.fromEntries(Object.entries(x).map(([k, y]) => [k, walk(y)]));
+    return x;
+  };
+  return walk(v) as T;
+}
+
 /** Returns a copy of the case with all placeholders replaced and npc names updated. */
 export function renameCase(c: LoadedCase, names: Names): LoadedCase {
   const defaults = Object.fromEntries(c.npcs.npcs.map((n) => [n.id, n.name]));
