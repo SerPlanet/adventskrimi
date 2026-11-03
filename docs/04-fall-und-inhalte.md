@@ -47,7 +47,7 @@ Regeln:
 - Atmosphäre-Objekte kosten nie eine Aktion (siehe `02`, §5).
 - Quellen am selben Ort an verschiedenen Tagen dürfen unterschiedliche Funde liefern (Tagesplan).
 
-Präsentation (optional, für das UI-Redesign `WP06b`): `presentation` = `dialog` (mit `lines`: Liste aus `speaker` + `text`), `note` (mit `note: {from, to, text}`, z. B. ein Zettel), `object` (Gegenstandskarte) oder `ambient` (Atmosphäre ohne Fund). Der gesamte Popup-Text einer Quelle ≤60 Wörter. Räume erhalten `floor`, `col`, `scene` und `objects[].spot {x,y}` für Karte und Szene.
+Präsentation (optional, für das UI-Redesign `WP06b`): `presentation` = `dialog` (mit `lines`: Liste aus `speaker` + `text`), `note` (mit `note: {from, to, text}`, z. B. ein Zettel), `object` (Gegenstandskarte) oder `ambient` (Atmosphäre ohne Fund). Der gesamte Popup-Text einer Quelle ≤60 Wörter. Räume erhalten `plan {x,y,w,h}`, `doors [{a,b,at}]`, `outside`, `stairs` (Grundriss auf einer Ebene, ersetzt `floor`/`col`) sowie `objects[].spot {x,y}`, `scale`, `layer` für die Szene. Türen müssen exakt dem Raumgraphen entsprechen.
 
 ## 5b. Erkunden-Format (ab WP06c)
 - **Dinge** (`things`) je Raum: `id`, `room`, `spot {x,y}`, `prop` (Vektor-Prop), `states` (z. B. zu/auf), `auffaellig`, `layers`: L0 Ansehen, L1 Untersuchen (`opens`: Zustandswechsel, liefert Funde), L2 Benutzen (`requires`: Gegenstand/Fund).

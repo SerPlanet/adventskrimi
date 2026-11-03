@@ -49,9 +49,15 @@ Warm-winterlich (Holz, Schnee, Kerzenlicht), ruhige Animationen (≤300 ms, absc
 ## Fehlerverhalten
 Offline/Server-Fehler: freundliche Meldung („Das Hotel ist gerade nicht erreichbar, versuche es gleich noch einmal.“), nichts geht verloren. Aktionen sind idempotent (siehe `06`).
 
-## Redesign (WP06b)
-- **Hotel** ist ein Querschnitt-Raster aller Räume mit Markern (Person, auffällig, erreichbar, du). **Raum** ist eine Szene mit antippbaren Hotspots; jeder Hotspot steht zusätzlich in einer Liste „Was gibt es hier?“.
-- **Popups:** Dialog (Sprechblasen + Themen-Chips), Notiz (Zettel mit Absender/Empfänger), Gegenstand, Atmosphäre. ≤60 Wörter, Fokus-Falle, Esc/Schließen-Knopf, Fokus kehrt zurück.
-- **Aktionen** als drei Kerzen (mit Text-Alternative). Tag beenden über die Karte.
-- **Zeitung** im Zeitungslayout, mobil einspaltig.
-- Nie nur durch Tippen auf Bildbereiche bedienbar: Liste und Tastatur sind Pflicht.
+## Look pro Bereich (WP06e–h, ersetzt WP06b)
+Jeder Bereich hat einen eigenen **Skin** (Schrift, Farben, Layout). Gemeinsam bleiben Navigation, Fokus, Kontrast AA, Touch-Ziele ≥48 px und die Tastaturbedienung.
+| Bereich | Skin | Kern |
+|---|---|---|
+| Zeitung | `skin-paper` | Echte Titelseite: fetter Titelkopf, Kachel-Artikel, Kästen, eine scrollbare Seite pro Tag, einfache Überblendung zwischen Tagen |
+| Hotelplan | `skin-plan` | Ein Grundriss von oben (wie Cluedo): Räume, Flur, Türen, Außenbereich, Treppen zu Keller und Dachboden |
+| Raum | `skin-room` | Von Hand komponierte Szene mit Props an realen Orten, kein Raster, Liste der Dinge nur eingeklappt als Hilfe |
+| Akte | `skin-file` | Aktenordner mit Reitern (Personen, Dokumente, Orte, Zeit), Karteikarten, Verknüpfungen auf der Karte. Keine Tafel mit Schnüren |
+| Theorie, Rangliste | bisher | unverändert |
+**Popups:** Dialog (Sprechblasen + Chips + Zeigen), Dokument-Leser (Einstecken), Gegenstand. ≤60 Wörter, Fokus-Falle, Esc/Schließen, Fokus kehrt zurück.
+**Desktop (ab 900 px):** Inhalt bis ca. 1200 px mittig, Zwei-Spalten-Layouts, Navigation oben oder links. Handy/Tablet einspaltig.
+**Zeitung:** Ein Spieler liest nur bis min(heute, eigener Spieltag), serverseitig erzwungen.

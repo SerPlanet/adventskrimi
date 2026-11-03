@@ -1,5 +1,7 @@
 # WP06b – UI-Redesign: Hotel, Raum, Popups, Zeitung
 
+> **Ersetzt durch WP06e–WP06h** (Skins, Hotelplan wie Cluedo, komponierter Raum, Zeitung im Zeitungslook, Akte als Ordner). Nur noch als Historie lesen.
+
 **Ziel:** Hotel und Aktionen fühlen sich wie ein Spiel an, die Zeitung wie eine Zeitung. Akte, Raster, Zeitstrahl und Rangliste bleiben unverändert.
 **Lies:** `docs/05-ui-und-barrierefreiheit.md` (Abschnitt „Redesign“), `docs/02-spielregeln.md` §5 und §7, `docs/04-fall-und-inhalte.md` §5 (Präsentationsfelder).
 **Abhängig von:** M2 (WP08, WP09 Teil 2). Ändert keine Spiellogik.

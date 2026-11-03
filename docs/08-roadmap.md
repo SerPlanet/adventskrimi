@@ -16,6 +16,10 @@ Es arbeitet immer nur 1 Haupt-Agent (+ höchstens 1 Sub-Agent). Die Zeitfenster 
 | 6c | Erkunden-Kern (Regeln, Daten, API) | nach M2, zuerst | M2 | `wp/WP06c-erkunden-kern.md` |
 | 6d | Props, Szenen, Nahansichten | nach WP06c | WP06c | `wp/WP06d-props-szenen.md` |
 | 10b | Inhalt-Umbau (Lügennetz, Dokumente, Dialoge) | parallel zu WP06d (Sub-Agent) | WP06c | `wp/WP10b-inhalt-umbau.md` |
+| 6e | Design-Grundlagen (Skins, Schriften, Desktop-Raster) | zuerst im Redesign | WP06d | `wp/WP06e-design-grundlagen.md` |
+| 6f | Hotelplan wie Cluedo und komponierter Raum | nach WP06e | WP06e | `wp/WP06f-hotelplan-raum.md` |
+| 6g | Zeitung im Zeitungslook, strenge Sperre | nach WP06f | WP06e | `wp/WP06g-zeitung.md` |
+| 6h | Akte als Ordner mit Karteikarten | nach WP06g | WP06e | `wp/WP06h-akte.md` |
 | 7 | Rätsel | 15.–17.11. | WP06 | `wp/WP07-raetsel.md` |
 | 9 | Wertung und Rangliste | 15.–17.11. (Teil 1), 19.–21.11. (Teil 2) | WP05, WP06 | `wp/WP09-wertung.md` |
 | – | **M1 Kalender-Light online** | ~17.11. | WP06, WP07, WP09-T1 | – |
