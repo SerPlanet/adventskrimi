@@ -42,6 +42,8 @@ export interface PlayerState {
   /** day being played; 25 = all days finished */
   day: number;
   room: string;
+  /** the room left when the last day ended (narrative, 02c §2) */
+  prevRoom?: string;
   /** "Genauer untersuchen" used today (budget: game/budget.ts), reset when the day ends */
   actionsUsed: number;
   /** player did something that counts as "played" on the current day */

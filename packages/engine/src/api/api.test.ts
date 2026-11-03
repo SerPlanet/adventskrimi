@@ -148,6 +148,16 @@ describe('idempotency and costs (talking is free)', () => {
 });
 
 describe('days, rooms, question of the day', () => {
+  test('after end_day the page keeps the state "day over" until the next calendar day', async () => {
+    expect(bodyOf(await call('state', { slug: 'test', player_id: a })).state.day_over).toBe(false);
+    await call('end_day', { slug: 'test', player_id: a, request_id: rid(), next_room: 'keller' });
+    const v = bodyOf(await call('state', { slug: 'test', player_id: a })).state;
+    expect(v.day_over).toBe(true);
+    expect(v.can_play).toBe(false);
+    expect(typeof v.narrative).toBe('string');
+    expect('puzzles' in v).toBe(false);
+  });
+
   test('end_day moves to a neighbour in order; a bad room is rejected', async () => {
     expect(
       (
@@ -409,10 +419,10 @@ describe('object puzzle', () => {
       DAY3,
     );
 
-  test('the prompt is visible in the room, the answer is not', async () => {
+  test('the view does not list the puzzles of the room, and never the answer', async () => {
     inKeller();
     const s = bodyOf(await call('state', { slug: 'test', player_id: a }, DAY3)).state;
-    expect(s.puzzles[0].prompt).toContain('Zahlen');
+    expect('puzzles' in s).toBe(false);
     expect(JSON.stringify(s)).not.toContain('"answer"');
   });
 

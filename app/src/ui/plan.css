@@ -318,10 +318,12 @@
   align-items: center;
   gap: 0.4rem 1rem;
 }
-details.help {
+details.help,
+details.narr {
   margin: 0.6rem 0;
 }
-details.help summary {
+details.help summary,
+details.narr summary {
   cursor: pointer;
   min-height: 48px;
   display: flex;

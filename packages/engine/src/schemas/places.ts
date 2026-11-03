@@ -31,6 +31,9 @@ export const Room = z.object({
   objects: z.array(RoomObject).default([]),
   /** rectangle in the floor plan, grid units (WP06f) */
   plan: Rect,
+  /** narrative building blocks (02c §2): leaving the room, entering it; one or two sentences each */
+  abgang: z.string().optional(),
+  ankunft: z.string().optional(),
   /** connecting room (hall): drawn as a corridor */
   corridor: z.boolean().optional(),
   scene: z.string().min(1),

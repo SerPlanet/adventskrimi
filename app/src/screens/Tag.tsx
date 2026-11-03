@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useSession, type ActResult, type Action } from '../store';
-import { ObjectPuzzles } from './ObjectPuzzles';
 import { FindCard } from './FindCard';
 import { EndDay } from './EndDay';
 import { Popup } from '../ui/Popup';
@@ -15,9 +14,18 @@ type Open =
   | { kind: 'doc'; id: string }
   | { kind: 'night' };
 
-/** Hotel: cross-section map, room scene with hotspots, popups for people and things. */
-export function Hotel() {
-  const { view, act, busy, pocket } = useSession();
+/** Day status (02c §9): red when the day is over, green while it can still be played. */
+function Chip({ over }: { over: boolean }) {
+  return (
+    <span className={`daychip ${over ? 'over' : 'open'}`} role="status">
+      <span aria-hidden="true">●</span> {over ? 'Tag beendet' : 'Tag noch nicht abgeschlossen'}
+    </span>
+  );
+}
+
+/** The day: place, who is here, status, floor plan, room scene with hotspots, popups. */
+export function Tag({ onNext }: { onNext: () => void }) {
+  const { view, act, busy, pocket, ended, startNext } = useSession();
   const [open, setOpen] = useState<Open | null>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
@@ -41,6 +49,31 @@ export function Hotel() {
       <section className="card">
         <h1>Der Fall ist abgeschlossen</h1>
         <p>Du hast alle 24 Tage gespielt. Sieh dir Theorie und Rangliste an.</p>
+      </section>
+    );
+
+  // the page stays after "Tag beenden"; a latecomer may go on to the next day
+  if (view.day_over || ended !== null)
+    return (
+      <section className="card dayover" aria-labelledby="over-h">
+        <h1 id="over-h">Gute Nacht</h1>
+        <Chip over />
+        <p>
+          {view.can_play
+            ? 'Du bist dem Spiel noch ein Stück hinterher. Du kannst den nächsten Tag gleich spielen.'
+            : 'Morgen früh liegt eine neue Zeitung bereit. Komm gern um 0 Uhr oder später wieder.'}
+        </p>
+        {view.can_play && (
+          <button
+            className="primary"
+            onClick={() => {
+              startNext();
+              onNext();
+            }}
+          >
+            Nächsten Tag spielen
+          </button>
+        )}
       </section>
     );
 
@@ -84,11 +117,16 @@ export function Hotel() {
 
   return (
     <>
-      {!play && (
-        <p className="card" role="status">
-          ⏳ Dein Tag {view.day} ist noch nicht freigeschaltet. Komm morgen wieder. Die Zeitung
-          früherer Tage kannst du jederzeit lesen.
-        </p>
+      {room && (
+        <header className="dayhead">
+          <h1 id="room-h">{room.name}</h1>
+          <Chip over={false} />
+          <p>
+            {room.npcs.length
+              ? `Hier sind: ${room.npcs.map((n) => n.name).join(', ')}.`
+              : 'Du bist allein hier.'}
+          </p>
+        </header>
       )}
       <div className="cols2 wide-left">
         <section aria-labelledby="plan-h">
@@ -96,9 +134,12 @@ export function Hotel() {
           <HotelPlan />
         </section>
         {room && (
-          <aside aria-labelledby="room-h">
-            <h1 id="room-h">{room.name}</h1>
+          <aside aria-label="Ort und Erzählung">
             <p>{room.description}</p>
+            <details className="narr">
+              <summary>Erzählung noch einmal lesen</summary>
+              <p>{view.narrative}</p>
+            </details>
             {room.blocked && (
               <p className="card">
                 ⛔ Dieser Raum ist heute gesperrt. Du kannst nur den Tag beenden.
@@ -162,8 +203,6 @@ export function Hotel() {
             </ul>
           </details>
           <p role="status">{msg}</p>
-
-          <ObjectPuzzles disabled={!play || busy} />
 
           {(view.inventory.length > 0 || view.documents.length > 0) && (
             <div className="inv" role="group" aria-label="Dein Inventar">

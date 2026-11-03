@@ -3,6 +3,7 @@ export * from './days';
 export * from './actions';
 export * from './budget';
 export * from './things';
+export * from './narrative';
 export * from './movement';
 export * from './points';
 export * from './contradictions';

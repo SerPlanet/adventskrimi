@@ -1,9 +1,11 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memory } from './api';
 import { goTo } from './route';
 import { useSession } from './store';
 import { Pick } from './screens/Pick';
 import { Newspaper } from './screens/Newspaper';
-import { Hotel } from './screens/Hotel';
+import { Tag } from './screens/Tag';
+import { Intro } from './screens/Intro';
 import { Dossier } from './screens/Dossier';
 import { Theory } from './screens/Theory';
 import { Ranking } from './screens/Ranking';
@@ -12,7 +14,7 @@ import { PageBubble } from './screens/PageBubble';
 
 const TABS = [
   { id: 'zeitung', label: 'Zeitung', icon: '📰' },
-  { id: 'hotel', label: 'Hotel', icon: '🏨' },
+  { id: 'tag', label: 'Tag', icon: '📖' },
   { id: 'akte', label: 'Akte', icon: '🗂️' },
   { id: 'theorie', label: 'Theorie', icon: '💡' },
   { id: 'rangliste', label: 'Rangliste', icon: '🏆' },
@@ -20,7 +22,7 @@ const TABS = [
 
 const SKIN: Record<string, string> = {
   zeitung: 'skin-paper',
-  hotel: 'skin-plan',
+  tag: 'skin-plan',
   akte: 'skin-file',
 };
 
@@ -29,7 +31,8 @@ const PLAIN = ['theorie', 'rangliste', 'einstellungen'];
 const FONT_PX = { normal: 18, large: 22, xl: 26 } as const;
 
 export function App({ slug, tab: route }: { slug: string; tab: string }) {
-  const { view, playerId, notice, busy } = useSession();
+  const { view, playerId, notice, busy, ended } = useSession();
+  const [, setSeen] = useState(0);
   const go = (tab: string) => goTo(slug, tab);
   const bar = useRef<HTMLElement>(null);
   const settings = view?.player.settings ?? {};
@@ -66,10 +69,22 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
 
   if (!playerId) return <Pick slug={slug} />;
 
+  // the narrative opening comes before the newspaper, once per day (it stays readable in the day tab)
+  const introKey = `advent.intro.${slug}.${playerId}`;
+  const startRoute = route === 'zeitung' || route === '';
+  const showIntro =
+    startRoute &&
+    !!view &&
+    view.can_play &&
+    !view.finished &&
+    !view.day_over &&
+    ended === null &&
+    Number(memory.get(introKey) ?? 0) < view.day;
+
   const screen = (() => {
     switch (route) {
-      case 'hotel':
-        return <Hotel />;
+      case 'tag':
+        return <Tag onNext={() => go('')} />;
       case 'akte':
         return <Dossier />;
       case 'theorie':
@@ -79,7 +94,16 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
       case 'einstellungen':
         return <Settings />;
       default:
-        return <Newspaper />;
+        return showIntro ? (
+          <Intro
+            onDone={() => {
+              memory.set(introKey, String(view?.day ?? 0));
+              setSeen((n) => n + 1);
+            }}
+          />
+        ) : (
+          <Newspaper />
+        );
     }
   })();
 

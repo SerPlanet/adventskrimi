@@ -38,6 +38,7 @@ export function endDay(st: PlayerState, ctx: GameCtx, nextRoom?: string): EndDay
       ...st,
       day: st.day + 1,
       room: target,
+      prevRoom: st.room,
       actionsUsed: 0,
       started: false,
       finishedDays: [...st.finishedDays, st.day],

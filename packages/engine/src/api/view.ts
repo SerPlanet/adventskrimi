@@ -12,6 +12,7 @@ import {
   dailyView,
   canPlayDay,
   dayOf,
+  narrativeOf,
   nextRooms,
   questionOfDay,
   rankOf,
@@ -160,18 +161,9 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       const i = c.puzzles.items.find((x) => x.id === id);
       return { id, name: i?.name ?? id, text: i?.text ?? '' };
     }),
-    puzzles: c.puzzles.puzzles
-      .filter((p) => p.room === st.room)
-      .map((p) => {
-        const prog = st.puzzles[p.id];
-        return {
-          id: p.id,
-          type: p.type,
-          prompt: p.prompt,
-          solved: prog?.solved ?? false,
-          hints: p.hints.slice(0, Math.min(prog?.hints ?? 0, 2)),
-        };
-      }),
+    // what the morning looks like (02c §2), and whether the player's day is over (02c §9)
+    narrative: narrativeOf(st, ctx),
+    day_over: st.finishedDays.includes(today),
     question: q && {
       id: q.id,
       text: q.text,

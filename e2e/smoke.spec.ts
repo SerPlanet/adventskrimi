@@ -48,6 +48,10 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
 
   // name tiles -> newspaper
   await page.getByRole('button', { name: new RegExp(NAME) }).click();
+  // the day opens with a short narrative (02c §2), then the newspaper
+  await expect(page.getByRole('heading', { name: 'Tag 1' })).toBeVisible();
+  await expect(page.locator('.intro .story')).toContainText('Testhaus');
+  await page.getByRole('button', { name: 'Weiter' }).click();
   await expect(page.getByRole('heading', { name: 'Der Bergbote' })).toBeVisible();
   await expect(page.getByText('Ausgabe Nr. 1')).toBeVisible();
   await expect(page.getByLabel('Tagesstatus')).toContainText('Tag 1');
@@ -64,7 +68,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.getByText('Das Rätsel ist beendet. Morgen gibt es ein neues.')).toBeVisible();
 
   // hotel: an empty topic costs nothing is covered by unit tests; here a real action
-  await page.getByRole('button', { name: 'Hotel' }).click();
+  await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
   // floor plan: every room of the test case, you are in one, a tap only previews (no move)
   await expect(page.locator('.hotelplan .rm')).toHaveCount(2);
   await expect(page.locator('.hotelplan .rm.here')).toHaveCount(1);
@@ -119,7 +123,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.getByRole('heading', { name: 'Dokumente' })).toBeVisible();
 
   // end the day with a confirmation
-  await page.getByRole('button', { name: 'Hotel' }).click();
+  await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
   await page.getByRole('button', { name: /Gute Nacht/ }).click();
   await expect(page.getByText('Danach kannst du diesen Tag nicht mehr ändern.')).toBeVisible();
   await page
@@ -128,6 +132,9 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
     .click();
   await page.getByRole('button', { name: 'Ja, Tag beenden' }).click();
   await expect(page.getByText(/^Tag 2 ·/)).toBeVisible();
+  // the page stays: a red chip says the day is over, no jump to the next day
+  await expect(page.getByText('Tag beendet')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Gute Nacht' })).toBeVisible();
 
   // next day: newspaper of day 2, now in the cellar
   await page.getByRole('button', { name: 'Zeitung' }).click();
@@ -147,8 +154,16 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: 'Prüfen' }).click();
   await expect(page.getByText('Richtig! Das hast du gut gelöst.')).toBeVisible();
 
-  // object puzzle: the lock in the cellar opens with the code, then the chest can be examined
-  await page.getByRole('button', { name: 'Hotel' }).click();
+  // a latecomer goes on to the next day by button: narrative of day 2, then the day
+  await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
+  await page.getByRole('button', { name: 'Nächsten Tag spielen' }).click();
+  await expect(page.getByRole('heading', { name: 'Tag 2' })).toBeVisible();
+  await expect(page.locator('.intro .story')).toContainText('Keller');
+  await page.getByRole('button', { name: 'Weiter' }).click();
+  await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
+  await page.getByText('Erzählung noch einmal lesen').click();
+  await expect(page.getByText('Im Keller riecht es nach Stein')).toBeVisible();
+  await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Keller', exact: true })).toBeVisible();
   // "Umsehen" makes everything tappable glint
   await page.getByRole('button', { name: /Umsehen/ }).click();
@@ -161,12 +176,11 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   // a locked chest brought nothing: no action spent
   await expect(page.locator('.bar .actions')).toContainText('(2/2)');
   await page.keyboard.press('Escape');
-  await page.getByLabel('Deine Antwort').fill('000');
-  await page.getByRole('button', { name: 'Ausprobieren' }).click();
-  await expect(page.getByText(/Das passt noch nicht/)).toBeVisible();
-  await page.getByLabel('Deine Antwort').fill('123');
-  await page.getByRole('button', { name: 'Ausprobieren' }).click();
-  await expect(page.getByText(/Das Schloss springt auf/)).toBeVisible();
+  // (the lock itself comes back as a thing in the scene with WP18: open it for now)
+  const sql2 = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
+  await sql2`update players set state = jsonb_set(state, '{puzzles}', '{"p_code":{"solved":true,"hints":0,"attempts":1}}'::jsonb) where name = ${NAME}`;
+  await sql2.end();
+  await page.reload();
   await page.getByRole('button', { name: /Kiste/ }).last().click();
   await page.getByRole('button', { name: /Genauer untersuchen/ }).click();
   await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
@@ -188,7 +202,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: /Zettel aus der Kiste/ }).click();
   await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
   await page.keyboard.press('Escape');
-  await page.getByRole('navigation').getByRole('button', { name: /Hotel/ }).click();
+  await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
   // WP06d: the chest is drawn as a prop and now shows its open state
   await expect(page.locator('.scene svg[data-prop="truhe"][data-state="auf"]')).toBeVisible();
 
@@ -199,7 +213,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: /Einstellungen/ }).click();
   await page.getByLabel('Schriftgröße').selectOption('xl');
   await expect(page.locator('html')).toHaveCSS('font-size', '26px');
-  for (const tab of ['Zeitung', 'Hotel', 'Akte', 'Rangliste']) {
+  for (const tab of ['Zeitung', 'Tag', 'Akte', 'Rangliste']) {
     await page.getByRole('button', { name: tab }).click();
     await page.waitForTimeout(400);
     expect(await overflow(), `overflow on ${tab}`).toBe(false);

@@ -1,3 +1,4 @@
+arrival: Du erreichst das Testhaus im ersten Schnee und klopfst dir die Stiefel ab.
 days:
   - { day: 1, goal: Lerne die Halle kennen, intro: 'Willkommen im Testhaus. Sprich mit {n:anna}.' }
   - { day: 2, goal: Öffne die Kiste, intro: Im Keller steht eine Kiste mit Schloss. }

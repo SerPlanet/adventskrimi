@@ -2,6 +2,8 @@ rooms:
   - id: halle
     name: Halle
     description: Eine große Halle mit Kamin und einer alten Lampe.
+    abgang: Du lässt die warme Halle hinter dir.
+    ankunft: In der Halle knistert der Kamin und die alte Lampe flackert.
     neighbors: [keller]
     plan: { x: 0, y: 0, w: 6, h: 4 }
     scene: halle
@@ -10,6 +12,8 @@ rooms:
   - id: keller
     name: Keller
     description: Ein kühler Keller mit einer schweren Kiste.
+    abgang: Du verlässt den kühlen Keller und atmest auf.
+    ankunft: Im Keller riecht es nach Stein und alten Brettern.
     neighbors: [halle]
     plan: { x: 0, y: 4, w: 6, h: 4 }
     scene: keller

@@ -1,6 +1,6 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-03 · Phase: **UI-Redesign fertig (WP06e–j), Aufräumen WP06i erledigt.** Nächstes: WP11 (Admin) → `docs/wp/WP11-admin.md`.
+Stand: 2026-11-03 · Lauf WP15–WP18, WP19 (Sub-Agent), danach WP06i erneut prüfen. Danach WP11 (Admin).
 
 Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/Feinschliff → WP13 Testlauf → WP14 Launch. Code-Freeze 29.11., Start 1.12.
 
@@ -10,6 +10,8 @@ Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/
 - UI: Skins je Bereich, ein Grundriss als Hotelplan, komponierte Raumszene (`place` hält jede Hotspot-Mitte frei), Zeitung als Titelseite (Sperre `readableDays`), Akte als Ordner (Personen, Dokumente, Orte, Zeit, Raster), eine feste Leiste (Name, Tag, Punkte, Aktionen, Menü).
 - Aufräumen: `knip` in der CI (D63), `normalizeState`, `format: legacy`, Hotspot-Notbehelf und tote CSS entfernt. Zeitraffer Tag 1–24 auf Staging für beide Profile ohne Fehler.
 - Berghotel: `validate-case` und `balance` grün (Freunde Budget 4, Familie 3). Lösetag des optimalen Spielers: 20.
+
+- WP15: Erzähltext (`game/narrative.ts`, `screens/Intro.tsx`), Reiter „Tag“ mit Ort, Personen im Raum und Statuschip, Seite bleibt nach „Tag beenden“ (`ended`, `day_over`), „Rätsel im Raum“ samt `view.puzzles` entfernt (Schlösser kommen mit WP18).
 
 ## Offen im Inhalt (WP10b-Nacharbeit, später)
 - Je Raum/Tag mehr untersuchbare Funde als Aktionen nur in Salon, Küche, Lobby; Tage 1–5 haben fast keine Untersuchen-Funde, Dachboden erst ab Tag 20 (Grenzen und Bots neu kalibrieren, `docs/07`).

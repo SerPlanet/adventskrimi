@@ -34,6 +34,9 @@ interface Session {
   refresh(): Promise<void>;
   act(a: Action): Promise<{ result: ActResult; plaque: string | null } | null>;
   endDay(room?: string): Promise<boolean>;
+  /** the day that was just ended on this page (the page stays, 02c §9); null otherwise */
+  ended: number | null;
+  startNext(): void;
   answer(optionId: string): Promise<string | null>;
   hint(): Promise<string | null>;
   saveSettings(s: Record<string, unknown>): Promise<void>;
@@ -41,11 +44,6 @@ interface Session {
     op: 'check' | 'hint' | 'skip',
     answer?: string,
   ): Promise<{ outcome?: string; hint?: string; solution?: boolean } | null>;
-  objectPuzzle(
-    id: string,
-    op: 'check' | 'hint',
-    answer?: string,
-  ): Promise<{ correct?: boolean; hint?: string } | null>;
   say(msg: string): void;
   setTheory(theory: Record<string, string | null>): Promise<boolean>;
   setNote(
@@ -74,6 +72,7 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
   const [view, setView] = useState<View | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
+  const [ended, setEnded] = useState<number | null>(null);
   // a slow older reply must never overwrite the view of a newer request
   const seq = useRef(0);
 
@@ -124,6 +123,8 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
       playerId,
       busy,
       notice,
+      ended,
+      startNext: () => setEnded(null),
       login,
       logout,
       refresh,
@@ -140,8 +141,12 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
         return { result: r.result, plaque: r.plaque };
       },
       async endDay(room) {
+        const day = view?.day ?? null;
         const r = await run('end_day', { request_id: newRequestId(), next_room: room });
-        if (r) setNotice('Der Tag ist zu Ende. Ein neuer Tag beginnt.');
+        if (r) {
+          setEnded(day);
+          setNotice('Der Tag ist zu Ende. Gute Nacht.');
+        }
         return r !== null;
       },
       async answer(optionId) {
@@ -160,9 +165,6 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
       },
       async daily(op, answer) {
         return run('daily_puzzle', { request_id: newRequestId(), op, answer });
-      },
-      async objectPuzzle(id, op, answer) {
-        return run('object_puzzle', { request_id: newRequestId(), puzzle_id: id, op, answer });
       },
       async setTheory(theory) {
         const r = await run('set_theory', { theory });
@@ -195,7 +197,7 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
         await run('settings', { settings: s });
       },
     }),
-    [view, playerId, busy, notice, login, logout, refresh, run],
+    [view, playerId, busy, notice, ended, login, logout, refresh, run],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

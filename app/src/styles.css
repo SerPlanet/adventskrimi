@@ -266,6 +266,33 @@ html {
   font-size: 1.1rem;
   line-height: 1.1;
 }
+.dayhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 1rem;
+}
+.dayhead h1 {
+  margin: 0;
+}
+.dayhead p {
+  margin: 0;
+  flex-basis: 100%;
+}
+.daychip {
+  display: inline-block;
+  padding: 0.1rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+}
+.daychip.over {
+  background: #b3261e;
+}
+.daychip.open {
+  background: #1d6b34;
+}
 .live {
   position: fixed;
   left: 0;
@@ -527,4 +554,13 @@ ul.plain li {
   width: min(60%, 12rem);
   margin: 0 auto;
   display: block;
+}
+
+.intro {
+  max-width: 36rem;
+  margin: 1.5rem auto;
+}
+.intro .story {
+  font-size: 1.2rem;
+  line-height: 1.7;
 }

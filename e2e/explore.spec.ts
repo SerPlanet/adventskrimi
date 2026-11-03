@@ -61,6 +61,7 @@ for (const c of CASES) {
     const now = encodeURIComponent(`2026-12-0${c.day}T12:00:00+01:00`);
     await page.goto(`/?now=${now}#/${c.slug}`);
     await page.getByRole('button', { name: new RegExp(nameOf(c)) }).click();
+    await page.getByRole('button', { name: 'Weiter' }).click();
     const bar = page.locator('.bar .actions');
     await expect(bar).toContainText('Aktionen übrig');
     const [, left, budget] = /\((\d+)\/(\d+)\)/.exec((await bar.textContent()) ?? '') ?? [];
@@ -73,8 +74,9 @@ for (const c of CASES) {
     await page.waitForTimeout(500);
     const before = await page.getByText(/ von \d+ Funden/).textContent();
 
-    await page.getByRole('navigation').getByRole('button', { name: /Hotel/ }).click();
+    await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
     // try every tappable thing: a try without a find says why and costs nothing
+    await page.locator('.scene').waitFor();
     const spots = page.locator('.scene button.spot.object');
     const n = await spots.count();
     let found = false;

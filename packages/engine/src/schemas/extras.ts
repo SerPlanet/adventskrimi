@@ -29,6 +29,8 @@ export const Event = z.object({
   headline: z.string().min(1),
   text: CardText,
   weather: z.string().optional(),
+  /** time of day / mood of the morning, one sentence for the narrative (02c §2) */
+  morgen: z.string().optional(),
   blocked_rooms: z.array(Id).default([]),
   bonus_rooms: z.array(Id).default([]),
 });
@@ -67,6 +69,8 @@ export const PrologFile = z.object({
       tips: z.array(z.string()).default([]),
     }),
   ),
+  /** day 1: how the player arrives, one to three sentences (02c §2) */
+  arrival: CardText.optional(),
   mini_case: z.object({ title: z.string().min(1), text: CardText }),
   page_texts: z.array(z.object({ id: Id, text: CardText })).default([]),
 });

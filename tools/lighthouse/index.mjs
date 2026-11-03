@@ -53,7 +53,7 @@ try {
   const page = await browser.newPage();
   await page.goto(`${BASE}/?now=${NOW}#/test/zeitung`);
   await page.evaluate((id) => localStorage.setItem('advent.player.test', id), player.id);
-  for (const tab of ['zeitung', 'hotel', 'akte', 'theorie', 'rangliste', 'einstellungen']) {
+  for (const tab of ['zeitung', 'tag', 'akte', 'theorie', 'rangliste', 'einstellungen']) {
     const url = `${BASE}/?now=${NOW}#/test/${tab}`;
     await page.goto(url);
     await page.reload();
