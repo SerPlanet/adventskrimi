@@ -8,8 +8,8 @@
 - **Verlauf** (nachlesbar, unsortiert) als eigener Bereich. **Akte-Reiter:** Personen, Dokumente, Orte, Zeit, Raster nur mit Eingelegtem.
 - **Löschen** (im selben WP, keine Altpfade): „Verknüpfen“-Endpunkt und -Knopf, „Das erinnert dich an“, Déjà-vu, Punkte für Verknüpfung (`scoring.json`), automatisches Übertragen in Raster/Zeitstrahl, Notizstufen Auto/Halb.
 - **Zeitstrahl-Tabelle:** Zeitfenster oben, Räume links, Zelle antippen → Personen wählen (Mehrfachauswahl). Nur Spielerdaten.
-- **Hilfestufe** (Einstellung, Standard aus): erlaubt Widerspruchs-Markierungen im Zeitstrahl. Familie wählbar.
-- Tests: Einlegen/Entfernen, Zelle mit mehreren Personen, keine automatischen Einträge, Hilfestufe an/aus. Lighthouse A11y ≥95.
+- **Keine Hilfestufe** und keine Widerspruchs-Markierung (auch Code dafür entfernen: Zeitstrahl-Prüfung, „Passt das zusammen?“-Endpunkt `fits`).
+- Tests: Einlegen/Entfernen, Zelle mit mehreren Personen, keine automatischen Einträge, keine Markierungen. Lighthouse A11y ≥95.
 
 ## Nicht tun
 Keine neuen Inhalte, keine Dialog-Umbauten (WP17).

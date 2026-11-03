@@ -66,5 +66,5 @@ Jeder Bereich hat einen eigenen **Skin** (Schrift, Farben, Layout). Gemeinsam bl
 - Startseite → Erzähltext (lesbar, überspringbar) → Zeitung (3–5 Artikel mit „In die Akte legen“) → Tag-Reiter mit Ort, Personen im Raum, Szene und Statuschip (rot „Tag beendet“, grün „Tag noch nicht abgeschlossen“).
 - Kein Bereich „Rätsel im Raum“. Gespräche starten sofort als Dialog mit Fragenliste und „In die Akte legen“ je Antwort.
 - Akte zeigt nur, was der Spieler eingelegt hat. Reiter Zeit = Tabelle (Zeitfenster oben, Räume links, Personen pro Zelle wählbar). Raster bleibt.
-- Hilfestufe in den Einstellungen (Standard aus).
+- Keine Hilfestufe. Alle Spieler lösen selbst.
 

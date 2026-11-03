@@ -88,4 +88,5 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D68 | Gespräche starten sofort als Dialog, jede Frage hat eine Antwort, Antworten einzeln in die Akte legbar. |
 | D69 | Schlösser verweisen auf Fundstellen in anderen Räumen, hinter ihnen liegen belohnende Funde. |
 | D70 | Reihenfolge: WP15 bis WP19 vor WP06i (Aufräumen). |
+| D71 | Keine Hilfestufe und keine Erleichterungs-Optionen für ältere oder jüngere Spieler (ersetzt Teil von D66). Alle Spieler lösen die Rätsel selbst. Barrierefreiheit (Schrift, Kontrast, Bedienung) bleibt, nur die Spielschwierigkeit wird nicht gesenkt. |
 

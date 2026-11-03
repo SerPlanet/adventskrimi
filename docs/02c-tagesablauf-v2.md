@@ -25,12 +25,11 @@ Tippen auf eine Person **startet sofort den Dialog**. Der Spieler wählt aus ein
 ## 7. Akte: nur was der Spieler hineinlegt
 - Inhalt: vom Spieler eingelegte Artikel, Antworten und Notizen sowie Dokumente und Gegenstände im Inventar. Der Rest bleibt im **Verlauf** (nachlesbar, aber nicht sortiert).
 - Einordnung nur nach **Sprecher oder Fundort** (Personen, Orte), nicht nach Bedeutung.
-- **Entfallen** (Standard): „Verknüpfen“-Knopf, „Das erinnert dich an …“, Déjà-vu-Hinweise, automatisches Übertragen in Raster oder Zeitstrahl, Widerspruchs-Markierung, Notizstufen Auto/Halb.
-- **Hilfestufe** (Einstellung pro Spieler, optional): erlaubt Widerspruchs-Markierungen im Zeitstrahl. Standard aus (Freunde), für die Familie wählbar.
+- **Entfallen** (ohne Ersatz): „Verknüpfen“-Knopf, „Das erinnert dich an …“, Déjà-vu-Hinweise, automatisches Übertragen in Raster oder Zeitstrahl, Widerspruchs-Markierung, Notizstufen Auto/Halb, jede Art von Hilfestufe. Alle Spieler (Familie und Freunde) lösen die Rätsel selbst. Die Schwierigkeit ist für beide Gruppen hoch gedacht, es gibt keine Erleichterungs-Optionen.
 - Punkte für Schlussfolgern kommen aus Wochenzeugnissen, Beweisfragen und Anklage, nicht aus Knöpfen.
 
 ## 8. Zeitstrahl als Tabelle
-Spalten = Zeitfenster der Tatnacht (oben), Zeilen = Räume (links). Zelle antippen → Personen auswählen, **mehrere Personen pro Zelle** möglich. Nur Spielerdaten, keine Prüfung (außer Hilfestufe). Raster (Täter/Komplize/…) bleibt.
+Spalten = Zeitfenster der Tatnacht (oben), Zeilen = Räume (links). Zelle antippen → Personen auswählen, **mehrere Personen pro Zelle** möglich. Nur Spielerdaten, keine Prüfung. Raster (Täter/Komplize/…) bleibt.
 
 ## 9. Tag beenden
 Die Seite bleibt. Oben steht ein Statuschip: **rot „Tag beendet“**, **grün „Tag noch nicht abgeschlossen“**. Nachzügler sehen zusätzlich „Nächsten Tag spielen“. Der nächste reale Tag beginnt um 0 Uhr.
