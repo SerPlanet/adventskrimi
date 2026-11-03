@@ -35,6 +35,9 @@ Details in `02b-erkunden.md`. Ansehen, Gespräche und Lesen sind frei. Nur „Ge
 Alle Funde erzeugt das System aus den Fall-Daten. Spieler können Text nicht ändern. Jeder Fund trägt Quelle und Tag („Koch, Küche, Tag 9“).
 
 ## 7. Zeitung („Der Bergbote“)
+
+> Inhalt und Aufbau ab WP19 laut `02c` §3 (3–5 Artikel als Geschichten, nur Fakten, „In die Akte legen“).
+
 Wird pro Tag aus den Fall-Daten und dem Vortag erzeugt (siehe `06`). Bestandteile:
 1. **Titelstory** = Tagesereignis (Basisinfo für alle, z. B. Stromausfall, Gast reist ab, Bonus-Raum).
 2. **Klatschspalte:** Aussagen, teils falsch. Futter für Widersprüche.
@@ -46,6 +49,9 @@ Wird pro Tag aus den Fall-Daten und dem Vortag erzeugt (siehe `06`). Bestandteil
 8. **Rätsel des Tages** (§9).
 
 ## 8. Werkzeuge des Spielers
+
+> **Überholt durch `02c` §7:** Notizstufen Auto/Halb entfallen. Die Akte füllt der Spieler selbst („In die Akte legen“). Optionale Hilfestufe für Widerspruchs-Markierungen.
+
 Fallakte, Verdächtigenraster, Zeitstrahl, Karte, Inventar, Theorie-Seite, Hotelbuch, Rangliste. Bedienung: `05`.
 
 **Notizstufen** (Einstellung pro Spieler, Familien-Standard „Halb“):

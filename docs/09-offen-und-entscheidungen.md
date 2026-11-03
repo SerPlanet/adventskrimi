@@ -82,3 +82,10 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D62 | Hybrid: Ansehen, Gespräche und Lesen frei, nur „Genauer untersuchen“ kostet 1 Aktion (kleines Tagesbudget, UI „Aktionen übrig (x/y)“). Ersetzt D49 teilweise (Invariante 4 geändert). Keine „!“-Markierungen, nicht alle Dinge anklickbar (Deko/Ansehen/Untersuchbar). |
 | D63 | WP06i: `knip` als Dev-Abhängigkeit (findet ungenutzte Dateien, Exporte, Abhängigkeiten), läuft in der CI (`npm run knip`, Konfiguration `knip.json`). Entfernt: `normalizeState` (Staging-Spieler haben alle Felder, Prod hat keine), `format: legacy|explore` im Fall (die Lügennetz- und Tagesbogen-Prüfung gilt immer), Hotspot-Notbehelf ohne `spot`, `states`, tote CSS-Klasse. `spot` und `scene` sind Pflicht. |
 | D64 | `lie_web` in `config/quality.json` (Standard `true`): Nur winzige Test-Fälle (`cases/_test`) schalten die Lügennetz- und Tagesbogen-Prüfung per `quality.override.json` ab. Spiel-Snapshot: Ein Spiel kopiert Profil und Punkte beim Anlegen. Nach Änderungen an `config/` müssen bestehende Staging-Spiele neu angelegt oder ihre `config` ersetzt werden. |
+| D65 | Tagesablauf v2 (`02c`): Erzähltext zum Einstieg, Zeitung mit 3–5 Geschichten (nur Fakten), Tag-Reiter mit Statuschip, kein Bereich „Rätsel im Raum“. |
+| D66 | Selbstbestimmung: Der Spieler legt selbst in die Akte (Artikel, Gesprächsantworten). Verknüpfen-Knopf, Déjà-vu, automatisches Eintragen und Notizstufen Auto/Halb entfallen. Optionale Hilfestufe (Standard aus). Ersetzt Teile von D50/D51. |
+| D67 | Zeitstrahl als Tabelle (Zeitfenster oben, Räume links, mehrere Personen pro Zelle), nur Spielerdaten. |
+| D68 | Gespräche starten sofort als Dialog, jede Frage hat eine Antwort, Antworten einzeln in die Akte legbar. |
+| D69 | Schlösser verweisen auf Fundstellen in anderen Räumen, hinter ihnen liegen belohnende Funde. |
+| D70 | Reihenfolge: WP15 bis WP19 vor WP06i (Aufräumen). |
+

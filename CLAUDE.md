@@ -43,6 +43,7 @@ Nie den ganzen `docs/`-Ordner lesen. Landkarte: `docs/00-index.md`. Arbeitsablau
 10. **Barrierefreiheit** (`docs/05`) gilt bei jeder UI-Änderung.
 11. **Spieltag = Datum in Europe/Berlin, Wechsel 0 Uhr**, Gnadenfrist bis 3 Uhr für begonnene Tage. Testen mit Datums-Override (nur Staging).
 12. Spielregeln und Zahlen stehen in `config/` und `cases/`, nie hartkodiert.
+14. **Selbstbestimmung:** Der Spieler legt selbst in die Akte (Artikel, Gesprächsantworten) und trägt selbst in Zeitstrahl und Raster ein. Keine automatische Verknüpfung, kein „Das erinnert dich an“, keine Widerspruchs-Markierung (nur über die optionale Hilfestufe). Details `docs/02c`.
 13. **Kein Fund nennt ein Urteil** („X war es nicht“). Dokumente und Beobachtungen werden nie automatisch in Raster/Zeitstrahl übertragen. Jede Figur lügt oder verschweigt aus einem entdeckbaren Grund (`docs/02b` §5).
 
 ## 5. Repo-Karte

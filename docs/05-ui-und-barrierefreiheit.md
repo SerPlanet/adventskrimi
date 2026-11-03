@@ -61,3 +61,10 @@ Jeder Bereich hat einen eigenen **Skin** (Schrift, Farben, Layout). Gemeinsam bl
 **Popups:** Dialog (Sprechblasen + Chips + Zeigen), Dokument-Leser (Einstecken), Gegenstand. ≤60 Wörter, Fokus-Falle, Esc/Schließen, Fokus kehrt zurück.
 **Desktop (ab 900 px):** Inhalt bis ca. 1200 px mittig, Zwei-Spalten-Layouts, Navigation oben oder links. Handy/Tablet einspaltig.
 **Zeitung:** Ein Spieler liest nur bis min(heute, eigener Spieltag), serverseitig erzwungen.
+
+## Tagesablauf v2 (WP15–WP19, siehe `02c`)
+- Startseite → Erzähltext (lesbar, überspringbar) → Zeitung (3–5 Artikel mit „In die Akte legen“) → Tag-Reiter mit Ort, Personen im Raum, Szene und Statuschip (rot „Tag beendet“, grün „Tag noch nicht abgeschlossen“).
+- Kein Bereich „Rätsel im Raum“. Gespräche starten sofort als Dialog mit Fragenliste und „In die Akte legen“ je Antwort.
+- Akte zeigt nur, was der Spieler eingelegt hat. Reiter Zeit = Tabelle (Zeitfenster oben, Räume links, Personen pro Zelle wählbar). Raster bleibt.
+- Hilfestufe in den Einstellungen (Standard aus).
+

@@ -92,3 +92,10 @@ Die Mengen ergeben sich aus der Redundanz-Regel. Der Validator rechnet nach (`07
 3. Gesamte Dateien nie neu erzeugen. Kleine Patches.
 4. Der Mensch bekommt die Lösung nie zu sehen: Ausgaben und Kommentare nennen sie nicht.
 5. Der Testfall `cases/_test/` (2 Räume, 3 NPCs, triviale Lösung) bleibt als Engine-Testfall bestehen und enthält keinen Spoilerwert.
+
+## 5c. Zeitung, Erzähltexte, Schlösser (ab WP15–WP19)
+- **Zeitung:** `newspaper.yaml` je Tag 3–5 Artikel `{id, titel, text (50–100 Wörter), traegt: [Fakt-IDs], art: klatsch|hintergrund|ereignis}`. Nur Fakten, nie Lügen. Beziehungen als `relation(A, B, art)` in Fakten, nur erzählt.
+- **Erzähltexte:** je Raum `abgang` und `ankunft` (1–2 Sätze), je Tag `wetter`, `tageszeit`. Der Client setzt sie zum Einstieg zusammen.
+- **Schlösser:** `lock {id, ding, typ, hinweis_quelle (Raum/Ding), belohnung: wichtig|bedeutend}`. Beim Versuch erscheint `versuchstext`, der auf `hinweis_quelle` verweist (oder bewusst keinen Hinweis gibt).
+- **Dialog:** jede Frage hat eine Antwort (auch „weiß ich nicht“), jede Antwort ist einzeln in die Akte legbar.
+

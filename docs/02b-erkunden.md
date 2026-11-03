@@ -33,6 +33,9 @@ Kostenlos und beliebig oft, damit sie Geschichte erzählen. Themen-Chips. **Zeig
 - Aufdeckung einer Lüge ist ein **Aha-Moment**: Man versteht danach die Person besser (Charakterbild).
 
 ## 6. Aha-Bausteine
+
+> **Überholt durch `02c` §7:** Verknüpfen-Knopf, „Das erinnert dich an …“ und Déjà-vu entfallen. Aha-Momente entstehen aus Lesen und eigenem Schließen (Widersprüche zwischen Texten, Zeugen, Dokumenten). Die restlichen Bausteine bleiben als Gestaltungsregel für die Inhalte.
+
 - **Widerspruch:** zwei Aussagen/Funde passen nicht (Zeitstrahl).
 - **Bestätigung:** Zeuge bestätigt oder widerlegt.
 - **Verknüpfung:** zwei Funde gehören zusammen (Fußspuren-Zettel ↔ Schuhe). Das System sagt nur „Das erinnert dich an …“, der Spieler bestätigt „Verknüpfen“ und bekommt Punkte.
