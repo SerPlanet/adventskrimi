@@ -18,6 +18,7 @@ Es arbeitet immer nur 1 Haupt-Agent (+ höchstens 1 Sub-Agent). Die Zeitfenster 
 | 10b | Inhalt-Umbau (Lügennetz, Dokumente, Dialoge) | parallel zu WP06d (Sub-Agent) | WP06c | `wp/WP10b-inhalt-umbau.md` |
 | 6e | Design-Grundlagen (Skins, Schriften, Desktop-Raster) | zuerst im Redesign | WP06d | `wp/WP06e-design-grundlagen.md` |
 | 6f | Hotelplan wie Cluedo und komponierter Raum | nach WP06e | WP06e | `wp/WP06f-hotelplan-raum.md` |
+| 6j | Genauer untersuchen (kleines Aktionsbudget), keine „!“-Zeichen | nach WP06f | WP06f | `wp/WP06j-genauer-untersuchen.md` |
 | 6g | Zeitung im Zeitungslook, strenge Sperre | nach WP06f | WP06e | `wp/WP06g-zeitung.md` |
 | 6h | Akte als Ordner mit Karteikarten | nach WP06g | WP06e | `wp/WP06h-akte.md` |
 | 6i | Aufräumen (Übergangscode, tote Teile, Doku) | nach WP06h, vor WP12 | WP06h | `wp/WP06i-aufraeumen.md` |

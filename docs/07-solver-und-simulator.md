@@ -29,8 +29,8 @@ Prüft in dieser Reihenfolge und bricht bei Schemafehlern früh ab. Ausgabe: je 
 - **Aha-Dichte:** ≥1 Verknüpfung oder Widerspruch pro Woche je Schwerpunktfigur.
 
 ## 3. Tempo-Prüfung (ersetzt „zeitgebundene Hinweise“)
-Pacing entsteht durch **Raumwahl pro Tag** und die Verteilung der Funde auf Räume und Tage (kein Aktionsbudget ab WP06c), nicht durch gesperrte Beweise.
-Planer: sucht den **frühesten Spieltag**, an dem ein einzelner perfekter Spieler (kennt die Daten, wählt optimal) die Lösung eindeutig herleiten kann (DP/BFS über Zustand `(Tag, Raum, Funde, Inventar)`; pro Tag wählt er einen Raum und erhält alle dortigen Funde dieses Tages).
+Pacing entsteht durch **Raumwahl pro Tag**, das **kleine Aktionsbudget** für genaues Untersuchen und die Verteilung der Funde auf Räume und Tage (`02b` §1), nicht durch gesperrte Beweise.
+Planer: sucht den **frühesten Spieltag**, an dem ein einzelner perfekter Spieler (kennt die Daten, wählt optimal) die Lösung eindeutig herleiten kann (DP/BFS über Zustand `(Tag, Raum, Funde, Inventar)`; pro Tag wählt er einen Raum, erhält dort alle **freien** Funde (Gespräche, Ansehen) und wählt bis zu B Untersuchungen mit B = Aktionsbudget des Profils).
 Soll: **frühestens Tag 20–21** (Frühanklage beginnt Tag 20, davor darf nichts herleitbar sein). Liegt er davor, sind Hinweise zu dicht/zu nah: Validator meldet die Stellschrauben (Aktionen/Tag senken, Schlüssel-Quellen weiter auseinander, Wege verlängern). Liegt er nach Tag 22, ist der Fall zu hart.
 
 ## 4. Simulator (`tools/simulate <fall> --profile <p> --bot <name>`)

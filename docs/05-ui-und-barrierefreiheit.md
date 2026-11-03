@@ -55,7 +55,7 @@ Jeder Bereich hat einen eigenen **Skin** (Schrift, Farben, Layout). Gemeinsam bl
 |---|---|---|
 | Zeitung | `skin-paper` | Echte Titelseite: fetter Titelkopf, Kachel-Artikel, Kästen, eine scrollbare Seite pro Tag, einfache Überblendung zwischen Tagen |
 | Hotelplan | `skin-plan` | Ein Grundriss von oben (wie Cluedo): Räume, Flur, Türen, Außenbereich, Treppen zu Keller und Dachboden |
-| Raum | `skin-room` | Von Hand komponierte Szene mit Props an realen Orten, kein Raster, Liste der Dinge nur eingeklappt als Hilfe |
+| Raum | `skin-room` | Von Hand komponierte Szene mit Props an realen Orten, kein Raster. **Keine „!“-Zeichen im Bild.** Nur ein Teil der Dinge ist anklickbar (Hervorhebung bei Hover/Fokus, Knopf „Umsehen“ für Touch). Zeile „Aktionen übrig (1/2)“. Liste der Dinge nur eingeklappt als Hilfe |
 | Akte | `skin-file` | Aktenordner mit Reitern (Personen, Dokumente, Orte, Zeit), Karteikarten, Verknüpfungen auf der Karte. Keine Tafel mit Schnüren |
 | Theorie, Rangliste | bisher | unverändert |
 **Popups:** Dialog (Sprechblasen + Chips + Zeigen), Dokument-Leser (Einstecken), Gegenstand. ≤60 Wörter, Fokus-Falle, Esc/Schließen, Fokus kehrt zurück.

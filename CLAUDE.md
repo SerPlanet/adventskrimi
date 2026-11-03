@@ -34,7 +34,7 @@ Nie den ganzen `docs/`-Ordner lesen. Landkarte: `docs/00-index.md`. Arbeitsablau
 1. **Lösung und noch gesperrte Inhalte verlassen nie den Server.** Der Client bekommt nur Freigeschaltetes. Die Lösung steht nicht in `docs/`, `STATUS.md`, Commit-Messages, Logs oder Chat-Ausgaben.
 2. **Keine Minuspunkte, keine Streaks, kein Verfall, keine Strafen.** Ein Tipp halbiert nur die Punkte dieser einen Sache.
 3. **Jeder Tag ist nachholbar** (in Reihenfolge). Punkte bleiben gleich; nur zeitgebundene Boni (Erstentdecker, Frühanklage) entfallen.
-4. **Es gibt keine Aktionspunkte.** Pro Raum und Tag gibt es eine feste Menge an Entdeckungen, die frei erkundbar sind (`docs/02b`). Gespräche sind kostenlos.
+4. **Ansehen und Gespräche sind frei, nur „Genauer untersuchen“ kostet eine Aktion** (kleines Tagesbudget aus der Konfiguration, UI zeigt „Aktionen übrig (x/y)“). Eine Aktion wird nur verbraucht, wenn sie etwas Neues liefert. Keine „!“-Markierungen im Bild (`docs/02b` §1).
 5. **Ein Spieltag dauert ≤10 Minuten.** Jede Textkarte ≤60 Wörter. Kein Rätsel braucht >3 Minuten.
 6. **Hinweise erzeugt das System** und Spieler können sie nicht ändern. „Aussage“ (kann falsch sein) und „Fakt“ sind immer gekennzeichnet.
 7. **Keine Funktionen für Chat, Teilen, Beschatten, Lügen oder Sabotage zwischen Spielern (v1).** Soziales entsteht über die Zeitung und die Erstentdecker-Plakette.

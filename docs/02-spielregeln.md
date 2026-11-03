@@ -16,7 +16,7 @@ Hinweise aus Tag 1–5 können später neu bedeutsam werden („Neudeutung“). 
 ## 3. Der Spieltag (≤10 Min.)
 1. **Zeitung** lesen (~2 Min.): Ereignis, Klatsch, Wetter, Anzeigen, Gerüchte, Ermittler des Tages, Rätsel des Tages.
 2. **Hotel:** Du bist in einem Raum (Start: Raum vom Vortag, Tag 1 Lobby). Du siehst NPCs, Objekte, Auffälligkeiten.
-3. **Erkunden** (siehe `02b-erkunden.md`): Dinge ansehen und untersuchen, Dokumente lesen, Personen befragen, Gegenstände benutzen. Kein Aktionsbudget.
+3. **Erkunden** (siehe `02b-erkunden.md`): Dinge ansehen (frei), Personen befragen (frei), Dokumente lesen (frei), Dinge genauer untersuchen (kostet 1 Aktion, Budget „x/y“ pro Tag).
 4. **Frage des Tages** (~1 Min.).
 5. **Rätsel des Tages** (optional, ≤3 Min., nur Punkte).
 6. **Tag beenden:** nächsten Raum wählen (§4). Danach ist der Tag abgeschlossen.
@@ -25,8 +25,8 @@ Reihenfolge ist frei, außer „Tag beenden“ zuletzt. Ein Tag zählt als gespi
 ## 4. Räume und Bewegung
 Hotel = Graph aus Räumen (Familie 6, Freunde 9) mit Flur als Knoten. Beim Tag-Ende wählt man den Raum für den nächsten Tag. **Familie:** jeder Raum frei wählbar. **Freunde:** nur Nachbarräume. Konfigurierbar (`config/profiles`). Welche NPCs wann in welchem Raum sind, ist pro Tag fest vorgeschrieben (Tagesplan). Die Welt ist deterministisch und unabhängig von Spielern.
 
-## 5. Erkunden statt Aktionen
-Gilt ab WP06c, Details in `02b-erkunden.md`. Pro Raum und Tag gibt es eine feste Menge Entdeckungen, die der Spieler frei erkundet. Die Fortschrittsanzeige „x von y entdeckt“ ersetzt Aktionspunkte. Gespräche sind kostenlos. Die frühere Regel „Aktion nur bei neuem Fund verbrauchen“ entfällt, weil es nichts zu verbrauchen gibt.
+## 5. Erkunden und Aktionen
+Details in `02b-erkunden.md`. Ansehen, Gespräche und Lesen sind frei. Nur „Genauer untersuchen“ kostet eine Aktion, und nur, wenn es etwas Neues liefert. Budget und Anzeige „Aktionen übrig (x/y)“ laut `02b` §1.
 
 ## 6. Fund-Typen
 - **Fakt:** wahre Beobachtung (z. B. „Schneespuren im Treppenhaus um 02:00“). Gekennzeichnet mit Lupen-Symbol.
