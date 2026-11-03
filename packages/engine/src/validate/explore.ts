@@ -1,5 +1,5 @@
 import type { Info } from '../solver/info';
-import { wordCount } from '../schemas';
+import { wordCount, type Quality } from '../schemas';
 import type { CheckResult } from './types';
 
 /** A visible text must not give the verdict (invariant 13). */
@@ -13,7 +13,7 @@ const VERDICT = [
 ];
 
 /** Checks of docs/07 §2b: no verdicts, lie web, links, documents, day beats. */
-export function checkExplore(info: Info): CheckResult {
+export function checkExplore(info: Info, quality: Quality): CheckResult {
   const { c } = info;
   const errors: string[] = [];
   const texts: [string, string][] = [
@@ -45,13 +45,8 @@ export function checkExplore(info: Info): CheckResult {
       if (words > 60) errors.push(`document ${s.id}: ${words} words`);
     }
 
-  if (c.case.format !== 'explore')
-    return {
-      name: 'explore',
-      ok: errors.length === 0,
-      errors,
-      note: 'legacy format: web and beats not required',
-    };
+  if (!quality.lie_web)
+    return { name: 'explore', ok: errors.length === 0, errors, note: 'lie web off' };
 
   // lie web: every figure keeps something back, with a reason; mentioned by at least two others
   const stmts = c.statements.statements;

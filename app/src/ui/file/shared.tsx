@@ -7,7 +7,7 @@ export type Find = View['finds'][number];
 export type FileLink = View['links'][number];
 
 /** True from 900 px: list left, detail right. Below, the detail opens under its card. */
-export function useWide(): boolean {
+function useWide(): boolean {
   const q = '(min-width: 900px)';
   const [wide, setWide] = useState(() => window.matchMedia(q).matches);
   useEffect(() => {
@@ -22,7 +22,7 @@ export function useWide(): boolean {
 const hue = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
 
 /** Instant photo: a coloured initial on white paper (no real photos in the case). */
-export function Polaroid({ name }: { name: string }) {
+function Polaroid({ name }: { name: string }) {
   return (
     <span className="polaroid" aria-hidden="true">
       <span style={{ background: `hsl(${hue(name)} 35% 42%)` }}>{name.slice(0, 1)}</span>

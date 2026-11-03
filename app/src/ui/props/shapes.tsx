@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 /** Palette of the style guide (app/src/ui/style-guide.md). */
-export const C = {
+const C = {
   wood: '#8a5a2b',
   dark: '#5e3b1b',
   paper: '#f6ecd0',

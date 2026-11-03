@@ -204,20 +204,6 @@ function sumFinale(): number {
   return f.who + f.accomplice + f.when + f.where + 2 * f.proof;
 }
 
-describe('players saved by an older version', () => {
-  test('a state without newer fields (daily, questions, ...) still loads', async () => {
-    const rec = store.players.get(p)!;
-    const old = { ...rec.state } as Record<string, unknown>;
-    for (const k of ['daily', 'questions', 'puzzles', 'theory', 'ledger', 'found']) delete old[k];
-    rec.state = old as never;
-    for (const fn of ['state', 'open_day'] as const) {
-      const r = await call(fn, {});
-      expect(r.status).toBe(200);
-      expect(out(r).state.theory).toEqual({});
-    }
-  });
-});
-
 describe('links (Verknüpfen)', () => {
   test('visible only with both finds, points once, never in the first view without them', async () => {
     expect(out(await call('state', {})).state.links).toEqual([]);

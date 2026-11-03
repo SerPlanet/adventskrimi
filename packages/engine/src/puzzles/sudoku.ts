@@ -9,7 +9,7 @@ interface Spec {
   keep: number;
 }
 
-export const SPECS: Record<Level, Spec> = {
+const SPECS: Record<Level, Spec> = {
   easy: { n: 4, br: 2, bc: 2, keep: 8 },
   medium: { n: 6, br: 2, bc: 3, keep: 18 },
   hard: { n: 9, br: 3, bc: 3, keep: 34 },

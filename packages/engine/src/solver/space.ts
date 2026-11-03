@@ -1,7 +1,7 @@
 import type { Category, FactBody } from '../schemas';
 import type { LoadedCase } from '../loader';
 
-export const CATS: Category[] = ['who', 'accomplice', 'when', 'where'];
+const CATS: Category[] = ['who', 'accomplice', 'when', 'where'];
 
 /** Candidate space = product of the four categories (mixed radix index). */
 export interface Space {

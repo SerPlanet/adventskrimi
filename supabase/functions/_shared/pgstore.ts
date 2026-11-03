@@ -1,7 +1,7 @@
 // Postgres implementation of the engine's Store contract (see packages/engine/src/api/types.ts).
 // Runs in Deno (edge functions) and in Node (integration tests via tsx).
 import postgres from 'postgres';
-import { ApiError, kindOfDay, normalizeState } from './engine.js';
+import { ApiError, kindOfDay } from './engine.js';
 import type {
   GameRecord,
   GameTx,
@@ -103,7 +103,7 @@ const toPlayer = (r: any): PlayerRecord => ({
   avatar: r.avatar,
   isDuo: r.is_duo,
   settings: r.settings ?? {},
-  state: normalizeState(r.state),
+  state: r.state,
 });
 
 const PLAYER_SELECT = (q: Sql | Q) => q`

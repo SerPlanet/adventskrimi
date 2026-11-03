@@ -5,7 +5,7 @@ import type { CheckResult } from './types';
 type Sol = Record<'who' | 'accomplice' | 'when' | 'where', string>;
 
 /** Does the body hold in the real world (world.yaml + solution)? undefined = not decidable from the world. */
-export function holds(b: FactBody, c: LoadedCase): boolean | undefined {
+function holds(b: FactBody, c: LoadedCase): boolean | undefined {
   const sol = c.case.solution as Sol;
   switch (b.type) {
     case 'presence':

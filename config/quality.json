@@ -1,14 +1,27 @@
 {
+  "lie_web": true,
   "card_words_max": 60,
   "newspaper_words_max": 250,
   "family_sentence_words_max": 18,
-  "redundancy_min": { "friends": 3, "family": 2 },
-  "tempo": { "earliest_day": 20, "latest_day": 22 },
+  "redundancy_min": {
+    "friends": 3,
+    "family": 2
+  },
+  "tempo": {
+    "earliest_day": 20,
+    "latest_day": 22
+  },
   "min_reinterpreted_finds": 3,
   "min_statement_fact_contradictions": 4,
   "min_statement_statement_contradictions": 2,
-  "red_herrings_min": { "friends": 4, "family": 2 },
-  "liars_max": { "friends": 4, "family": 2 },
+  "red_herrings_min": {
+    "friends": 4,
+    "family": 2
+  },
+  "liars_max": {
+    "friends": 4,
+    "family": 2
+  },
   "bots": {
     "random_median_max_candidates": 3,
     "casual_median_max_candidates": 4,

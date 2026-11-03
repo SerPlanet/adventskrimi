@@ -1,7 +1,14 @@
 {
-  "tempo": { "earliest_day": 1, "latest_day": 5 },
+  "tempo": {
+    "earliest_day": 1,
+    "latest_day": 5
+  },
   "min_reinterpreted_finds": 0,
   "min_statement_fact_contradictions": 1,
   "min_statement_statement_contradictions": 0,
-  "red_herrings_min": { "friends": 0, "family": 0 }
+  "red_herrings_min": {
+    "friends": 0,
+    "family": 0
+  },
+  "lie_web": false
 }

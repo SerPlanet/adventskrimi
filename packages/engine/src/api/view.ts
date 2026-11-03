@@ -102,7 +102,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       id: room.id,
       name: room.name,
       description: room.description,
-      scene: room.scene ?? room.id,
+      scene: room.scene,
       blocked: blockedToday,
       book: hasBook && !blockedToday,
       objects: room.objects.map((o) => ({

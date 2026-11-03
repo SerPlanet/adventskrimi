@@ -40,7 +40,7 @@ export function runChecks(
     minimums: () => checkMinimums(info, quality),
     texts: () => checkTexts(info, quality),
     tempo: () => checkTempo(info, quality),
-    explore: () => checkExplore(info),
+    explore: () => checkExplore(info, quality),
     plan: () => checkPlan(c),
   };
   return CHECK_NAMES.filter((n) => !only || n === only).map((n) => all[n]());

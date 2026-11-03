@@ -15,7 +15,7 @@ const MESSAGES: Record<string, string> = {
   already_accused: 'Du hast schon Anklage erhoben. Danach kann man nichts mehr ändern.',
   too_early: 'Die Anklage ist für dich noch nicht möglich.',
 };
-export const OFFLINE = 'Das Hotel ist gerade nicht erreichbar, versuche es gleich noch einmal.';
+const OFFLINE = 'Das Hotel ist gerade nicht erreichbar, versuche es gleich noch einmal.';
 
 /** Staging only: ?now=2026-12-03T12:00:00+01:00 fakes the clock. The server ignores it in prod. */
 function clockOverride(): string | null {

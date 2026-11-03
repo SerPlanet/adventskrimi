@@ -7,4 +7,3 @@ export * from './admin';
 export * from './lobby';
 export * from './memory-store';
 export { kindOfDay } from '../puzzles';
-export { normalizeState } from '../game/state';

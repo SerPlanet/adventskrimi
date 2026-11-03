@@ -1,5 +1,5 @@
 import type { LoadedCase } from '../loader';
-import { normalizeState, totalPoints, type PlayerState } from '../game/state';
+import { totalPoints, type PlayerState } from '../game/state';
 import {
   ApiError,
   type DayActivity,
@@ -95,8 +95,7 @@ export class MemoryStore implements Store {
       const tx: PlayerTx = {
         ...this.gameTx(),
         get player() {
-          const rec = self.players.get(playerId) as PlayerRecord;
-          return { ...rec, state: normalizeState(rec.state) };
+          return self.players.get(playerId) as PlayerRecord;
         },
         async saved(id) {
           return self.responses.get(`${playerId}:${id}`);

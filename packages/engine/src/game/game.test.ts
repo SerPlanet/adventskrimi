@@ -149,6 +149,7 @@ describe('movement', () => {
         neighbors: [],
         objects: [],
         plan: { x: 0, y: 20, w: 4, h: 4 },
+        scene: 'dach',
       });
     });
     const st = newPlayer(c2);

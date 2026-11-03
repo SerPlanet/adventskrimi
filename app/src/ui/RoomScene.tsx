@@ -41,9 +41,8 @@ const half = (t: Spot) => Math.max(t.scale * HALF * (t.kind === 'npc' ? 2 / 3 : 
  * defaults. Without a spot the things stand in an even row.
  */
 export function spotsOf(room: Room): Spot[] {
-  const row = (n: number, i: number) => ((i + 1) * 100) / (n + 1);
-  const things: Spot[] = room.objects.map((o, i) => {
-    const y0 = o.spot?.y ?? 30;
+  const things: Spot[] = room.objects.map((o) => {
+    const y0 = o.spot.y;
     const layer = o.layer ?? (y0 < 35 ? 'back' : 'front');
     const hung = HUNG.has(propFor(o.name, o.prop));
     const base = layer === 'back' ? WALL + 1 : Math.min(94, WALL + 8 + (y0 - 35) * 1.3);
@@ -57,7 +56,7 @@ export function spotsOf(room: Room): Spot[] {
       untersuchbar: o.klasse === 'untersuchbar',
       prop: o.prop,
       open: o.explored,
-      x: o.spot?.x ?? row(room.objects.length, i),
+      x: o.spot.x,
       y: hung ? 36 : base,
       scale: o.scale ?? (layer === 'back' ? 1 : 1 + (base - WALL) / 60),
       layer,

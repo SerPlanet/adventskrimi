@@ -7,11 +7,10 @@ export const RoomObject = z.object({
   text: CardText,
   /** deko: not clickable, ansehen: look only, untersuchbar: can be examined for 1 action. Derived when absent. */
   klasse: z.enum(['deko', 'ansehen', 'untersuchbar']).optional(),
-  /** vector prop and its states, e.g. ["zu", "auf"] (WP06d) */
+  /** vector prop of the library (ui/props); chosen by name when absent */
   prop: z.string().optional(),
-  states: z.array(z.string()).optional(),
   /** hotspot position in the room scene, percent of width/height */
-  spot: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100) }).optional(),
+  spot: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100) }),
   /** size factor and depth layer in the scene (WP06f); defaults follow the spot */
   scale: z.number().min(0.3).max(3).optional(),
   layer: z.enum(['back', 'front']).optional(),
@@ -34,7 +33,7 @@ export const Room = z.object({
   plan: Rect,
   /** connecting room (hall): drawn as a corridor */
   corridor: z.boolean().optional(),
-  scene: z.string().optional(),
+  scene: z.string().min(1),
 });
 
 export const Npc = z.object({

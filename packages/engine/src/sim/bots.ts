@@ -44,7 +44,7 @@ export function actionsHere(st: PlayerState, ctx: GameCtx): Action[] {
   return [...out.values()];
 }
 
-export interface Option {
+interface Option {
   action: Action;
   /** tuples the new finds remove from the candidate space */
   gain: number;
@@ -52,7 +52,7 @@ export interface Option {
 }
 
 /** Options that would really yield something new (budget ignored), with their information gain. */
-export function options(st: PlayerState, ctx: GameCtx, info: Info): Option[] {
+function options(st: PlayerState, ctx: GameCtx, info: Info): Option[] {
   const before = count(combine(info, st.found));
   const out: Option[] = [];
   for (const action of actionsHere(st, ctx)) {

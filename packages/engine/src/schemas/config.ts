@@ -58,6 +58,8 @@ export const Scoring = z.object({
 });
 
 export const Quality = z.object({
+  /** lie web and a beat for every day are required (02b §5); only tiny test cases switch it off */
+  lie_web: z.boolean(),
   card_words_max: z.number().int(),
   newspaper_words_max: z.number().int(),
   family_sentence_words_max: z.number().int(),

@@ -1,72 +1,36 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-02 · Phase: **M2 erreicht** (Testfall bis Tag 24 im Zeitraffer, WP08, WP09 Teil 2, WP04 fertig). Offen: Push, Prod-Migration, WP11
+Stand: 2026-11-03 · Phase: **UI-Redesign fertig (WP06e–j), Aufräumen WP06i erledigt.** Nächstes: WP11 (Admin) → `docs/wp/WP11-admin.md`.
 
-## Nächstes Work Package
-**UI-Redesign:** WP06e ✓, WP06f ✓, WP06j ✓, WP06g ✓, WP06h ✓ (wartet auf Test durch den Menschen) → danach WP06i (Aufräumen). Danach WP11.
+Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/Feinschliff → WP13 Testlauf → WP14 Launch. Code-Freeze 29.11., Start 1.12.
 
-**M2 erreicht.** Nächstes: WP11 (Admin) → `docs/wp/WP11-admin.md`; parallel Balance-Verstöße aus `npm run balance` (siehe unten) in WP10/WP13 beheben.
+## Erledigt (Kurzform, Details in `git log` und den WP-Dateien)
+- Kern: Engine, Schemas, Solver, Validator (10 Prüfungen + `plan`), Simulator mit Bots, Edge Functions, Frontend, Rätsel des Tages, Objekt-Rätsel, Raster, Zeitstrahl, Theorie, Zeugnis, Anklage, Rangliste, Plaketten.
+- Erkunden-Kern: Dinge je Raum (Klassen `deko`/`ansehen`/`untersuchbar`), nur „Genauer untersuchen“ kostet 1 Aktion (D62), Dokumente einstecken, Verknüpfen, Lügennetz. Kein „!“.
+- UI: Skins je Bereich, ein Grundriss als Hotelplan, komponierte Raumszene (`place` hält jede Hotspot-Mitte frei), Zeitung als Titelseite (Sperre `readableDays`), Akte als Ordner (Personen, Dokumente, Orte, Zeit, Raster), eine feste Leiste (Name, Tag, Punkte, Aktionen, Menü).
+- Aufräumen: `knip` in der CI (D63), `normalizeState`, `format: legacy`, Hotspot-Notbehelf und tote CSS entfernt. Zeitraffer Tag 1–24 auf Staging für beide Profile ohne Fehler.
+- Berghotel: `validate-case` und `balance` grün (Freunde Budget 4, Familie 3). Lösetag des optimalen Spielers: 20.
 
-Reihenfolge (Details: `docs/08-roadmap.md`):
-WP00 ✓ → WP01 ✓ → WP02 ✓ → WP03 ✓ → (WP10 ✓) → WP05 ✓ → WP06 ✓ → WP07 ✓ → WP09 (Teil 1 ✓) → **M1** ✓ → WP08 ✓ → WP09 Teil 2 ✓ → WP04 ✓ → **M2** ✓ → WP11 → WP12 → WP13 → WP14
+## Offen im Inhalt (WP10b-Nacharbeit, später)
+- Je Raum/Tag mehr untersuchbare Funde als Aktionen nur in Salon, Küche, Lobby; Tage 1–5 haben fast keine Untersuchen-Funde, Dachboden erst ab Tag 20 (Grenzen und Bots neu kalibrieren, `docs/07`).
+- Namen in `insider.yaml`; Stichprobe der Dialogtexte lesen.
 
-## Erledigt
-- Doku v0.1 (Spielregeln, Punkte, Architektur, Roadmap)
-- WP00: Workspaces, TS strict, ESLint/Prettier/Vitest, Hello-App, check-bundle-Stub, CI + Pages-Workflow, Supabase-Config + leere Migration. `npm run lint && npm test && npm run build` grün.
-- WP01: Zod-Schemas, Loader mit Referenzprüfung, Migration (27 Tabellen, RLS gesperrt), `load-case`, `validate-schema`, Testfall `cases/_test`, Configs. Auf Staging angewendet und geladen.
-- WP02: Solver (Kandidatenraum, Fakt-Auswertung, Tempo-Planer), Profilanwendung, Validator `npm run validate-case -- <fall> --profile <p> [--only <check>]` mit 9 Prüfungen, Mini-Fall-Tests. `_test` besteht beide Profile.
-- WP03: Engine-Kern `packages/engine/src/game/` (Aktionen, Bewegung, Tage/Gnadenfrist, Punkte, Zeugnis, Anklage, Widersprüche). Vollständiger 24-Tage-Lauf auf `_test` als Test.
-- WP05: Edge Functions (state, open_day, act, end_day, answer_daily, scoreboard, newspaper, settings, admin_players) auf Staging, Integrationstests grün. Spieler anlegen: `admin_players`; Spiel anlegen: `npm run create-game`.
-- WP06: Frontend-Kern (Namenswahl per Link `/#/<slug>`, Zeitung, Hotel, Akte, Rangliste, Einstellungen, Page). Playwright-Smoke grün, Lighthouse-A11y 100 auf allen Screens, kein Überlauf bei 360 px und Schrift „sehr groß“.
-- WP07: Rätsel des Tages (4 Arten × 3 Stufen, deterministisch, serverseitig geprüft, Tipp-Leiter, Überspringen) und Objekt-Rätsel (Endpunkt `object_puzzle`). Playwright-Smoke deckt beide ab, Lighthouse 100.
-- WP09 Teil 1: Rangliste mit Plaketten-Sammlung, „Meine Punkte“ (Aufschlüsselung), Ermittler des Tages in der Zeitung.
-- WP10: Fall Berghotel (lokal, per .gitignore nicht im Repo) und Familienprofil; `validate-case` grün für friends und family, Tempo Tag 20. Noch offen: `npm run balance` (WP04), Namen in `insider.yaml`.
-- WP08: Raster (Auto/Halb/Manuell), Zeitstrahl (Tippen, Widersprüche aus eigenen Einträgen, „Passt das zusammen?“), Theorie mit Verlauf, serverseitig pro Spieler. Neue Functions `set_note`, `fits`, `set_theory`, `get_theory`. Playwright + Lighthouse 100 (inkl. Theorie).
-- WP09 Teil 2: Wochenzeugnis (beim Tagesende, einmalig, Inspektor-Satz nach Trefferzahl), Anklage (`accuse`, ab Tag 20, Bestätigung, endgültig), Frühbonus nur pünktlich, Zeitungsnotiz, Auflösung (`story`) nur nach Abgabe und ab echtem Tag 24. Nicht gebaut: Admin-Knopf Zeugnis, „Gemeinsames Finale“ (WP11).
-- Fix: alte Spielerstände ohne neue Felder (z. B. `daily`) führten zu HTTP 500; `normalizeState` beim Laden.
-- WP04: `packages/engine/src/sim` (Bots optimal/greedy/random/newspaper_only/worst auf der echten Engine), `npm run simulate -- <fall> --profile <p> [--bot] [--seeds] [--json]`, `npm run balance [-- <fall>]` (07 §5). Test `timelapse.test.ts`: Testfall Tag 1–24 über die API bis zur Auflösung. Laufzeit alle Bots <1 s.
-- Balance auf Berghotel (Stand heute, Verstöße für WP10/WP13): newspaper_only und random liegen über dem Boden (Wer 8/5 statt ≤3, Komplize 7), greedy wird bis Tag 24 nicht eindeutig (Freunde), optimal/greedy/worst haben späte Tage ohne neue Funde (ab Tag 18–20, teils Grenze des Bots).
+## Bekannt
+- `tools/integration/api.int.ts` ist veraltet (Test `actions.used`, Altlast „Int-P“): reparieren oder löschen.
+- Ein Spiel kopiert Profil und Punkte beim Anlegen (D64): nach Änderungen an `config/` Staging-Spiele neu anlegen.
+- Prod: Migrationen 0000–0300 sind angewendet, kein Fall geladen, keine Functions deployt, `SUPABASE_PROD_ANON_KEY` fehlt in `.env`.
 
-- WP06c (Kern): Aktionsbudget entfernt (Engine, API, UI, Bots, Planer), Fortschritt „Entdeckt x von y“, Dokumente einklappbar in der Akte, Verknüpfen (Endpunkt link, +3), Schemas links/beats/format/lies/secret/document, Validator-Check explore (nur bei format: explore), Bots neu (planDay). Offen: Déjà-vu, Kalibrierung der Bot-Grenzen nach WP10b.
-
-- WP06d (Familien-Räume): Props-Bibliothek app/src/ui/props/ (26 Vektor-Props mit je 2 Zuständen, Zuordnung per Namens-Stichwort oder Feld prop im Fall), Stilregeln app/src/ui/style-guide.md, Szene mit Props an den Spots, Nahansicht mit Zustand, Zustand „untersucht" aus der View (explored). Playwright prüft Prop-Zustand, Lighthouse 100. Offen: Hotspot-Editor (tools/hotspot-editor), Dokument-Leser mit „Einstecken", Props/Spots für die 3 Räume nur der Freunde, Feinschliff der Szenen.
-
-- WP10b: Berghotel im Erkunden-Format (178 Quellen, 88 Dokumente, 8 Dialoge mit Zeigen, 20 Verknüpfungen, 24 Beats, Lügennetz). validate-case und balance grün für friends und family, auf Staging geladen. Danach: Platzhalter-Fix, „!" nur bei Dingen mit Fund, Prolog ohne Aktionen, Einstecken und Inventar mit Dokumenten, Hotspot-Editor (npm run hotspot-editor -- cases/<fall>).
-
-- WP06e: Skins (`app/src/skins.css`), lokale Schriften (D61), Desktop-Raster `.wrap`/`.cols2`, Navigation am PC oben.
-- WP06f: Hotelplan als ein Grundriss (`ui/HotelPlan.tsx`, Daten `plan`/`doors`/`outside`/`stairs` in `rooms.yaml`, Validator-Check `plan`: Türen = Raumgraph), komponierte Raumszene (`ui/RoomScene.tsx`, `spot`/`scale`/`layer`), Liste der Dinge eingeklappt. `floor`/`col`/HotelMap entfernt. Fall-Zusatzdaten liegen in `case_meta.data` (kein Schemawechsel). Bekannt: `tools/integration/api.int.ts` ist veraltet (`actions.used`, Int-P-Altlast), nicht Teil von WP06f.
-
-- WP06j: Aktionsbudget neu (`game/budget.ts`, `game/things.ts`): nur „Genauer untersuchen“ kostet 1 und nur bei neuem Fund, Budget je Tag aus `actions_per_day` (Profil, Prolog-Tage). Klassen deko/ansehen/untersuchbar (abgeleitet, `klasse` überschreibt), Ansicht `actions {used,budget}`, `explore` und `auffaellig` gelöscht, kein „!“, Deko nicht klickbar, Knopf „Umsehen“. Planer, Bots, Validator auf B umgestellt; `balance` und `validate-case` grün. Offen (Inhalt, Sub-Agent): fast alle Dinge im Berghotel sind untersuchbar; je Raum/Tag prüfen, dass mehr untersuchbare Funde als Aktionen existieren und die Grenzen kalibrieren.
-
-- Obere Leiste (nach WP06j): eine feste Leiste mit Name, Tag, Punkte, Aktionen übrig und Menü (`.bar`, Höhe als `--bar-h`). Nahansicht sagt, warum „Genauer untersuchen“ fehlt oder aus ist. `e2e/explore.spec.ts` prüft Untersuchen an Tag 2 und 6 (Freunde, Familie). Raumszene: keine verdeckten Hotspots mehr (`place` in `ui/RoomScene.tsx`).
-- WP06g: Zeitung als Titelseite (`ui/Issue.tsx`, `ui/paper.css`), Sperre `readableDays` = min(heute, eigener Spieltag) im Endpunkt `newspaper` und in `newspaper_days`, mit Tests.
-- WP06h: Akte als Ordner (`screens/Dossier.tsx`, `ui/file/`): Reiter Personen, Dokumente, Orte, Zeit, Raster; Karteikarten, Leser mit Einstecken, Verknüpfen auf den Karten. Alt gelöscht: Reiter Funde, Hotelbuch, Gegenstände (jetzt unter Dokumente).
-
-## In Arbeit
-- **WP06b (halb fertig, nicht gepusht):** Neu: `app/src/ui/` (Popup, Candles, HotelMap, RoomScene, Bubbles), `screens/EndDay.tsx`, neues Hotel, Zeitungs-Layout, Schema-Felder (`floor/col/scene`, `spot`, `presentation/lines/note`), Popup-Wortprüfung. Functions auf Staging neu deployt. **Offen:** `e2e/smoke.spec.ts` bricht nach dem Fund-Popup ab (das Popup „Neu in deiner Akte" bleibt offen und blockiert den Klick auf „Akte"; im Test vor dem Wechsel `Escape` drücken), danach Lighthouse (`npm run a11y`, Preview muss laufen) und Playwright für Dialog/Notiz/Karte ergänzen.
-- **WP06b:** fertig bis auf Berghotel-Inhalte. Playwright (3 Tests inkl. Dialog-Sprechblasen und Notiz-Zettel) grün, Lighthouse A11y 100 auf allen Screens. Ursache des unzuverlässigen Tests: Verbindungs-Slots der Datenbank waren erschöpft (jede Function-Instanz hielt bis zu 3 Verbindungen, Fall-Laden innerhalb der Transaktion brauchte eine zweite). Behoben: max 1 Verbindung je Instanz, Fall-Laden über die Transaktion. Kein Lost Update (Spielerzeile wird mit FOR UPDATE gesperrt); Integrationstest mit parallelen Anfragen ergänzt.
-- **Berghotel-Präsentation:** nachgetragen (49 dialog, 72 note, 24 object, 5 newspaper ohne; 9 Räume auf 3 Etagen, 55 Objekte mit spot). validate-case und balance grün. Dialogtexte nur vom Validator geprüft, bitte Stichprobe lesen.
-- **Staging-Spiele:** /#/freunde (Mia Tag 1, Noah Tag 6, Lena Tag 12, Tom Tag 20) und /#/familie (Oma Tag 1, Papa Tag 6, Lisa Tag 12, Jonas Tag 20). Werkzeug: npm run fast-forward -- <slug> <Name> <Tag> (nur Staging, Bot greedy, nur vorwärts).
-- **Balance (D48):** Bot `casual` und neue Grenzen (random ≤3, casual ≤4, worst ≤4, newspaper_only ohne Ziel) sind in Engine, `config/quality.json` und `npm run balance`. Sub-Agent repariert `cases/berghotel` (Balance + Präsentationsformat). Ergebnis noch nicht geprüft: `npm run validate-case -- cases/berghotel --profile friends|family` und `npm run balance` ausführen. Lose Datei `tools/_dbg.ts` (vom Sub-Agent) löschen, sonst schlägt `npm run lint` fehl.
-- Prod: Migrationen 0000–0300 sind auf advent-prod angewendet (per db-url, ohne Umverknüpfung). Es wurde kein Fall geladen und keine Functions deployt. Es fehlt SUPABASE_PROD_ANON_KEY in .env.
-
-## Blocker / offene Fragen an den Menschen
-- Siehe `docs/09-offen-und-entscheidungen.md` (Abschnitt „Offen“)
+## Staging-Spiele
+/#/freunde (Mia, Noah Tag 6, Lena, Tom Tag 20) und /#/familie (Oma, Papa Tag 6, Lisa, Jonas Tag 20). Datum fälschen: `?now=2026-12-06T12:00:00+01:00`. Werkzeug: `npm run fast-forward -- <slug> <Name> <Tag>`.
 
 ## Mensch (kann kein Agent tun)
-- [x] GitHub: privates Repo `SerPlanet/adventskrimi` angelegt
-- [ ] Einmalig `gh auth refresh -s workflow` ausführen (Browser-Login), danach `git push -u origin main`
-- [x] Supabase `advent-staging` angelegt, verknüpft, leere Migration angewendet (2026-11-02)
-- [x] Supabase `advent-prod` angelegt (2026-11-02), noch ohne Migration
-- [x] Repo ist öffentlich, Pages läuft über GitHub Actions (kein Pro nötig)
-- [x] Repo-Variablen gesetzt: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (anon-Key ist öffentlich, kein Service-Key!)
-- [ ] Spieler-Namen und Profilwahl (Familie/Freunde) bereitstellen, siehe WP14
+- [ ] Spieler-Namen und Profilwahl (Familie/Freunde) bereitstellen (WP14)
+- [ ] Prod: `SUPABASE_PROD_ANON_KEY` in `.env`, Fall laden, Functions deployen, Spiele anlegen (WP14)
+- [ ] Domain/Link an die Spieler verteilen
 
 ## Meilensteine
-| ID | Ziel | Datum | Inhalt |
-|----|------|-------|--------|
-| M1 | Kalender-Light (Fallback) | ~17.11. | Profilwahl, Zeitung, Rätsel des Tages, Rangliste, online |
-| M2 | Spielbar mit Testfall | ~21.11. | Aktionen, Fallakte, Raster, Zeitstrahl, Theorie auf `cases/_test` |
-| M3 | Inhalte fertig | ~24.11. | Fall Berghotel für beide Profile validiert |
-| M4 | Testlauf ok | ~28.11. | Zeitraffer + Bots + Menschen-Test |
-| M5 | Launch | 1.12. | Freeze 29.11. |
+| ID | Ziel | Datum |
+|----|------|-------|
+| M3 | Inhalte fertig (Berghotel, beide Profile) | ~24.11. |
+| M4 | Testlauf ok (Zeitraffer, Bots, Menschen-Test) | ~28.11. |
+| M5 | Launch (Freeze 29.11.) | 1.12. |

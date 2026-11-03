@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["supabase/functions/*/index.ts", "e2e/*.spec.ts"],
+      "project": ["supabase/**/*.ts", "e2e/**/*.ts"]
+    },
+    "app": { "project": ["src/**/*.{ts,tsx}"] },
+    "packages/engine": { "project": ["src/**/*.ts"] },
+    "tools/*": { "entry": ["index.{ts,mjs}"], "project": ["**/*.{ts,mjs}"] }
+  }
+}

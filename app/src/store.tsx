@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { call, memory, newRequestId, OFFLINE, type View } from './api';
+import { call, memory, newRequestId, type View } from './api';
 
 export type Action =
   | { type: 'talk'; npc: string; topic: string }
@@ -200,5 +200,3 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
-
-export { OFFLINE };

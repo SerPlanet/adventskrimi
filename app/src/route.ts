@@ -7,7 +7,7 @@ export interface Route {
 }
 
 /** Reads #/<slug>/<tab>; query parts after ? or & (e.g. a test clock) are ignored here. */
-export function parseHash(hash: string): Route {
+function parseHash(hash: string): Route {
   const [slug, tab] = hash.replace(/^#\/?/, '').split(/[?&]/)[0]!.split('/');
   return { slug: slug && /^[a-z0-9-]{2,40}$/.test(slug) ? slug : null, tab: tab || 'zeitung' };
 }

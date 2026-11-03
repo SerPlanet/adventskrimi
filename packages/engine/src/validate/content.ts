@@ -23,7 +23,7 @@ export function checkReach(info: Info): CheckResult {
 }
 
 /** Facts whose removal leaves more consistent tuples than with all of them. */
-export function keyItems(info: Info): string[] {
+function keyItems(info: Info): string[] {
   const items = [...reachableItems(info)].filter((id) => info.masks.has(id));
   const full = count(combine(info, items));
   return items.filter(
@@ -59,7 +59,7 @@ export function checkRiddle(info: Info): CheckResult {
 }
 
 /** false statement id -> refuting reason (undefined = not refutable) */
-export function refutations(info: Info): Map<string, string | undefined> {
+function refutations(info: Info): Map<string, string | undefined> {
   const reachable = reachableItems(info);
   const consistent = combine(info, reachable);
   const facts = info.c.facts.facts.filter((f) => reachable.has(f.id));

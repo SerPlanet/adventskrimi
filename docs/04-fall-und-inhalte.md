@@ -19,7 +19,7 @@ Optional später: Motiv (nicht in v1). Dazu 2 Beweisfragen (Mehrfachauswahl, je 
 |---|---|
 | `case.yaml` | Titel, Start (Tag 1 = 2026-12-01), Tatnacht, Kategorien, **Lösung** (SPOILER), Beweisfragen |
 | `world.yaml` | Wahrheit: pro Person × Zeitfenster der Tatnacht der Raum; Tatort, Ablenkungsort, Ablauf der Tat (SPOILER) |
-| `rooms.yaml` | Räume, Nachbarschaften, Beschreibung, Objekte (mit `auffaellig`) |
+| `rooms.yaml` | Räume, Nachbarschaften, Beschreibung, Objekte (mit `spot`, optional `klasse`, `prop`, `scale`, `layer`), Plan (`plan`, `doors`, `outside`, `stairs`) |
 | `npcs.yaml` | Figuren, Rolle, Tagesplan (Tag → Raum), Themenliste, Eigenheit |
 | `facts.yaml` | Atomare Wahrheiten (siehe §4) |
 | `statements.yaml` | Aussagen von Figuren mit Wahrheitswert |
@@ -43,7 +43,7 @@ Neue Typen nur nach Eintrag im Entscheidungslog und Update dieser Liste.
 ## 5. Quellen
 Eine **Quelle** liefert Funde. Felder: `id`, `kind` (talk | inspect | use | newspaper | hotelbook), `room`, `npc` oder `object`, `topic`, `days` (Liste oder Bereich, an denen sie verfügbar ist, folgt Tagesplan), `requires` (Gegenstand/Rätsel, optional), `auffaellig` (bool), `yields` (Fakt-/Aussage-IDs), `plaque` (optional, neutraler Titel).
 Regeln:
-- Jede Quelle liefert ≥1 Fund. Keine Quelle ohne Fund, außer reine Atmosphäre-Objekte ohne `auffaellig`.
+- Jede Quelle liefert ≥1 Fund. Keine Quelle ohne Fund, außer reine Atmosphäre- und Info-Objekte (Klasse `deko` oder `ansehen`).
 - Atmosphäre-Objekte kosten nie eine Aktion (siehe `02`, §5).
 - Quellen am selben Ort an verschiedenen Tagen dürfen unterschiedliche Funde liefern (Tagesplan).
 

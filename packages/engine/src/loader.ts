@@ -7,7 +7,7 @@ import * as S from './schemas';
 import { checkRefs } from './refs';
 import { NamesFile, type Names } from './names';
 
-export const CASE_FILES = {
+const CASE_FILES = {
   case: ['case.yaml', S.CaseFile],
   world: ['world.yaml', S.WorldFile],
   rooms: ['rooms.yaml', S.RoomsFile],

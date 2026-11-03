@@ -22,8 +22,6 @@ export const CaseFile = z.object({
   /** Candidate ids per category (who/accomplice: npc ids, when: window ids, where: room ids). */
   categories: z.record(Category, z.array(Id).min(2)),
   solution: z.record(Category, Id),
-  /** "explore" turns on the lie-web and day-beat checks (docs/07 §2b); "legacy" is the old format */
-  format: z.enum(['legacy', 'explore']).default('legacy'),
   proof_questions: z.array(ProofQuestion).length(2),
   /** pairs of finds that belong together; the hint never states a verdict */
   links: z.array(z.object({ id: Id, a: Id, b: Id, text: z.string().min(1) })).default([]),

@@ -109,27 +109,6 @@ export function newPlayer(ctx: GameCtx): PlayerState {
   };
 }
 
-/**
- * Fills in what saved states of older versions lack (e.g. `daily` before WP07), so a player
- * created earlier never crashes a newer engine. Call whenever a state is loaded from storage.
- */
-export function normalizeState(raw: PlayerState): PlayerState {
-  const s = raw as Partial<PlayerState>;
-  return {
-    ...raw,
-    found: s.found ?? [],
-    discoveries: s.discoveries ?? [],
-    inventory: s.inventory ?? [],
-    puzzles: s.puzzles ?? {},
-    theory: s.theory ?? {},
-    ledger: s.ledger ?? [],
-    finishedDays: s.finishedDays ?? [],
-    accused: s.accused ?? false,
-    questions: s.questions ?? {},
-    daily: s.daily ?? {},
-  };
-}
-
 /** Appends a ledger entry. Idempotent per (kind, ref); points are never negative. */
 export function addLedger(st: PlayerState, e: LedgerEntry): PlayerState {
   if (e.points <= 0 || st.ledger.some((l) => l.kind === e.kind && l.ref === e.ref)) return st;
