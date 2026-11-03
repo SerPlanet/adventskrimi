@@ -5,6 +5,7 @@ import { connInfo, readEnv } from '../tools/lib/db';
 
 // Day 2 is "today" in the fake clock, so a fresh player (still on day 1) can play day 1 and then day 2.
 const NOW = encodeURIComponent('2026-12-02T12:00:00+01:00');
+test.use({ actionTimeout: 10_000 });
 const env = readEnv();
 const NAME = `E2E-${Date.now().toString(36)}`;
 let gameId = '';
@@ -92,17 +93,25 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.getByRole('dialog')).toHaveCount(0);
   // exploring is free: progress counts finds, no action budget any more
   // talking is free: the budget of day 1 is untouched
-  await expect(page.getByText('Aktionen übrig (1/1)')).toBeVisible();
+  await expect(page.locator('.bar .actions')).toContainText('(1/1)');
   await expect(page.getByText('!', { exact: true })).toHaveCount(0);
 
   await page.keyboard.press('Escape');
 
   // dossier shows the find, tagged as fact
-  await page.getByRole('button', { name: 'Akte' }).click();
-  await expect(page.getByText('Ben ist als Dieb ausgeschlossen.')).toBeVisible();
-  await expect(page.getByText('Das stimmt.').first()).toBeVisible();
+  await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
+  // folder with index cards: open a person, read the fact and the statement from the talks
+  await page.getByRole('button', { name: /^Cora/ }).click();
   await expect(page.getByText('Ich war die ganze Nacht in der Halle.')).toBeVisible();
   await expect(page.getByText('Das kann falsch sein.')).toBeVisible();
+  // Anna's find came with the newspaper: it sits under the places, in "Allgemein"
+  await page.getByRole('tab', { name: 'Orte' }).click();
+  await expect(page.getByRole('tab', { name: 'Orte', selected: true })).toBeVisible();
+  await page.getByRole('button', { name: /^Allgemein/ }).click();
+  await expect(page.getByText('Ben ist als Dieb ausgeschlossen.')).toBeVisible();
+  await expect(page.getByText('Das stimmt.').first()).toBeVisible();
+  await page.getByRole('tab', { name: 'Dokumente' }).click();
+  await expect(page.getByRole('heading', { name: 'Dokumente' })).toBeVisible();
 
   // end the day with a confirmation
   await page.getByRole('button', { name: 'Hotel' }).click();
@@ -139,13 +148,14 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   // "Umsehen" makes everything tappable glint
   await page.getByRole('button', { name: /Umsehen/ }).click();
   await expect(page.locator('.scene .spot.glint').first()).toBeVisible();
-  await expect(page.getByText('Aktionen übrig (2/2)')).toBeVisible();
+  await expect(page.locator('.bar .actions')).toContainText('(2/2)');
   await page.getByRole('button', { name: /Kiste/ }).last().click();
   await expect(page.getByText('Du siehst es dir an. Das kostet nichts.')).toBeVisible();
   await page.getByRole('button', { name: /Genauer untersuchen \(kostet 1 Aktion\)/ }).click();
   await expect(page.getByText(/verschlossen/).first()).toBeVisible();
   // a locked chest brought nothing: no action spent
-  await expect(page.getByText('Aktionen übrig (2/2)')).toBeVisible();
+  await expect(page.locator('.bar .actions')).toContainText('(2/2)');
+  await page.keyboard.press('Escape');
   await page.getByLabel('Deine Antwort').fill('000');
   await page.getByRole('button', { name: 'Ausprobieren' }).click();
   await expect(page.getByText(/Das passt noch nicht/)).toBeVisible();
@@ -165,8 +175,15 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  // the finding cost one action
-  await expect(page.getByText('Aktionen übrig (1/2)')).toBeVisible();
+  // the finding cost one action (the bar says so too)
+  await expect(page.locator('.bar .actions')).toContainText('(1/2)');
+  // the dossier lists the document; opening it reads it
+  await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
+  await page.getByRole('tab', { name: 'Dokumente' }).click();
+  await page.getByRole('button', { name: /Zettel aus der Kiste/ }).click();
+  await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.getByRole('navigation').getByRole('button', { name: /Hotel/ }).click();
   // WP06d: the chest is drawn as a prop and now shows its open state
   await expect(page.locator('.scene svg[data-prop="truhe"][data-state="auf"]')).toBeVisible();
 
@@ -189,13 +206,18 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
 
 test('timeline: place two cards, the contradiction shows; theory is saved', async ({ page }) => {
   const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
-  await sql`update players set settings = '{}'::jsonb, state = jsonb_set(jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb), '{timeline}', '[]'::jsonb) where name = ${NAME}`;
+  await sql`update players set settings = '{}'::jsonb, state = jsonb_set(jsonb_set(jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb), '{discoveries}', '[{"sourceId":"src_lampe","itemIds":["f_cora_keller"],"day":1},{"sourceId":"src_cora","itemIds":["s_cora_halle"],"day":1}]'::jsonb), '{timeline}', '[]'::jsonb) where name = ${NAME}`;
   await sql.end();
 
   await page.goto(`/?now=${NOW}#/test`);
   await page.getByRole('button', { name: new RegExp(NAME) }).click();
   await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
-  await page.getByRole('tab', { name: 'Zeitstrahl' }).click();
+  // a link sits on the card of the person it is about; booking it is once only
+  await page.getByRole('button', { name: /^Cora/ }).click();
+  await expect(page.getByText('Das erinnert dich an Coras Weg durch das Haus.')).toBeVisible();
+  await page.getByRole('button', { name: /Verknüpfen/ }).click();
+  await expect(page.getByText('✓ verknüpft')).toBeVisible();
+  await page.getByRole('tab', { name: 'Zeit' }).click();
 
   for (const card of [/Fakt: In Keller/, /Aussage: In Halle/]) {
     await page.getByRole('button', { name: card }).click();

@@ -34,6 +34,14 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
   const roomName = (id?: string) => c.rooms.rooms.find((r) => r.id === id)?.name;
   const npcName = (id?: string) => c.npcs.npcs.find((n) => n.id === id)?.name;
 
+  const metNpcs = new Set<string>([
+    ...st.discoveries.flatMap((d) => {
+      const n = c.sources.sources.find((s) => s.id === d.sourceId)?.npc;
+      return n ? [n] : [];
+    }),
+    ...c.statements.statements.filter((s) => st.found.includes(s.id)).map((s) => s.npc),
+  ]);
+
   const finds = st.discoveries.flatMap((d) => {
     const src = c.sources.sources.find((s) => s.id === d.sourceId);
     const source = {
@@ -85,7 +93,8 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     can_play: canPlay,
     finished: st.day > 24,
     actions: { used: st.actionsUsed, budget: budgetOf(ctx, st.day) },
-    links: linksOf(st, ctx).map(({ id, text, done }) => ({ id, text, done })),
+    // a and b: the two finds (both already the player's), so a link can sit on its cards
+    links: linksOf(st, ctx),
     points: totalPoints(st),
     breakdown: breakdown(st),
     rank: rankOf(totalPoints(st), scoring),
@@ -197,7 +206,12 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       })),
       where: c.case.categories.where.map((id) => ({ id, name: roomName(id) ?? id })),
     },
-    people: c.npcs.npcs.map((n) => ({ id: n.id, name: n.name })),
+    // the role is only told for people the player has met (a find from a talk or a statement)
+    people: c.npcs.npcs.map((n) => ({
+      id: n.id,
+      name: n.name,
+      role: metNpcs.has(n.id) ? n.role : undefined,
+    })),
     notes: notesOf(st, ctx, player.settings.note_level ?? 'half'),
     reports: Object.entries(st.reports ?? {}).map(([day, right]) => ({
       day: Number(day),
@@ -216,7 +230,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     },
     // the story: only after the own accusation AND from the real day 24 on
     story: st.accused && today >= 24 ? resolutionOf(ctx, st) : null,
-    newspaper_days: Math.max(0, Math.min(24, today)),
+    newspaper_days: Math.max(0, Math.min(24, today, st.day)),
   };
 }
 

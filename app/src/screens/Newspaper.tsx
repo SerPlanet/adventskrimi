@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { call, type Paper } from '../api';
 import { useSession } from '../store';
 import { DailyPuzzle } from './DailyPuzzle';
+import { Issue } from '../ui/Issue';
 
 /** "Der Bergbote": start screen of every day. Older issues stay readable. */
 export function Newspaper() {
@@ -34,12 +35,14 @@ export function Newspaper() {
   return (
     <article className="paper">
       <header className="masthead">
+        <p className="topline">Unabhängig · Berghotel Edelweiß · Preis: eine Schneeflocke</p>
         <h1>Der Bergbote</h1>
+        <div className="rule" aria-hidden="true" />
         <p className="issue">
           Ausgabe Nr. {shown} · {dateOf(view?.start_date, shown)}
         </p>
       </header>
-      <div className="row between" role="group" aria-label="Ausgabe wählen">
+      <div className="issuenav" role="group" aria-label="Ausgabe wählen">
         <button
           disabled={shown <= 1}
           onClick={() => setDay(shown - 1)}
@@ -63,8 +66,16 @@ export function Newspaper() {
           <Issue p={paper} />
         </div>
       )}
-      {view?.question && shown === view.day && <Question />}
-      {view?.daily_puzzle && shown === view.day && <DailyPuzzle />}
+      {shown === view?.day && (view?.question || view?.daily_puzzle) && (
+        <div className="corners corner">
+          {view.daily_puzzle && (
+            <section className="box" aria-label="Rätsel-Ecke">
+              <DailyPuzzle />
+            </section>
+          )}
+          {view.question && <Question />}
+        </div>
+      )}
     </article>
   );
 }
@@ -81,71 +92,6 @@ const dateOf = (start: string | undefined, day: number): string => {
     timeZone: 'UTC',
   });
 };
-
-function Issue({ p }: { p: Paper }) {
-  return (
-    <>
-      <section className="lead">
-        <h2 className="headline">{p.headline}</h2>
-        <p className="columns">{p.text}</p>
-        <div className="boxes">
-          {p.weather && <p className="box">🌨️ Wetter: {p.weather}</p>}
-          {p.blocked_rooms.length > 0 && (
-            <p className="box">⛔ Gesperrt: {p.blocked_rooms.join(', ')}</p>
-          )}
-          {p.bonus_rooms.length > 0 && (
-            <p className="box">⭐ Heute offen: {p.bonus_rooms.join(', ')}</p>
-          )}
-        </div>
-      </section>
-      {p.gossip.length > 0 && (
-        <section className="card">
-          <h2>Klatsch und Tratsch</h2>
-          {p.gossip.map((g) => (
-            <p key={g}>💬 {g}</p>
-          ))}
-        </section>
-      )}
-      {p.rumors.length > 0 && (
-        <section className="card">
-          <h2>Gerüchte</h2>
-          {p.rumors.map((g) => (
-            <p key={g}>👂 {g}</p>
-          ))}
-        </section>
-      )}
-      {p.ads.length > 0 && (
-        <section className="card">
-          <h2>Anzeigen</h2>
-          {p.ads.map((g) => (
-            <p key={g}>📌 {g}</p>
-          ))}
-        </section>
-      )}
-      {(p.plaques.length > 0 || p.detective_of_day || p.accusations?.length) && (
-        <section className="card">
-          <h2>Gästebuch</h2>
-          {p.accusations?.map((name) => (
-            <p key={name}>⚖️ {name} hat Anklage erhoben.</p>
-          ))}
-          {p.plaques.map((x) => (
-            <p key={x.title + x.player} className="stamp">
-              🏅 {x.player} hat etwas als Erste/r entdeckt: „{x.title}“.
-            </p>
-          ))}
-          {p.detective_of_day && (
-            <p>
-              🕵️ Ermittler des Tages: {p.detective_of_day.name} ({p.detective_of_day.points} Punkte)
-            </p>
-          )}
-        </section>
-      )}
-      {p.filler.map((f) => (
-        <p key={f}>{f}</p>
-      ))}
-    </>
-  );
-}
 
 function Question() {
   const { view, answer, hint } = useSession();
@@ -167,8 +113,8 @@ function Question() {
   };
 
   return (
-    <section className="card" aria-labelledby="q-title">
-      <h2 id="q-title">Frage des Tages</h2>
+    <section className="box" aria-labelledby="q-title">
+      <h2 id="q-title">Leserfrage des Tages</h2>
       <p>{q.text}</p>
       {q.done ? (
         <p role="status">

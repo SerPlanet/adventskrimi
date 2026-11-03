@@ -1,0 +1,148 @@
+/* WP06h: the dossier as a folder with tabs and index cards (skin-file) */
+.folder h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.stampmark {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #a02a22;
+  border: 3px double #a02a22;
+  padding: 0.1rem 0.5rem;
+  transform: rotate(-4deg);
+}
+:root[data-theme='dark'] .stampmark {
+  color: #ff9a8c;
+  border-color: #ff9a8c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .stampmark {
+    color: #ff9a8c;
+    border-color: #ff9a8c;
+  }
+}
+.ftabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  margin-bottom: -2px;
+  position: relative;
+  z-index: 1;
+}
+.ftabs button {
+  border: 2px solid var(--line);
+  border-bottom: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: color-mix(in srgb, var(--card) 70%, var(--bg));
+  padding: 0.3rem 0.9rem;
+}
+.ftabs button.on {
+  background: var(--card);
+  font-weight: 700;
+}
+.sheetfile {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 0 0.4rem 0.4rem 0.4rem;
+  padding: 0.8rem;
+  box-shadow: 3px 3px 0 var(--line);
+}
+.linkhint {
+  margin: 0.2rem 0 0.6rem;
+  padding: 0.3rem 0.6rem;
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  border-left: 4px solid var(--accent);
+}
+.cards {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+.card-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  text-align: left;
+  border-radius: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--card);
+  position: relative;
+}
+.card-entry.on {
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 var(--accent);
+}
+.card-entry .ct {
+  display: grid;
+  min-width: 0;
+}
+.card-entry .clip {
+  margin-left: auto;
+}
+.polaroid {
+  flex: none;
+  width: 3.2rem;
+  padding: 0.2rem 0.2rem 0.6rem;
+  background: #fff;
+  border: 1px solid #bbb;
+  transform: rotate(-3deg);
+  box-shadow: 1px 2px 3px rgb(0 0 0 / 0.3);
+}
+.polaroid span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.detail {
+  border-top: 2px dashed var(--line);
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+}
+.masterdetail > .detail {
+  border-top: none;
+  margin-top: 0;
+  padding: 0 0 0 1rem;
+  border-left: 2px dashed var(--line);
+}
+.linkbox {
+  margin-top: 0.8rem;
+  padding: 0.4rem 0.7rem;
+  background: color-mix(in srgb, var(--accent) 14%, var(--card));
+  border: 2px solid var(--accent);
+}
+.linkbox h3 {
+  margin: 0 0 0.3rem;
+}
+.stack {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+}
+.docard {
+  display: grid;
+  width: 100%;
+  text-align: left;
+  gap: 0.1rem;
+  border-radius: 0.2rem;
+  padding: 0.5rem 0.7rem 0.5rem 1.8rem;
+  position: relative;
+  background: var(--card);
+  box-shadow:
+    2px 2px 0 var(--line),
+    4px 4px 0 var(--bg);
+}
+.docard .clip {
+  position: absolute;
+  left: 0.4rem;
+  top: 0.3rem;
+}
+.sheetfile .find {
+  margin: 0.4rem 0;
+}

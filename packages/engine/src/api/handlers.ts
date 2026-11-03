@@ -17,7 +17,7 @@ import {
   canPlayDay,
   changeTheory,
   closeDay,
-  dayOf,
+  readableDays,
   endDay,
   fileAccusation,
   fits,
@@ -298,7 +298,9 @@ export const handlers = {
   },
 
   async newspaper(tx: PlayerTx, req: Req<'newspaper'>, now: Date) {
-    if (req.day > dayOf(now, tx.game.startDate)) throw new ApiError('not_yet', 403);
+    // readable up to min(today, the day this player is playing): nobody reads ahead of their own game
+    if (req.day > readableDays(tx.player.state, now, tx.game.startDate))
+      throw new ApiError('not_yet', 403);
     const existing = await tx.newspaper(req.day);
     if (existing) return { newspaper: existing };
     const ctx = await ctxOf(tx);

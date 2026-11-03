@@ -243,6 +243,11 @@ describe('first discoverer', () => {
 
 describe('newspaper and scoreboard', () => {
   test('two simultaneous first requests produce one newspaper', async () => {
+    // both players are on day 2 (the issue of day 2 is readable from there)
+    for (const id of [a, b]) {
+      const st = store.players.get(id)!;
+      store.players.set(id, { ...st, state: { ...st.state, day: 2 } });
+    }
     const [x, y] = await Promise.all([
       call('newspaper', { slug: 'test', player_id: a, day: 2 }, DAY3),
       call('newspaper', { slug: 'test', player_id: b, day: 2 }, DAY3),
@@ -255,6 +260,25 @@ describe('newspaper and scoreboard', () => {
   test('future newspapers are refused', async () => {
     const r = await call('newspaper', { slug: 'test', player_id: a, day: 2 }, DAY1);
     expect(r.status).toBe(403);
+  });
+
+  test('nobody reads ahead of their own game: min(today, own day), earlier issues always', async () => {
+    const DAY24 = new Date('2026-12-24T12:00:00+01:00');
+    // a is on day 1 although the calendar says day 24
+    for (const day of [2, 3, 24]) {
+      const r = await call('newspaper', { slug: 'test', player_id: a, day }, DAY24);
+      expect(r.status).toBe(403);
+    }
+    expect((await call('newspaper', { slug: 'test', player_id: a, day: 1 }, DAY24)).status).toBe(
+      200,
+    );
+    expect(
+      bodyOf(await call('state', { slug: 'test', player_id: a }, DAY24)).state.newspaper_days,
+    ).toBe(1);
+    // and with the calendar behind the player the calendar wins
+    expect((await call('newspaper', { slug: 'test', player_id: a, day: 2 }, DAY1)).status).toBe(
+      403,
+    );
   });
 
   test('scoreboard ranks by points and marks the caller', async () => {

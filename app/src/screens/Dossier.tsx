@@ -1,17 +1,22 @@
 import { useMemo, useState } from 'react';
 import { useSession } from '../store';
 import { emptyFilter, filterFinds, options, type FindFilter } from '../filters';
-import { FindCard } from './FindCard';
 import { Grid } from './Grid';
 import { Timeline } from './Timeline';
+import { Popup } from '../ui/Popup';
+import { SourceCard } from '../ui/Bubbles';
+import { People } from '../ui/file/People';
+import { Places } from '../ui/file/Places';
+import { Docs } from '../ui/file/Docs';
+import '../ui/file/file.css';
 
-type Tab = 'funde' | 'raster' | 'zeitstrahl' | 'gegenstaende' | 'hotelbuch';
+type Tab = 'personen' | 'dokumente' | 'orte' | 'zeit' | 'raster';
 const TABS: [Tab, string][] = [
-  ['funde', 'Funde'],
+  ['personen', 'Personen'],
+  ['dokumente', 'Dokumente'],
+  ['orte', 'Orte'],
+  ['zeit', 'Zeit'],
   ['raster', 'Raster'],
-  ['zeitstrahl', 'Zeitstrahl'],
-  ['gegenstaende', 'Gegenstände'],
-  ['hotelbuch', 'Hotelbuch'],
 ];
 
 function Select(props: {
@@ -33,21 +38,31 @@ function Select(props: {
   );
 }
 
-/** Akte: all finds with filters and search, inventory, and the hotel book (finds by day). */
+/**
+ * Akte: a folder with tabs (people, documents, places, time) and index cards. Search and filters
+ * apply to all finds. Nothing moves into grid or timeline by itself (invariant 13).
+ */
 export function Dossier() {
-  const { view, link, busy } = useSession();
-  const [tab, setTab] = useState<Tab>('funde');
+  const { view, pocket, busy } = useSession();
+  const [tab, setTab] = useState<Tab>('personen');
   const [flt, setFlt] = useState<FindFilter>(emptyFilter);
-  const finds = useMemo(() => view?.finds ?? [], [view?.finds]);
-  const opt = useMemo(() => options(finds), [finds]);
-  const shown = useMemo(() => filterFinds(finds, flt), [finds, flt]);
+  const [reading, setReading] = useState<string | null>(null);
+  const all = useMemo(() => view?.finds ?? [], [view?.finds]);
+  const opt = useMemo(() => options(all), [all]);
+  const finds = useMemo(() => filterFinds(all, flt), [all, flt]);
   const set = <K extends keyof FindFilter>(k: K, v: FindFilter[K]) => setFlt({ ...flt, [k]: v });
-  const days = [...new Set(finds.map((f) => f.source.day))].sort((a, b) => a - b);
+  if (!view) return null;
+
+  const doc = all.find((f) => f.source.id === reading && f.source.document);
+  const pocketed = view.documents.some((d) => d.id === reading);
+  const filtered = tab === 'personen' || tab === 'dokumente' || tab === 'orte';
 
   return (
-    <>
-      <h1>Deine Akte</h1>
-      <div className="tabs" role="tablist" aria-label="Bereiche der Akte">
+    <div className="folder">
+      <h1>
+        Deine Akte <span className="stampmark">Vertraulich</span>
+      </h1>
+      <div className="ftabs" role="tablist" aria-label="Reiter der Akte">
         {TABS.map(([id, label]) => (
           <button
             key={id}
@@ -61,100 +76,76 @@ export function Dossier() {
         ))}
       </div>
 
-      {tab === 'funde' && (
-        <section role="tabpanel" aria-label="Funde">
-          {(view?.links ?? []).length > 0 && (
-            <div className="card">
-              <h2>Das erinnert dich an …</h2>
-              {view?.links.map((l) => (
-                <div key={l.id} className="row between">
-                  <span>{l.text}</span>
-                  {l.done ? (
-                    <span>✓ verknüpft</span>
-                  ) : (
-                    <button disabled={busy} onClick={() => void link(l.id)}>
-                      Verknüpfen
-                    </button>
-                  )}
-                </div>
-              ))}
+      <div className="sheetfile" role="tabpanel" aria-label={TABS.find((t) => t[0] === tab)?.[1]}>
+        {filtered && (
+          <>
+            <div className="filters">
+              <label>
+                Suche
+                <input type="search" value={flt.q} onChange={(e) => set('q', e.target.value)} />
+              </label>
+              <label>
+                Art
+                <select
+                  value={flt.type}
+                  onChange={(e) => set('type', e.target.value as FindFilter['type'])}
+                >
+                  <option value="all">Alle</option>
+                  <option value="fact">Fakten</option>
+                  <option value="statement">Aussagen</option>
+                </select>
+              </label>
+              <Select
+                label="Person"
+                value={flt.person}
+                onChange={(v) => set('person', v)}
+                items={opt.persons}
+              />
+              <Select
+                label="Raum"
+                value={flt.room}
+                onChange={(v) => set('room', v)}
+                items={opt.rooms}
+              />
+              <Select
+                label="Tag"
+                value={flt.day}
+                onChange={(v) => set('day', v)}
+                items={opt.days}
+              />
             </div>
-          )}
-          <div className="filters">
-            <label>
-              Suche
-              <input type="search" value={flt.q} onChange={(e) => set('q', e.target.value)} />
-            </label>
-            <label>
-              Art
-              <select
-                value={flt.type}
-                onChange={(e) => set('type', e.target.value as FindFilter['type'])}
-              >
-                <option value="all">Alle</option>
-                <option value="fact">Fakten</option>
-                <option value="statement">Aussagen</option>
-              </select>
-            </label>
-            <Select
-              label="Person"
-              value={flt.person}
-              onChange={(v) => set('person', v)}
-              items={opt.persons}
-            />
-            <Select
-              label="Raum"
-              value={flt.room}
-              onChange={(v) => set('room', v)}
-              items={opt.rooms}
-            />
-            <Select label="Tag" value={flt.day} onChange={(v) => set('day', v)} items={opt.days} />
-          </div>
-          <p role="status">
-            {shown.length} von {finds.filter((f) => f.type !== 'item').length} Funden
+            <p role="status" className="small">
+              {finds.length} von {all.filter((f) => f.type !== 'item').length} Funden
+            </p>
+            {view.links.some((l) => !l.done) && (
+              <p className="linkhint">
+                🔗 Es warten Verknüpfungen auf dich. Du findest sie auf den Karten.
+              </p>
+            )}
+          </>
+        )}
+        {tab === 'personen' && <People view={view} finds={finds} onDoc={(id) => setReading(id)} />}
+        {tab === 'dokumente' && <Docs view={view} finds={finds} onOpen={(id) => setReading(id)} />}
+        {tab === 'orte' && <Places view={view} finds={finds} />}
+        {tab === 'zeit' && <Timeline />}
+        {tab === 'raster' && <Grid />}
+      </div>
+
+      {doc && (
+        <Popup title={doc.source.document?.title ?? 'Dokument'} onClose={() => setReading(null)}>
+          <p className="small">
+            {doc.source.room ? `Gefunden: ${doc.source.room}` : ''} (Tag {doc.source.day})
           </p>
-          {shown.map((f) => (
-            <FindCard key={f.id + f.source.day} f={f} />
-          ))}
-          {finds.length === 0 && (
-            <p>Noch nichts gefunden. Geh ins Hotel und sprich mit den Leuten.</p>
-          )}
-        </section>
-      )}
-
-      {tab === 'raster' && <Grid />}
-      {tab === 'zeitstrahl' && <Timeline />}
-
-      {tab === 'gegenstaende' && (
-        <section role="tabpanel" aria-label="Gegenstände">
-          {view?.inventory.length ? (
-            view.inventory.map((i) => (
-              <article className="find item" key={i.id}>
-                <h2>🎒 {i.name}</h2>
-                <p>{i.text}</p>
-              </article>
-            ))
+          <SourceCard s={doc.source} text={doc.text} />
+          {pocketed ? (
+            <p className="small">📄 Eingesteckt: Du findest es auch im Hotel im Inventar.</p>
           ) : (
-            <p>Du trägst noch keine Gegenstände bei dir.</p>
+            <button disabled={busy} onClick={() => void pocket(doc.source.id)}>
+              📄 Einstecken
+            </button>
           )}
-        </section>
+        </Popup>
       )}
-
-      {tab === 'hotelbuch' && (
-        <section role="tabpanel" aria-label="Hotelbuch">
-          {days.map((d) => (
-            <div key={d}>
-              <h2>Tag {d}</h2>
-              {finds
-                .filter((f) => f.source.day === d)
-                .map((f) => (
-                  <FindCard key={f.id} f={f} />
-                ))}
-            </div>
-          ))}
-          {finds.length === 0 && <p>Das Hotelbuch ist noch leer.</p>}
-        </section>
-      )}
-    </>
+    </div>
   );
 }

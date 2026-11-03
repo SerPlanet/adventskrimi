@@ -26,6 +26,14 @@ export function dayOf(now: Date, startDate: string): number {
   return dayNumber(p.y, p.m, p.d) - dayNumber(sy, sm, sd) + 1;
 }
 
+/**
+ * Newest newspaper a player may read: min(today, the day they are playing). Earlier issues
+ * always; later ones never, even when the calendar is further (docs 05, D57).
+ */
+export function readableDays(st: { day: number }, now: Date, startDate: string): number {
+  return Math.max(0, Math.min(24, dayOf(now, startDate), st.day));
+}
+
 /** Highest day a player may play right now (catch-up upper bound). 0 = game has not started. */
 export function maxPlayableDay(now: Date, startDate: string): number {
   return Math.max(0, Math.min(24, dayOf(now, startDate)));

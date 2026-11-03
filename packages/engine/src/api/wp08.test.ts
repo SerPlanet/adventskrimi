@@ -192,6 +192,8 @@ describe('accusation and resolution', () => {
   test('the newspaper names the accuser, nothing else', async () => {
     patch(() => ({ day: 20 }));
     await call('accuse', { theory: right, proof }, at(20));
+    // the next morning: the accuser has reached day 21 and may read its issue
+    patch(() => ({ day: 21 }));
     const paper = out(await call('newspaper', { day: 21 }, at(21))).newspaper;
     expect(paper.accusations).toEqual(['Pia']);
   });
