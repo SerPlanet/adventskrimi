@@ -264,7 +264,7 @@ describe('newspaper and scoreboard', () => {
     ]);
     expect(x.status).toBe(200);
     expect(bodyOf(x).newspaper).toEqual(bodyOf(y).newspaper);
-    expect(bodyOf(x).newspaper.headline).toBe('Der Keller ist kalt');
+    expect(bodyOf(x).newspaper.articles[0].title).toBe('Der Keller ist kalt');
   });
 
   test('future newspapers are refused', async () => {

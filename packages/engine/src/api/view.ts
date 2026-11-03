@@ -2,7 +2,6 @@ import {
   accusationFromDay,
   budgetOf,
   classOf,
-  linksOf,
   canAccuse,
   inspectorSentence,
   notesOf,
@@ -94,8 +93,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     can_play: canPlay,
     finished: st.day > 24,
     actions: { used: st.actionsUsed, budget: budgetOf(ctx, st.day) },
-    // a and b: the two finds (both already the player's), so a link can sit on its cards
-    links: linksOf(st, ctx),
+    filed: st.filed,
     points: totalPoints(st),
     breakdown: breakdown(st),
     rank: rankOf(totalPoints(st), scoring),
@@ -176,16 +174,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     },
     prolog: prolog && { goal: prolog.goal, intro: prolog.intro, tips: prolog.tips },
     daily_puzzle:
-      st.day <= 24
-        ? dailyView(
-            st,
-            dailyPuzzleFor(
-              startSalt(tx),
-              st.day,
-              dailyLevel(st, ctx, player.settings.puzzle_level),
-            ),
-          )
-        : null,
+      st.day <= 24 ? dailyView(st, dailyPuzzleFor(startSalt(tx), st.day, dailyLevel(st))) : null,
     theory: st.theory,
     theory_history: st.theoryHistory ?? [],
     // public candidate lists (never the solution)
@@ -204,7 +193,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       name: n.name,
       role: metNpcs.has(n.id) ? n.role : undefined,
     })),
-    notes: notesOf(st, ctx, player.settings.note_level ?? 'half'),
+    notes: notesOf(st),
     reports: Object.entries(st.reports ?? {}).map(([day, right]) => ({
       day: Number(day),
       right,

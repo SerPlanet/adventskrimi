@@ -12,14 +12,10 @@ import {
   bonusDay,
   canPlayDay,
   dayOf,
-  confirmLink,
   endDay,
   actionsLeft,
   budgetOf,
   classOf,
-  linksOf,
-  findContradictions,
-  fitsTogether,
   isOnTime,
   makeCtx,
   newPlayer,
@@ -31,7 +27,6 @@ import {
   resolveAction,
   setTheory,
   solvePuzzle,
-  timelineFromFound,
   totalPoints,
   type Action,
   type GameCtx,
@@ -78,22 +73,6 @@ describe('only new finds change anything', () => {
     const one = resolveAction(newPlayer(ctx), ctx, talkAnna).state;
     const r = resolveAction(one, ctx, { type: 'talk', npc: 'cora', topic: 'nacht' });
     expect(r.result.status).toBe('found');
-  });
-
-  test('links give points once', () => {
-    const withLink = mk((c) => {
-      c.case.links = [
-        { id: 'l1', a: 'f_excl_ben', b: 's_cora_halle', text: 'Das erinnert dich an die Halle.' },
-      ];
-    });
-    let st = resolveAction(newPlayer(withLink), withLink, talkAnna).state;
-    expect(linksOf(st, withLink)).toEqual([]);
-    expect(confirmLink(st, withLink, 'l1')).toBeNull();
-    st = resolveAction(st, withLink, { type: 'talk', npc: 'cora', topic: 'nacht' }).state;
-    expect(linksOf(st, withLink).map((l) => l.id)).toEqual(['l1']);
-    const done = confirmLink(st, withLink, 'l1') as PlayerState;
-    expect(totalPoints(done) - totalPoints(st)).toBe(scoring.link);
-    expect(confirmLink(done, withLink, 'l1')).toBe(done);
   });
 
   test('person who is not here today is unavailable', () => {
@@ -287,22 +266,6 @@ describe('points', () => {
     expect(early(accuse(base, ctx, half, 20).state)).toBe(12);
     expect(early(accuse(base, ctx, acc, 19).state)).toBeUndefined();
     expect(early(accuse(base, ctx, acc, null).state)).toBeUndefined();
-  });
-});
-
-describe('contradictions come only from the players own entries', () => {
-  test('statement vs fact is flagged once both are found', () => {
-    expect(findContradictions(timelineFromFound(ctx, ['s_cora_halle']))).toEqual([]);
-    const both = timelineFromFound(ctx, ['s_cora_halle', 'f_cora_keller']);
-    const found = findContradictions(both);
-    expect(found).toHaveLength(1);
-    expect(found[0]?.kind).toBe('statement-fact');
-    expect(fitsTogether(both[0]!, both[1]!)).toBe(false);
-  });
-
-  test('consistent entries do not conflict', () => {
-    const entries = timelineFromFound(ctx, ['s_ben_keller', 'f_ben_keller']);
-    expect(findContradictions(entries)).toEqual([]);
   });
 });
 

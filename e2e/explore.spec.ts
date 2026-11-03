@@ -72,7 +72,8 @@ for (const c of CASES) {
 
     await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
     await page.waitForTimeout(500);
-    const before = await page.getByText(/ von \d+ Funden/).textContent();
+    await page.getByRole('tab', { name: 'Verlauf' }).click();
+    const before = await page.locator('.sheetfile .find').count();
 
     await page.getByRole('navigation').getByRole('button', { name: 'Tag', exact: true }).click();
     // try every tappable thing: a try without a find says why and costs nothing
@@ -86,7 +87,7 @@ for (const c of CASES) {
       if (await go.isEnabled().catch(() => false)) {
         await go.click();
         found = await page
-          .getByRole('heading', { name: 'Neu in deiner Akte' })
+          .getByRole('heading', { name: 'Neu entdeckt' })
           .waitFor({ timeout: 4000 })
           .then(() => true)
           .catch(() => false);
@@ -100,6 +101,7 @@ for (const c of CASES) {
 
     await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
     await page.waitForTimeout(500);
-    expect(await page.getByText(/ von \d+ Funden/).textContent()).not.toBe(before);
+    await page.getByRole('tab', { name: 'Verlauf' }).click();
+    expect(await page.locator('.sheetfile .find').count()).toBeGreaterThan(before);
   });
 }

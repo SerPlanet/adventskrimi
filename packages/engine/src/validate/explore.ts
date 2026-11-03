@@ -12,7 +12,7 @@ const VERDICT = [
   /ist ausgeschlossen/i,
 ];
 
-/** Checks of docs/07 §2b: no verdicts, lie web, links, documents, day beats. */
+/** Checks of docs/07 §2b: no verdicts, lie web, documents, day beats. */
 export function checkExplore(info: Info, quality: Quality): CheckResult {
   const { c } = info;
   const errors: string[] = [];
@@ -31,12 +31,6 @@ export function checkExplore(info: Info, quality: Quality): CheckResult {
     const hit = VERDICT.find((re) => re.test(t));
     if (hit) errors.push(`${where}: verdict pattern ${hit}`);
   }
-
-  const finds = new Set([...c.facts.facts, ...c.statements.statements].map((x) => x.id));
-  const items = new Set(c.puzzles.items.map((i) => i.id));
-  for (const l of c.case.links)
-    for (const id of [l.a, l.b])
-      if (!finds.has(id) && !items.has(id)) errors.push(`link ${l.id}: unknown find ${id}`);
 
   for (const s of c.sources.sources)
     if (s.document) {

@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react';
 import type { View } from '../api';
 import { SourceCard } from '../ui/Bubbles';
 
 export type Find = View['finds'][number];
 
 /** One find: a fact (magnifier, always true) or a statement (speech bubble, may be false). */
-export function FindCard({ f }: { f: Find }) {
+export function FindCard({ f, action }: { f: Find; action?: ReactNode }) {
   const kind =
     f.type === 'fact'
       ? { icon: '🔍', label: 'Fakt', note: 'Das stimmt.' }
@@ -24,6 +25,7 @@ export function FindCard({ f }: { f: Find }) {
           <span className="small">({src})</span>
         </summary>
         <SourceCard s={f.source} text={f.text} />
+        {action}
       </details>
     );
   return (
@@ -37,6 +39,7 @@ export function FindCard({ f }: { f: Find }) {
         {f.text}
       </p>
       {src && <p className="small">Quelle: {src}</p>}
+      {action}
     </article>
   );
 }

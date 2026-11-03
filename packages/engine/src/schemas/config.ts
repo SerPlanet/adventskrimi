@@ -30,7 +30,6 @@ export const Profile = z.object({
   rumor_min_players: z.number().int().min(1),
   /** share of active players in one room that counts as "Großversammlung" */
   crowd_share: z.number().min(0).max(1),
-  puzzle_levels: z.array(z.enum(['easy', 'medium', 'hard'])).min(1),
   chess: z.boolean().default(false),
   max_liars: z.number().int().min(0),
 });
@@ -47,8 +46,6 @@ export const Scoring = z.object({
   }),
   prolog_mini_case: NonNeg,
   first_discoverer: NonNeg,
-  /** confirmed link between two finds (02b §6), once per link */
-  link: NonNeg,
   report_card: z.object({ per_category: NonNeg, days: z.array(Day).min(1) }),
   finale: z.object({ who: NonNeg, accomplice: NonNeg, when: NonNeg, where: NonNeg, proof: NonNeg }),
   early_accusation: z.object({ factor: NonNeg, last_day: Day }),

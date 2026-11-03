@@ -47,73 +47,83 @@ beforeEach(async () => {
     .id;
 });
 
-const note = (key: string, put = true) => call('set_note', { kind: 'timeline', key, put });
-const level = async (note_level: string) => call('settings', { settings: { note_level } });
+describe('timeline table (02c §8)', () => {
+  const cell = (window: string, room: string, persons: string[]) =>
+    call('set_note', { kind: 'cell', window, room, persons });
 
-describe('timeline contradictions', () => {
-  beforeEach(() => patch(() => ({ found: ['f_cora_keller', 's_cora_halle', 'f_ben_keller'] })));
-
-  test('half: only placed entries are checked, a fitting pair is not marked', async () => {
-    await level('half');
-    expect(out(await call('state', {})).state.notes.contradictions).toEqual([]);
-    await note('f_cora_keller#0');
-    await note('f_ben_keller#0');
-    expect(out(await call('state', {})).state.notes.contradictions).toEqual([]);
-    const r = out(await note('s_cora_halle#0')).state.notes;
-    expect(r.contradictions).toHaveLength(1);
-    expect(r.contradictions[0].text).toMatch(/^Passt nicht/);
-    expect(r.suggestions).toEqual([]);
+  test('several people per cell, stored as entered, cleared with an empty list', async () => {
+    const r = out(await cell('w1', 'halle', ['anna', 'cora']));
+    expect(r.state.notes.table['w1|halle']).toEqual(['anna', 'cora']);
+    expect(out(await cell('w1', 'halle', ['anna', 'anna'])).state.notes.table['w1|halle']).toEqual([
+      'anna',
+    ]);
+    expect(out(await cell('w1', 'halle', [])).state.notes.table).toEqual({});
   });
 
-  test('manual: no marks, but the free question answers', async () => {
-    await level('manual');
-    await note('f_cora_keller#0');
-    await note('s_cora_halle#0');
-    expect(out(await call('state', {})).state.notes.contradictions).toEqual([]);
-    const bad = out(await call('fits', { a: 'f_cora_keller#0', b: 's_cora_halle#0' }));
-    expect(bad.fits).toBe(false);
-    const ok = out(await call('fits', { a: 'f_cora_keller#0', b: 'f_ben_keller#0' }));
-    expect(ok.fits).toBe(true);
+  test('nothing is checked, marked or filled in: only what the player entered', async () => {
+    patch(() => ({ found: ['f_cora_keller', 's_cora_halle', 'f_ben_keller'] }));
+    const notes = out(await call('state', {})).state.notes;
+    expect(notes).toEqual({ grid: {}, table: {} });
+    await cell('w1', 'keller', ['cora']);
+    await cell('w1', 'halle', ['cora']);
+    const v = out(await call('state', {})).state;
+    expect(Object.keys(v.notes).sort()).toEqual(['grid', 'table']);
+    expect(JSON.stringify(v)).not.toMatch(/Passt nicht|contradiction|suggest/);
   });
 
-  test('auto fills everything, half suggests, manual stays empty', async () => {
-    await level('auto');
-    let notes = out(await call('state', {})).state.notes;
-    expect(notes.placed).toHaveLength(3);
-    expect(notes.contradictions).toHaveLength(1);
-    await level('half');
-    notes = out(await call('state', {})).state.notes;
-    expect(notes.placed).toEqual([]);
-    expect(notes.suggestions).toHaveLength(3);
-    await level('manual');
-    notes = out(await call('state', {})).state.notes;
-    expect(notes.suggestions).toEqual([]);
-  });
-
-  test('nothing outside the own file: unknown claims are refused', async () => {
-    expect((await note('f_cora_keller#0')).status).toBe(200);
-    expect((await note('s_ben_keller#0')).status).toBe(400);
-    expect((await call('fits', { a: 'f_cora_keller#0', b: 's_ben_keller#0' })).status).toBe(400);
-    const view = JSON.stringify(out(await call('state', {})).state);
-    expect(view).not.toContain('s_ben_keller');
-    expect(view).not.toContain('"truth"');
+  test('unknown window, room or person is refused', async () => {
+    expect((await cell('w9', 'halle', [])).status).toBe(400);
+    expect((await cell('w1', 'nirgends', [])).status).toBe(400);
+    expect((await cell('w1', 'halle', ['niemand'])).status).toBe(400);
   });
 });
 
 describe('grid', () => {
-  test('marks are stored, unknown candidates refused, half suggests facts only', async () => {
+  test('marks are stored and unknown candidates refused; nothing is suggested or filled in', async () => {
     patch(() => ({ found: ['f_excl_ben', 's_cora_halle'] }));
-    await level('half');
     const mark = { kind: 'grid', cat: 'who', candidate: 'ben' };
-    const sug = out(await call('state', {})).state.notes.grid_suggestions;
-    expect(sug).toEqual([{ cat: 'who', candidate: 'ben' }]);
+    expect(out(await call('state', {})).state.notes.grid).toEqual({});
     const r = out(await call('set_note', { ...mark, mark: 'no' }));
     expect(r.state.notes.grid['who:ben']).toBe('no');
-    expect(r.state.notes.grid_suggestions).toEqual([]);
     expect((await call('set_note', { ...mark, candidate: 'zed', mark: 'no' })).status).toBe(400);
     expect(out(await call('set_note', { ...mark, mark: null })).state.notes.grid).toEqual({});
-    await level('auto');
-    expect(out(await call('state', {})).state.notes.grid['who:ben']).toBe('no');
+  });
+});
+
+describe('the dossier (02c §7)', () => {
+  test('a find the player has can be filed and taken out again; unknown ones are refused', async () => {
+    patch(() => ({
+      found: ['f_excl_ben'],
+      discoveries: [{ sourceId: 'src_anna', itemIds: ['f_excl_ben'], day: 1 }],
+    }));
+    expect(out(await call('state', {})).state.filed).toEqual([]);
+    expect((await call('file_add', { kind: 'find', id: 's_cora_halle' })).status).toBe(400);
+    const r = out(await call('file_add', { kind: 'find', id: 'f_excl_ben' }));
+    expect(r.state.filed).toEqual([{ kind: 'find', ref: 'f_excl_ben', day: 1 }]);
+    expect(
+      out(await call('file_add', { kind: 'find', id: 'f_excl_ben' })).state.filed,
+    ).toHaveLength(1);
+    expect(out(await call('file_remove', { kind: 'find', id: 'f_excl_ben' })).state.filed).toEqual(
+      [],
+    );
+    // history stays: the find is still the player's
+    expect(out(await call('state', {})).state.finds).toHaveLength(1);
+  });
+
+  test('an article of a readable paper can be filed with its text, a future one not', async () => {
+    const paper = out(await call('newspaper', { day: 1 })).newspaper;
+    const art = paper.articles[0];
+    const r = out(await call('file_add', { kind: 'article', day: 1, id: art.id }));
+    expect(r.state.filed).toEqual([
+      { kind: 'article', ref: art.id, day: 1, title: art.title, text: art.text },
+    ]);
+    expect((await call('file_add', { kind: 'article', day: 2, id: 'a2_lead' })).status).toBe(403);
+    expect((await call('file_add', { kind: 'article', day: 1, id: 'a1_nope' })).status).toBe(400);
+  });
+
+  test('nothing is filed by itself: finding things leaves the dossier empty', async () => {
+    await call('act', { action: { type: 'talk', npc: 'anna', topic: 'nacht' } });
+    expect(out(await call('state', {})).state.filed).toEqual([]);
   });
 });
 
@@ -203,20 +213,6 @@ function sumFinale(): number {
   const f = scoring.finale;
   return f.who + f.accomplice + f.when + f.where + 2 * f.proof;
 }
-
-describe('links (Verknüpfen)', () => {
-  test('visible only with both finds, points once, never in the first view without them', async () => {
-    expect(out(await call('state', {})).state.links).toEqual([]);
-    expect((await call('link', { link_id: 'l_cora' })).status).toBe(400);
-    patch(() => ({ found: ['f_cora_keller', 's_cora_halle'] }));
-    const v = out(await call('state', {})).state;
-    expect(v.links).toEqual([expect.objectContaining({ id: 'l_cora', done: false })]);
-    const r = out(await call('link', { link_id: 'l_cora' }));
-    expect(r.state.points).toBe(scoring.link);
-    expect(r.state.links[0].done).toBe(true);
-    expect(out(await call('link', { link_id: 'l_cora' })).state.points).toBe(scoring.link);
-  });
-});
 
 describe('visible texts', () => {
   test('no placeholder braces reach the player, not even in the prolog or page texts', async () => {

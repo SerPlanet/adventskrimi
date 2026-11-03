@@ -41,6 +41,20 @@ export const NewspaperFile = z.object({
     z.object({ id: Id, text: z.string().min(1), min_players: z.number().int().optional() }),
   ),
   ads: z.array(z.object({ id: Id, text: z.string().min(1) })).default([]),
+  /** stories of the daily paper (02c §3): 50-100 words, facts only, relations told as a story */
+  articles: z
+    .array(
+      z.object({
+        id: Id,
+        day: Day,
+        title: z.string().min(1),
+        text: z.string().min(1),
+        kind: z.enum(['klatsch', 'hintergrund']).default('klatsch'),
+        /** facts the article carries */
+        traegt: z.array(Id).default([]),
+      }),
+    )
+    .default([]),
   plaque_titles: z.array(z.string().min(1)).default([]),
   filler: z.array(z.object({ id: Id, day: Day.optional(), text: z.string().min(1) })).default([]),
 });

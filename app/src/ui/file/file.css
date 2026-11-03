@@ -50,12 +50,6 @@
   padding: 0.8rem;
   box-shadow: 3px 3px 0 var(--line);
 }
-.linkhint {
-  margin: 0.2rem 0 0.6rem;
-  padding: 0.3rem 0.6rem;
-  background: color-mix(in srgb, var(--accent) 12%, var(--card));
-  border-left: 4px solid var(--accent);
-}
 .cards {
   display: grid;
   gap: 0.5rem;
@@ -111,15 +105,6 @@
   padding: 0 0 0 1rem;
   border-left: 2px dashed var(--line);
 }
-.linkbox {
-  margin-top: 0.8rem;
-  padding: 0.4rem 0.7rem;
-  background: color-mix(in srgb, var(--accent) 14%, var(--card));
-  border: 2px solid var(--accent);
-}
-.linkbox h3 {
-  margin: 0 0 0.3rem;
-}
 .stack {
   display: grid;
   gap: 0.5rem;
@@ -145,4 +130,36 @@
 }
 .sheetfile .find {
   margin: 0.4rem 0;
+}
+.tablewrap {
+  overflow-x: auto;
+}
+.timetable {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 20rem;
+}
+.timetable th,
+.timetable td {
+  border: 1px solid var(--line);
+  padding: 0.2rem;
+  text-align: left;
+  vertical-align: top;
+}
+.timetable thead th {
+  background: color-mix(in srgb, var(--card) 80%, var(--line));
+}
+.timetable .cell {
+  width: 100%;
+  min-height: 48px;
+  text-align: left;
+  border-radius: 0.2rem;
+  font-size: 0.85rem;
+}
+.filebtn {
+  margin: 0.3rem 0;
+}
+.filebtn[aria-pressed='true'] {
+  border-color: var(--accent);
+  font-weight: 700;
 }

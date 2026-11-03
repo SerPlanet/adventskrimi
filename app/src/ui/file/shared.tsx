@@ -1,10 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { useSession } from '../../store';
 import type { View } from '../../api';
 import './file.css';
 
 export type Find = View['finds'][number];
-export type FileLink = View['links'][number];
 
 /** True from 900 px: list left, detail right. Below, the detail opens under its card. */
 function useWide(): boolean {
@@ -35,8 +33,6 @@ export interface CardItem {
   title: string;
   lines?: string[];
   photo?: boolean;
-  /** a link waits on this card */
-  link?: boolean;
 }
 
 /**
@@ -72,11 +68,6 @@ export function Cards(props: {
                 </span>
               ))}
             </span>
-            {i.link && (
-              <span className="clip" title="Hier wartet eine Verknüpfung">
-                🔗<span className="sr"> Verknüpfung</span>
-              </span>
-            )}
           </button>
           {!wide && open === i.id && <div className="detail">{props.detail(i.id)}</div>}
         </li>
@@ -88,30 +79,6 @@ export function Cards(props: {
     <div className="cols2 wide-right masterdetail">
       {list}
       <div className="detail">{open ? props.detail(open) : null}</div>
-    </div>
-  );
-}
-
-/** "Das erinnert dich an …" on the card the two finds belong to. */
-export function LinkBox({ links, ids }: { links: FileLink[]; ids: Set<string> }) {
-  const { link, busy } = useSession();
-  const mine = links.filter((l) => ids.has(l.a) || ids.has(l.b));
-  if (!mine.length) return null;
-  return (
-    <div className="linkbox">
-      <h3>Das erinnert dich an …</h3>
-      {mine.map((l) => (
-        <div key={l.id} className="row between">
-          <span>{l.text}</span>
-          {l.done ? (
-            <span>✓ verknüpft</span>
-          ) : (
-            <button disabled={busy} onClick={() => void link(l.id)}>
-              Verknüpfen (+3)
-            </button>
-          )}
-        </div>
-      ))}
     </div>
   );
 }

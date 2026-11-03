@@ -8,15 +8,18 @@ import { SourceCard } from '../ui/Bubbles';
 import { People } from '../ui/file/People';
 import { Places } from '../ui/file/Places';
 import { Docs } from '../ui/file/Docs';
+import { FindCard } from './FindCard';
+import { FileFind } from '../ui/file/FileButton';
 import '../ui/file/file.css';
 
-type Tab = 'personen' | 'dokumente' | 'orte' | 'zeit' | 'raster';
+type Tab = 'personen' | 'dokumente' | 'orte' | 'zeit' | 'raster' | 'verlauf';
 const TABS: [Tab, string][] = [
   ['personen', 'Personen'],
   ['dokumente', 'Dokumente'],
   ['orte', 'Orte'],
   ['zeit', 'Zeit'],
   ['raster', 'Raster'],
+  ['verlauf', 'Verlauf'],
 ];
 
 function Select(props: {
@@ -49,8 +52,13 @@ export function Dossier() {
   const [reading, setReading] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const all = useMemo(() => view?.finds ?? [], [view?.finds]);
-  const opt = useMemo(() => options(all), [all]);
-  const finds = useMemo(() => filterFinds(all, flt), [all, flt]);
+  const filedIds = useMemo(
+    () => new Set((view?.filed ?? []).filter((e) => e.kind === 'find').map((e) => e.ref)),
+    [view?.filed],
+  );
+  const filedFinds = useMemo(() => all.filter((f) => filedIds.has(f.id)), [all, filedIds]);
+  const opt = useMemo(() => options(filedFinds), [filedFinds]);
+  const finds = useMemo(() => filterFinds(filedFinds, flt), [filedFinds, flt]);
   const set = <K extends keyof FindFilter>(k: K, v: FindFilter[K]) => setFlt({ ...flt, [k]: v });
   if (!view) return null;
 
@@ -96,7 +104,7 @@ export function Dossier() {
                 🔍 Filter{active ? ` (${active} aktiv)` : ''} {showFilters ? '▴' : '▾'}
               </button>
               <span role="status" className="small">
-                {finds.length} von {all.filter((f) => f.type !== 'item').length} Funden
+                {finds.length} von {filedFinds.filter((f) => f.type !== 'item').length} Einträgen
               </span>
               {active > 0 && (
                 <button className="link" onClick={() => setFlt(emptyFilter)}>
@@ -141,18 +149,30 @@ export function Dossier() {
                 />
               </div>
             </div>
-            {view.links.some((l) => !l.done) && (
-              <p className="linkhint">
-                🔗 Es warten Verknüpfungen auf dich. Du findest sie auf den Karten.
-              </p>
-            )}
           </>
         )}
         {tab === 'personen' && <People view={view} finds={finds} onDoc={(id) => setReading(id)} />}
-        {tab === 'dokumente' && <Docs view={view} finds={finds} onOpen={(id) => setReading(id)} />}
+        {tab === 'dokumente' && <Docs view={view} finds={all} onOpen={(id) => setReading(id)} />}
         {tab === 'orte' && <Places view={view} finds={finds} />}
         {tab === 'zeit' && <Timeline />}
         {tab === 'raster' && <Grid />}
+        {tab === 'verlauf' && (
+          <>
+            <h2>Verlauf</h2>
+            <p className="small">
+              Alles, was du erfahren hast, in der Reihenfolge deiner Tage. Lege selbst in die Akte,
+              was dich interessiert.
+            </p>
+            {all
+              .filter((f) => f.type !== 'item')
+              .map((f) => (
+                <FindCard key={f.id + f.source.day} f={f} action={<FileFind f={f} />} />
+              ))}
+            {all.length === 0 && (
+              <p>Noch nichts erlebt. Geh in den Reiter Tag und sprich mit den Leuten.</p>
+            )}
+          </>
+        )}
       </div>
 
       {doc && (

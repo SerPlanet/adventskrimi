@@ -89,4 +89,4 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D69 | Schlösser verweisen auf Fundstellen in anderen Räumen, hinter ihnen liegen belohnende Funde. |
 | D70 | Reihenfolge: WP15 bis WP19 vor WP06i (Aufräumen). |
 | D71 | Keine Hilfestufe und keine Erleichterungs-Optionen für ältere oder jüngere Spieler (ersetzt Teil von D66). Alle Spieler lösen die Rätsel selbst. Barrierefreiheit (Schrift, Kontrast, Bedienung) bleibt, nur die Spielschwierigkeit wird nicht gesenkt. |
-
+| D72 | WP16: Spielerstand hat `filed` (Akte), `table` (Zeitstrahl-Tabelle) und `grid` als Pflichtfelder; Zeitung liefert `articles` (id, title, text) statt headline/gossip; Rätselstufe ist für alle `medium` (keine Erleichterung, D71). Neue Fall-Datei-Felder: `newspaper.yaml` `articles`. |

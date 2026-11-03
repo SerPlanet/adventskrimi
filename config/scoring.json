@@ -9,7 +9,6 @@
     "puzzle_hint": 1
   },
   "prolog_mini_case": 10,
-  "link": 3,
   "first_discoverer": 5,
   "report_card": { "per_category": 5, "days": [10, 14, 18, 22] },
   "finale": { "who": 40, "accomplice": 40, "when": 40, "where": 40, "proof": 25 },

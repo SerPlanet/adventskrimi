@@ -9,6 +9,5 @@ early_accusation: true
 early_accusation_from_day: 20
 rumor_min_players: 3
 crowd_share: 0.5
-puzzle_levels: [easy, medium, hard]
 chess: false # O6: optional, off by default
 max_liars: 8

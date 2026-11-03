@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSession, type ActResult, type Action } from '../store';
 import { FindCard } from './FindCard';
+import { FileFind } from '../ui/file/FileButton';
 import { EndDay } from './EndDay';
 import { Popup } from '../ui/Popup';
 import { HotelPlan } from '../ui/HotelPlan';
@@ -296,10 +297,21 @@ export function Tag({ onNext }: { onNext: () => void }) {
         </Popup>
       )}
       {open?.kind === 'found' && (
-        <Popup title="Neu in deiner Akte" onClose={close}>
+        <Popup title="Neu entdeckt" onClose={close}>
           {bySource.map((f) => (
             <div key={f.source.id}>
               <SourceCard s={f.source} text={f.text} />
+              {newFinds
+                .filter((x) => x.source.id === f.source.id && x.type !== 'item')
+                .map((x) => (
+                  <div key={x.id}>
+                    <p className="small">
+                      {x.type === 'statement' ? 'Aussage (kann falsch sein)' : 'Fakt (stimmt)'}:{' '}
+                      {x.text}
+                    </p>
+                    <FileFind f={x} />
+                  </div>
+                ))}
               {f.source.document && !view.documents.some((d) => d.id === f.source.id) && (
                 <button disabled={busy} onClick={() => void pocket(f.source.id)}>
                   📄 Einstecken
@@ -312,7 +324,10 @@ export function Tag({ onNext }: { onNext: () => void }) {
           ))}
           {bySource.length === 0 && newFinds.map((f) => <FindCard key={f.id} f={f} />)}
           {open.plaque && <p>🏅 Du bist die/der Erste! Plakette: „{open.plaque}“.</p>}
-          <p className="small">Alles liegt jetzt in deiner Akte.</p>
+          <p className="small">
+            Im Verlauf deiner Akte kannst du alles nachlesen. Lege selbst ein, was dich
+            interessiert.
+          </p>
         </Popup>
       )}
       {open?.kind === 'doc' && (

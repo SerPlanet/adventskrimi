@@ -32,28 +32,6 @@ export function Settings() {
             <option value="dark">Dunkel</option>
           </select>
         </label>
-        <label>
-          Notizen
-          <select
-            value={s.note_level ?? 'half'}
-            onChange={(e) => save({ note_level: e.target.value })}
-          >
-            <option value="auto">Automatisch (das Spiel trägt ein)</option>
-            <option value="half">Halb (das Spiel schlägt vor)</option>
-            <option value="manual">Selbst (du trägst alles ein)</option>
-          </select>
-        </label>
-        <label>
-          Rätsel
-          <select
-            value={s.puzzle_level ?? 'medium'}
-            onChange={(e) => save({ puzzle_level: e.target.value })}
-          >
-            <option value="easy">Leicht</option>
-            <option value="medium">Mittel</option>
-            <option value="hard">Schwer</option>
-          </select>
-        </label>
         <label className="radio">
           <input
             type="checkbox"

@@ -17,38 +17,14 @@ const MARKS = {
 export function Grid() {
   const { view, setNote } = useSession();
   if (!view) return null;
-  const level = view.player.settings.note_level ?? 'half';
-  const { grid, grid_suggestions: sug } = view.notes;
-  const name = (cat: (typeof CATS)[number][0], id: string) =>
-    view.options[cat].find((o) => o.id === id)?.name ?? id;
+  const { grid } = view.notes;
 
   return (
     <section role="tabpanel" aria-label="Raster">
       <p className="small">
-        {level === 'auto' && 'Das Hotel trägt sichere Ausschlüsse für dich ein.'}
-        {level === 'half' && 'Das Hotel macht Vorschläge. Du entscheidest.'}
-        {level === 'manual' && 'Du trägst alles selbst ein.'} Tippe eine Zeile, um zu wechseln: ?
-        unklar, ✗ ausgeschlossen, ✓ sicher.
+        Du trägst alles selbst ein. Tippe eine Zeile, um zu wechseln: ? unklar, ✗ ausgeschlossen, ✓
+        sicher.
       </p>
-      {sug.length > 0 && (
-        <div className="card">
-          <h2>Vorschläge</h2>
-          <ul className="plain">
-            {sug.map((s) => (
-              <li key={s.cat + s.candidate} className="row between">
-                <span>✗ {name(s.cat, s.candidate)} ausschließen</span>
-                <button
-                  onClick={() =>
-                    setNote({ kind: 'grid', cat: s.cat, candidate: s.candidate, mark: 'no' })
-                  }
-                >
-                  Übernehmen
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       {CATS.map(([cat, title]) => (
         <fieldset key={cat}>
           <legend>{title}</legend>

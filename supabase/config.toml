@@ -66,18 +66,18 @@ import_map = "./functions/deno.json"
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.fits]
-verify_jwt = false
-import_map = "./functions/deno.json"
-
 [functions.accuse]
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.link]
+[functions.pocket]
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.pocket]
+[functions.file_add]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.file_remove]
 verify_jwt = false
 import_map = "./functions/deno.json"

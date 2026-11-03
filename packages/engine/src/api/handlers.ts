@@ -12,7 +12,6 @@ import {
   awardPlaque,
   bonusDay,
   canAccuse,
-  confirmLink,
   pocketDocument,
   canPlayDay,
   changeTheory,
@@ -20,17 +19,20 @@ import {
   readableDays,
   endDay,
   fileAccusation,
-  fits,
   isCandidate,
   isOnTime,
   makeCtx,
   setMark,
-  setPlaced,
+  fileArticle,
+  fileFind,
+  unfile,
+  setCell,
   questionHint,
   rankOf,
   readNewspaper,
   resolveAction,
   type GameCtx,
+  type PlayerState,
 } from '../game';
 import { applyProfile } from '../solver/profile';
 import { renameCase, renderAll } from '../names';
@@ -57,6 +59,20 @@ const view = (tx: PlayerTx, ctx: GameCtx, now: Date, state = tx.player.state) =>
 function requirePlayable(tx: PlayerTx, now: Date) {
   if (!canPlayDay(tx.player.state, now, tx.game.startDate))
     throw new ApiError('day_not_available', 403);
+}
+
+/** The paper of a day, rendered (a stored paper may still hold placeholders); made once, then stored. */
+async function paperOf(tx: PlayerTx, ctx: GameCtx, day: number) {
+  const existing = await tx.newspaper(day);
+  if (existing) return renderAll(existing, {}, namesOf(ctx));
+  const fresh = generateNewspaper(
+    ctx,
+    day,
+    await tx.activity(day - 1),
+    await tx.plaquesOnDay(day - 1),
+    await tx.accusationsOnDay(day - 1),
+  );
+  return tx.storeNewspaper(day, fresh);
 }
 
 /** Replays the stored response for a repeated request_id; otherwise runs fn and stores its response. */
@@ -127,15 +143,6 @@ export const handlers = {
     });
   },
 
-  /** "Verknüpfen": two finds that belong together; points once per link. */
-  async link(tx: PlayerTx, req: Req<'link'>, now: Date) {
-    const ctx = await ctxOf(tx);
-    const next = confirmLink(tx.player.state, ctx, req.link_id);
-    if (!next) throw new ApiError('bad_request', 400);
-    if (next !== tx.player.state) await tx.save(next);
-    return { state: view(tx, ctx, now, next) };
-  },
-
   /** "Einstecken": a found document goes into the inventory and stays readable in full. */
   async pocket(tx: PlayerTx, req: Req<'pocket'>, now: Date) {
     const ctx = await ctxOf(tx);
@@ -160,24 +167,40 @@ export const handlers = {
     return { state: view(tx, ctx, now, next) };
   },
 
-  /** Grid marks and timeline placements, stored per player so devices can change. */
+  /** Grid marks and timeline table cells, stored per player so devices can change. */
   async set_note(tx: PlayerTx, req: Req<'set_note'>, now: Date) {
     const ctx = await ctxOf(tx);
     const st = tx.player.state;
     const next =
       req.kind === 'grid'
         ? setMark(st, ctx, req.cat, req.candidate, req.mark)
-        : setPlaced(st, ctx, req.key, req.put);
+        : setCell(st, ctx, req.window, req.room, req.persons);
     if (!next) throw new ApiError('bad_request', 400);
     await tx.save(next);
     return { state: view(tx, ctx, now, next) };
   },
 
-  /** "Passt das zusammen?": free yes/no for two claims from the player's own file. */
-  async fits(tx: PlayerTx, req: Req<'fits'>) {
-    const ok = fits(await ctxOf(tx), tx.player.state, req.a, req.b);
-    if (ok === null) throw new ApiError('bad_request', 400);
-    return { fits: ok };
+  /** "In die Akte legen": a find the player has, or an article of a paper the player may read. */
+  async file_add(tx: PlayerTx, req: Req<'file_add'>, now: Date) {
+    const ctx = await ctxOf(tx);
+    const st = tx.player.state;
+    let next: PlayerState | null;
+    if (req.kind === 'find') next = fileFind(st, req.id);
+    else {
+      if (req.day > readableDays(st, now, tx.game.startDate)) throw new ApiError('not_yet', 403);
+      const article = (await paperOf(tx, ctx, req.day)).articles.find((a) => a.id === req.id);
+      next = article ? fileArticle(st, article, req.day) : null;
+    }
+    if (!next) throw new ApiError('bad_request', 400);
+    if (next !== st) await tx.save(next);
+    return { state: view(tx, ctx, now, next) };
+  },
+
+  async file_remove(tx: PlayerTx, req: Req<'file_remove'>, now: Date) {
+    const ctx = await ctxOf(tx);
+    const next = unfile(tx.player.state, req.kind, req.id);
+    if (next.filed.length !== tx.player.state.filed.length) await tx.save(next);
+    return { state: view(tx, ctx, now, next) };
   },
 
   /** Final accusation: allowed from the early-accusation day on, final once handed in. */
@@ -228,7 +251,7 @@ export const handlers = {
       requirePlayable(tx, now);
       const ctx = await ctxOf(tx);
       const st = tx.player.state;
-      const level = dailyLevel(st, ctx, tx.player.settings.puzzle_level);
+      const level = dailyLevel(st);
       const puzzle = dailyPuzzleFor(tx.game.slug, st.day, level);
       let next = st;
       let extra: Record<string, unknown> = {};
@@ -301,18 +324,7 @@ export const handlers = {
     // readable up to min(today, the day this player is playing): nobody reads ahead of their own game
     if (req.day > readableDays(tx.player.state, now, tx.game.startDate))
       throw new ApiError('not_yet', 403);
-    const ctx = await ctxOf(tx);
-    // a paper stored earlier may still hold placeholders: render on the way out
-    const existing = await tx.newspaper(req.day);
-    if (existing) return { newspaper: renderAll(existing, {}, namesOf(ctx)) };
-    const fresh = generateNewspaper(
-      ctx,
-      req.day,
-      await tx.activity(req.day - 1),
-      await tx.plaquesOnDay(req.day - 1),
-      await tx.accusationsOnDay(req.day - 1),
-    );
-    return { newspaper: await tx.storeNewspaper(req.day, fresh) };
+    return { newspaper: await paperOf(tx, await ctxOf(tx), req.day) };
   },
 };
 
@@ -327,7 +339,8 @@ export const MUTATING: HandlerName[] = [
   'settings',
   'set_theory',
   'set_note',
-  'link',
+  'file_add',
+  'file_remove',
   'pocket',
   'accuse',
 ];

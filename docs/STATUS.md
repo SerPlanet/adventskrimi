@@ -13,6 +13,8 @@ Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/
 
 - WP15: Erzähltext (`game/narrative.ts`, `screens/Intro.tsx`), Reiter „Tag“ mit Ort, Personen im Raum und Statuschip, Seite bleibt nach „Tag beenden“ (`ended`, `day_over`), „Rätsel im Raum“ samt `view.puzzles` entfernt (Schlösser kommen mit WP18).
 
+- WP16: Akte nur mit Eingelegtem (`game/file.ts`, Endpunkte `file_add`/`file_remove`, Reiter Personen/Dokumente/Orte/Zeit/Raster/Verlauf), „In die Akte legen“ an Artikeln und Antworten, Zeitstrahl als Tabelle (`set_note` kind `cell`). Gelöscht: Verknüpfen, Déjà-vu, Notizstufen, `fits`, Widerspruchs-Markierung, `scoring.link`, `puzzle_level`. Zeitung liefert `articles` (Lead, Klatsch, Fall-Artikel).
+
 ## Offen im Inhalt (WP10b-Nacharbeit, später)
 - Je Raum/Tag mehr untersuchbare Funde als Aktionen nur in Salon, Küche, Lobby; Tage 1–5 haben fast keine Untersuchen-Funde, Dachboden erst ab Tag 20 (Grenzen und Bots neu kalibrieren, `docs/07`).
 - Namen in `insider.yaml`; Stichprobe der Dialogtexte lesen.

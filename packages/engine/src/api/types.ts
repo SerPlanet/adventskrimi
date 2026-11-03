@@ -1,13 +1,11 @@
 import { z } from 'zod';
 import type { LoadedCase } from '../loader';
-import { Category, Id, type Profile, type Scoring } from '../schemas';
+import { Category, Day, Id, type Profile, type Scoring } from '../schemas';
 import type { PlayerState } from '../game/state';
 
 export const SettingsSchema = z
   .object({
     font_size: z.enum(['normal', 'large', 'xl']),
-    note_level: z.enum(['auto', 'half', 'manual']),
-    puzzle_level: z.enum(['easy', 'medium', 'hard']),
     explanations: z.boolean(),
     dark_mode: z.enum(['auto', 'light', 'dark']),
   })
@@ -45,12 +43,11 @@ export interface DayActivity {
 
 export interface NewspaperContent {
   day: number;
-  headline: string;
-  text: string;
+  /** the stories of the day (02c §3): the lead first; each can be put into the dossier */
+  articles: { id: string; title: string; text: string }[];
   weather?: string;
   blocked_rooms: string[];
   bonus_rooms: string[];
-  gossip: string[];
   ads: string[];
   filler: string[];
   rumors: string[];
@@ -163,7 +160,16 @@ export const Requests = {
   scoreboard: z.object({ slug: Slug, player_id: PlayerId }),
   newspaper: z.object({ slug: Slug, player_id: PlayerId, day: z.number().int().min(1).max(24) }),
   settings: z.object({ slug: Slug, player_id: PlayerId, settings: SettingsSchema }),
-  link: z.object({ slug: Slug, player_id: PlayerId, link_id: Id }),
+  file_add: z.discriminatedUnion('kind', [
+    z.object({ slug: Slug, player_id: PlayerId, kind: z.literal('find'), id: Id }),
+    z.object({ slug: Slug, player_id: PlayerId, kind: z.literal('article'), day: Day, id: Id }),
+  ]),
+  file_remove: z.object({
+    slug: Slug,
+    player_id: PlayerId,
+    kind: z.enum(['find', 'article']),
+    id: Id,
+  }),
   pocket: z.object({ slug: Slug, player_id: PlayerId, source_id: Id }),
   get_theory: z.object({ slug: Slug, player_id: PlayerId }),
   set_theory: z.object({
@@ -183,17 +189,12 @@ export const Requests = {
     z.object({
       slug: Slug,
       player_id: PlayerId,
-      kind: z.literal('timeline'),
-      key: z.string().min(1).max(80),
-      put: z.boolean(),
+      kind: z.literal('cell'),
+      window: Id,
+      room: Id,
+      persons: z.array(Id).max(20),
     }),
   ]),
-  fits: z.object({
-    slug: Slug,
-    player_id: PlayerId,
-    a: z.string().min(1).max(80),
-    b: z.string().min(1).max(80),
-  }),
   accuse: z.object({
     slug: Slug,
     player_id: PlayerId,

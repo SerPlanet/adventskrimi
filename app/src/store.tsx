@@ -49,10 +49,13 @@ interface Session {
   setNote(
     n:
       | { kind: 'grid'; cat: string; candidate: string; mark: 'yes' | 'no' | null }
-      | { kind: 'timeline'; key: string; put: boolean },
+      | { kind: 'cell'; window: string; room: string; persons: string[] },
   ): Promise<boolean>;
-  fits(a: string, b: string): Promise<boolean | null>;
-  link(id: string): Promise<boolean>;
+  /** "In die Akte legen" (02c §7) and taking it out again */
+  fileAdd(
+    what: { kind: 'find'; id: string } | { kind: 'article'; day: number; id: string },
+  ): Promise<boolean>;
+  fileRemove(kind: 'find' | 'article', id: string): Promise<boolean>;
   pocket(sourceId: string): Promise<boolean>;
   accuse(theory: Record<string, string>, proof: Record<string, string[]>): Promise<boolean>;
 }
@@ -179,14 +182,15 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
         if (r) setNotice('Eingesteckt. Du findest es im Inventar.');
         return r !== null;
       },
-      async link(id) {
-        const r = await run('link', { link_id: id });
-        if (r) setNotice('Verknüpft. Gut aufgepasst!');
+      async fileAdd(what) {
+        const r = await run('file_add', what);
+        if (r) setNotice('In die Akte gelegt.');
         return r !== null;
       },
-      async fits(a, b) {
-        const r = await run<{ fits: boolean }>('fits', { a, b });
-        return r ? r.fits : null;
+      async fileRemove(kind, id) {
+        const r = await run('file_remove', { kind, id });
+        if (r) setNotice('Aus der Akte genommen. Im Verlauf kannst du es weiter nachlesen.');
+        return r !== null;
       },
       async accuse(theory, proof) {
         const r = await run('accuse', { request_id: newRequestId(), theory, proof });

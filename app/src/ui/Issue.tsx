@@ -1,4 +1,5 @@
 import type { Paper } from '../api';
+import { FileArticle } from './file/FileButton';
 import './paper.css';
 
 /** Splits the story into a lead-in (first sentence) and the rest. */
@@ -7,29 +8,35 @@ function split(text: string): [string, string] {
   return m ? [m[1] as string, m[2] as string] : [text, ''];
 }
 
-/** One front page: big story, tiles, boxes. The DOM order is the reading order on every width. */
+/**
+ * One front page: the lead story, more stories, boxes. Every story can be put into the dossier
+ * by the player (02c §3). The DOM order is the reading order on every width.
+ */
 export function Issue({ p }: { p: Paper }) {
-  const [lead, rest] = split(p.text);
+  const [top, ...more] = p.articles;
+  const [lead, rest] = split(top?.text ?? '');
   const hasBook = p.plaques.length > 0 || p.detective_of_day || p.accusations?.length;
   return (
     <div className="front">
-      <section className="lead" aria-labelledby="lead-h">
-        <h2 id="lead-h" className="headline">
-          {p.headline}
-        </h2>
-        <p className="standfirst">{lead}</p>
-        {rest && <p className="body">{rest}</p>}
-      </section>
+      {top && (
+        <section className="lead" aria-labelledby="lead-h">
+          <h2 id="lead-h" className="headline">
+            {top.title}
+          </h2>
+          <p className="standfirst">{lead}</p>
+          {rest && <p className="body">{rest}</p>}
+          <FileArticle day={p.day} id={top.id} />
+        </section>
+      )}
 
       <div className="briefs">
-        {p.gossip.length > 0 && (
-          <section className="brief">
-            <h3>Klatsch und Tratsch</h3>
-            {p.gossip.map((g) => (
-              <p key={g}>{g}</p>
-            ))}
+        {more.map((a) => (
+          <section key={a.id} className="brief">
+            <h3>{a.title}</h3>
+            <p>{a.text}</p>
+            <FileArticle day={p.day} id={a.id} />
           </section>
-        )}
+        ))}
         {p.rumors.length > 0 && (
           <section className="brief">
             <h3>Gerüchte</h3>

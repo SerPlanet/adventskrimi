@@ -1,23 +1,10 @@
-import {
-  checkDaily,
-  generateDaily,
-  LEVELS,
-  publicPuzzle,
-  type DailyPuzzle,
-  type Level,
-} from '../puzzles';
+import { checkDaily, generateDaily, publicPuzzle, type DailyPuzzle, type Level } from '../puzzles';
 import { awardDailyPuzzle } from './points';
 import type { DailyProgress, GameCtx, PlayerState } from './state';
 
-/** Level of the day: the player's choice, but only levels the profile offers (hard falls back to medium). */
-export function dailyLevel(st: PlayerState, ctx: GameCtx, preferred: Level | undefined): Level {
-  const locked = st.daily[st.day]?.level;
-  if (locked) return locked;
-  const allowed = ctx.profile.puzzle_levels as Level[];
-  const want = preferred ?? 'medium';
-  if (allowed.includes(want)) return want;
-  const down = [...LEVELS].slice(0, LEVELS.indexOf(want) + 1).reverse();
-  return down.find((l) => allowed.includes(l)) ?? (allowed[0] as Level);
+/** Everybody gets the same level: medium (D71, no easier options). Once started it stays. */
+export function dailyLevel(st: PlayerState): Level {
+  return st.daily[st.day]?.level ?? 'medium';
 }
 
 const cache = new Map<string, DailyPuzzle>();

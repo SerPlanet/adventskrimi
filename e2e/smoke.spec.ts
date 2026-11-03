@@ -53,6 +53,9 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.locator('.intro .story')).toContainText('Testhaus');
   await page.getByRole('button', { name: 'Weiter' }).click();
   await expect(page.getByRole('heading', { name: 'Der Bergbote' })).toBeVisible();
+  // nothing lands in the dossier by itself; the player files an article (02c §3)
+  await page.locator('.lead .filebtn').click();
+  await expect(page.locator('.lead .filebtn')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByText('Ausgabe Nr. 1')).toBeVisible();
   await expect(page.getByLabel('Tagesstatus')).toContainText('Tag 1');
 
@@ -90,9 +93,15 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
     .getByRole('dialog')
     .getByRole('button', { name: /Die Nacht/ })
     .click();
-  await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Neu entdeckt' })).toBeVisible();
   // dialog popup: speech bubbles, closed with the button
   await expect(page.locator('.bubble')).toHaveCount(2);
+  // every answer can be put into the dossier on its own
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /In die Akte legen/ })
+    .click();
+  await expect(page.getByRole('dialog').getByRole('button', { name: /In der Akte/ })).toBeVisible();
   await page.getByRole('button', { name: 'Schließen' }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   // exploring is free: progress counts finds, no action budget any more
@@ -113,8 +122,16 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.getByRole('button', { name: /^Cora/ }).click();
   await expect(page.getByText('Ich war die ganze Nacht in der Halle.')).toBeVisible();
   await expect(page.getByText('Das kann falsch sein.')).toBeVisible();
-  // Anna's find came with the newspaper: it sits under the places, in "Allgemein"
+  // the history lists everything; Anna's find (it came with the newspaper) is filed from there
+  await page.getByRole('tab', { name: 'Verlauf' }).click();
+  await expect(page.getByText('Ben ist als Dieb ausgeschlossen.')).toBeVisible();
+  await page
+    .locator('article.find', { hasText: 'Ben ist als Dieb ausgeschlossen.' })
+    .getByRole('button', { name: /In die Akte legen/ })
+    .click();
+  // ... and sits under the places, in "Allgemein"; the filed article under "Zeitung"
   await page.getByRole('tab', { name: 'Orte' }).click();
+  await expect(page.getByRole('button', { name: 'Zeitung 1 Artikel' })).toBeVisible();
   await expect(page.getByRole('tab', { name: 'Orte', selected: true })).toBeVisible();
   await page.getByRole('button', { name: /^Allgemein/ }).click();
   await expect(page.getByText('Ben ist als Dieb ausgeschlossen.')).toBeVisible();
@@ -183,7 +200,7 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await page.reload();
   await page.getByRole('button', { name: /Kiste/ }).last().click();
   await page.getByRole('button', { name: /Genauer untersuchen/ }).click();
-  await expect(page.getByRole('heading', { name: 'Neu in deiner Akte' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Neu entdeckt' })).toBeVisible();
   // note popup: the little paper with sender and receiver
   await expect(page.locator('.zettel').getByText('Von Ben an Cora')).toBeVisible();
   // WP06d: pocket the document, read it again from the inventory
@@ -223,27 +240,29 @@ test('name tile, newspaper, action, dossier, end of day, next day', async ({ pag
   await expect(page.getByText(/\(du\)/)).toBeVisible();
 });
 
-test('timeline: place two cards, the contradiction shows; theory is saved', async ({ page }) => {
+test('timeline table: several people per cell, nothing checked; theory is saved', async ({
+  page,
+}) => {
   const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
-  await sql`update players set settings = '{}'::jsonb, state = jsonb_set(jsonb_set(jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb), '{discoveries}', '[{"sourceId":"src_lampe","itemIds":["f_cora_keller"],"day":1},{"sourceId":"src_cora","itemIds":["s_cora_halle"],"day":1}]'::jsonb), '{timeline}', '[]'::jsonb) where name = ${NAME}`;
+  await sql`update players set settings = '{}'::jsonb, state = jsonb_set(jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb), '{discoveries}', '[{"sourceId":"src_lampe","itemIds":["f_cora_keller"],"day":1},{"sourceId":"src_cora","itemIds":["s_cora_halle"],"day":1}]'::jsonb) where name = ${NAME}`;
   await sql.end();
 
   await page.goto(`/?now=${NOW}#/test`);
   await page.getByRole('button', { name: new RegExp(NAME) }).click();
   await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
-  // a link sits on the card of the person it is about; booking it is once only
-  await page.getByRole('button', { name: /^Cora/ }).click();
-  await expect(page.getByText('Das erinnert dich an Coras Weg durch das Haus.')).toBeVisible();
-  await page.getByRole('button', { name: /Verknüpfen/ }).click();
-  await expect(page.getByText('✓ verknüpft')).toBeVisible();
   await page.getByRole('tab', { name: 'Zeit' }).click();
-
-  for (const card of [/Fakt: In Keller/, /Aussage: In Halle/]) {
-    await page.getByRole('button', { name: card }).click();
-    await page.getByRole('button', { name: /Hierhin legen/ }).click();
-    await expect(page.getByRole('button', { name: card })).toHaveCount(0);
-  }
-  await expect(page.getByRole('alert').getByText(/Passt nicht: Cora/)).toBeVisible();
+  const cell = page.getByRole('button', { name: /^Halle, Erste Nachthälfte/ });
+  await expect(cell).toHaveText('＋');
+  await cell.click();
+  await page.getByRole('checkbox', { name: 'Cora' }).click();
+  await expect(page.getByRole('checkbox', { name: 'Cora' })).toBeChecked();
+  await page.getByRole('checkbox', { name: 'Anna' }).click();
+  await expect(page.getByRole('checkbox', { name: 'Anna' })).toBeChecked();
+  await page.getByRole('button', { name: 'Fertig' }).click();
+  // exactly what was entered, no check, no marking
+  await expect(cell).toHaveText('Cora, Anna');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await expect(page.getByText(/Passt nicht/)).toHaveCount(0);
 
   await page
     .getByRole('navigation')

@@ -23,8 +23,6 @@ export const CaseFile = z.object({
   categories: z.record(Category, z.array(Id).min(2)),
   solution: z.record(Category, Id),
   proof_questions: z.array(ProofQuestion).length(2),
-  /** pairs of finds that belong together; the hint never states a verdict */
-  links: z.array(z.object({ id: Id, a: Id, b: Id, text: z.string().min(1) })).default([]),
   /** story of each day: what the player should understand, the planned aha moment */
   beats: z
     .array(

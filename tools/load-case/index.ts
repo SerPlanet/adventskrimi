@@ -97,7 +97,6 @@ try {
       night: c.case.night,
       windows: c.case.windows,
       categories: c.case.categories,
-      links: c.case.links,
       beats: c.case.beats,
       doors: c.rooms.doors,
       outside: c.rooms.outside,

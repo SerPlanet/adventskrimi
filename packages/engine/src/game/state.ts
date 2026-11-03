@@ -1,6 +1,7 @@
 import type { LoadedCase } from '../loader';
 import type { Category, Profile, Scoring } from '../schemas';
 import { buildReach, type Reach } from '../solver/reach';
+import type { FiledEntry } from './file';
 
 export interface LedgerEntry {
   kind: string;
@@ -61,10 +62,12 @@ export interface PlayerState {
   questions: Record<number, QuestionProgress>;
   /** puzzle of the day progress by day */
   daily: Record<number, DailyProgress>;
-  /** grid marks by "category:candidate"; absent in older saved states */
-  grid?: Record<string, 'yes' | 'no'>;
-  /** claims the player placed on the timeline, as "item#claimIndex" */
-  timeline?: string[];
+  /** grid marks by "category:candidate" */
+  grid: Record<string, 'yes' | 'no'>;
+  /** timeline table: "window|room" -> the people the player put there (02c §8) */
+  table: Record<string, string[]>;
+  /** what the player put into the dossier (02c §7) */
+  filed: FiledEntry[];
   /** every saved change of the theory, newest last */
   theoryHistory?: { day: number; theory: Partial<Record<Category, string>> }[];
   /** report card by day: how many categories were right (details stay private) */
@@ -108,6 +111,9 @@ export function newPlayer(ctx: GameCtx): PlayerState {
     accused: false,
     questions: {},
     daily: {},
+    grid: {},
+    table: {},
+    filed: [],
   };
 }
 

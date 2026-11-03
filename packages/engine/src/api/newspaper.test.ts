@@ -67,7 +67,7 @@ for (const dir of CASES) {
 }
 
 describe('a paper stored with placeholders is rendered when it is read', () => {
-  test('headline, text, gossip, ads, rumors and filler lose their {n:..}', async () => {
+  test('article, ads, rumors and filler lose their {n:..}', async () => {
     const res = loadCase(join(ROOT, 'cases/_test'));
     if (!res.ok) throw new Error(res.errors.join('\n'));
     const profile = loadProfile(join(ROOT, 'config/profiles/friends.yaml'));
@@ -91,11 +91,9 @@ describe('a paper stored with placeholders is rendered when it is read', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (store as any).papers.set(2, {
       day: 2,
-      headline: raw,
-      text: raw,
+      articles: [{ id: 'a2_lead', title: raw, text: raw }],
       blocked_rooms: [],
       bonus_rooms: [],
-      gossip: [raw],
       ads: [raw],
       filler: [raw],
       rumors: [raw],

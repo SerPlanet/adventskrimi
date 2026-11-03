@@ -39,15 +39,26 @@ export function generateNewspaper(
     if (empty) rumors.push(`Der Raum „${empty.name}“ lag gestern verlassen da.`);
   }
 
+  // the stories: the lead, the gossip and the case's own articles of the day
+  const articles = [
+    {
+      id: `a${day}_lead`,
+      title: ev?.headline ?? 'Ein ruhiger Tag im Hotel',
+      text: ev?.text ?? 'Im Berghotel passiert heute nichts Besonderes.',
+    },
+    ...gossip.map((text, i) => ({ id: `a${day}_k${i + 1}`, title: 'Klatsch und Tratsch', text })),
+    ...c.newspaper.articles
+      .filter((a) => a.day === day)
+      .map((a) => ({ id: a.id, title: a.title, text: a.text })),
+  ];
+
   const best = [...yesterday].sort((a, b) => b.points - a.points)[0];
   const paper: NewspaperContent = {
     day,
-    headline: ev?.headline ?? 'Ein ruhiger Tag im Hotel',
-    text: ev?.text ?? 'Im Berghotel passiert heute nichts Besonderes.',
+    articles,
     weather: ev?.weather,
     blocked_rooms: (ev?.blocked_rooms ?? []).map(roomName),
     bonus_rooms: (ev?.bonus_rooms ?? []).map(roomName),
-    gossip,
     ads,
     filler,
     rumors,
