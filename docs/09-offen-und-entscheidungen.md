@@ -78,3 +78,4 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D58 | Akte als Aktenordner mit Reitern und Karteikarten (keine Tafel mit Schnüren). Verknüpfungen auf den Karten. |
 | D59 | Schriften werden lokal gebündelt (OFL, WOFF2), kein CDN. Eintrag der konkreten Fonts erfolgt in WP06e. |
 | D60 | Beim Ersetzen wird der alte Weg im selben WP gelöscht. Übergangscode (D53, `normalizeState`, Fallbacks) wird in `WP06i` vor dem Freeze entfernt. `knip` prüft in der CI auf tote Teile. |
+| D61 | WP06e: Schriften lokal in `app/public/fonts/` (alle OFL, WOFF2 latin): Playfair Display 800 (21 KB, Zeitungskopf), Source Serif 4 400/700 (19+21 KB, Text), Courier Prime 400/700 (19+19 KB, Akte). Skins in `app/src/skins.css`, Layout `.wrap`/`.cols2`. |

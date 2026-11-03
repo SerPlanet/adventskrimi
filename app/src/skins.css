@@ -1,0 +1,236 @@
+/* Skins (WP06e): one look per area. Shared: navigation, focus rings, AA contrast, touch targets. */
+@font-face {
+  font-family: 'Playfair Display';
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/playfair-display-latin-800-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Courier Prime';
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/courier-prime-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Courier Prime';
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/courier-prime-latin-700-normal.woff2') format('woff2');
+}
+
+:root {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-type: 'Courier Prime', 'Courier New', monospace;
+  --r: 0.6rem;
+}
+
+/* Tokens per skin; each skin re-declares the base tokens so existing components follow. */
+.skin-paper {
+  --bg: #efe6d2;
+  --card: #f8f1e0;
+  --text: #1c1a16;
+  --muted: #4d463a;
+  --line: #8f8470;
+  --accent: #8a1c14;
+  --on-accent: #ffffff;
+  --r: 0.15rem;
+  --font-head: var(--font-display);
+  --font-body: var(--font-serif);
+}
+.skin-plan {
+  --bg: #e6edf0;
+  --card: #ffffff;
+  --text: #1d2a30;
+  --muted: #46575f;
+  --line: #7f98a1;
+  --accent: #1f5f73;
+  --on-accent: #ffffff;
+  --r: 999px;
+  --font-head: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-body: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+.skin-room {
+  --bg: #20160f;
+  --card: #2f2218;
+  --text: #f4e8d4;
+  --muted: #d4c3a8;
+  --line: #7a5d3d;
+  --accent: #f0b860;
+  --on-accent: #20160f;
+  --focus: #8ab4f8;
+  --r: 0.4rem;
+  --font-head: var(--font-serif);
+  --font-body: var(--font-serif);
+}
+.skin-file {
+  --bg: #d9c9a3;
+  --card: #f3e8c8;
+  --text: #2a2118;
+  --muted: #54482f;
+  --line: #8f7a4a;
+  --accent: #5a3a14;
+  --on-accent: #fff8e6;
+  --r: 0.3rem 0.3rem 0 0;
+  --font-head: var(--font-type);
+  --font-body: var(--font-type);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .skin-paper {
+    --bg: #1d1b17;
+    --card: #272420;
+    --text: #ece4d2;
+    --muted: #c9bfa8;
+    --line: #5d5546;
+    --accent: #f0a48d;
+    --on-accent: #1d1b17;
+  }
+  :root:not([data-theme='light']) .skin-plan {
+    --bg: #121a1e;
+    --card: #1b262b;
+    --text: #e4eef1;
+    --muted: #b8cad0;
+    --line: #3f565e;
+    --accent: #7cc4d8;
+    --on-accent: #121a1e;
+  }
+  :root:not([data-theme='light']) .skin-file {
+    --bg: #201c14;
+    --card: #2c261a;
+    --text: #efe3c2;
+    --muted: #d0c29c;
+    --line: #6a5c3a;
+    --accent: #e8c070;
+    --on-accent: #201c14;
+  }
+}
+:root[data-theme='dark'] .skin-paper {
+  --bg: #1d1b17;
+  --card: #272420;
+  --text: #ece4d2;
+  --muted: #c9bfa8;
+  --line: #5d5546;
+  --accent: #f0a48d;
+  --on-accent: #1d1b17;
+}
+:root[data-theme='dark'] .skin-plan {
+  --bg: #121a1e;
+  --card: #1b262b;
+  --text: #e4eef1;
+  --muted: #b8cad0;
+  --line: #3f565e;
+  --accent: #7cc4d8;
+  --on-accent: #121a1e;
+}
+:root[data-theme='dark'] .skin-file {
+  --bg: #201c14;
+  --card: #2c261a;
+  --text: #efe3c2;
+  --muted: #d0c29c;
+  --line: #6a5c3a;
+  --accent: #e8c070;
+  --on-accent: #201c14;
+}
+
+/* A skinned area paints its own surface and uses its own type and button shape. */
+[class*='skin-'] {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+[class*='skin-'] h1,
+[class*='skin-'] h2,
+[class*='skin-'] h3 {
+  font-family: var(--font-head);
+}
+.skin-paper h1,
+.skin-paper h2 {
+  font-weight: 800;
+}
+.skin-plan h1,
+.skin-plan h2 {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.skin-file h1,
+.skin-file h2,
+.skin-file h3 {
+  font-weight: 700;
+}
+[class*='skin-'] button,
+[class*='skin-'] select,
+[class*='skin-'] input[type='search'] {
+  border-radius: var(--r);
+  font-family: inherit;
+}
+.skin-plan button {
+  padding-inline: 1.1rem;
+}
+
+/* Desktop grid: content up to 1200 px, centred; two-column blocks; navigation on top. */
+.wrap {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 7rem;
+}
+.cols2 {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 900px) {
+  .wrap {
+    max-width: 1200px;
+    padding: 1.5rem 2rem 3rem;
+  }
+  .cols2 {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .cols2.wide-left {
+    grid-template-columns: 2fr 1fr;
+  }
+  .cols2.wide-right {
+    grid-template-columns: 1fr 2fr;
+  }
+  .bottom {
+    top: 0;
+    bottom: auto;
+    height: 3.6rem;
+    justify-content: center;
+    gap: 0.5rem;
+    border-top: none;
+    border-bottom: 2px solid var(--line);
+  }
+  .bottom button {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1.2rem;
+    min-height: 48px;
+    font-size: 1rem;
+    align-self: center;
+    border-radius: 0.6rem;
+  }
+  .bottom button span {
+    font-size: 1.2rem;
+  }
+  .top {
+    top: 3.6rem;
+  }
+  .live {
+    bottom: 1rem;
+  }
+}

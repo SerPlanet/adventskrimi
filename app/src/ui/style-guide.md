@@ -16,3 +16,13 @@ Alle Props sind React-SVG in `app/src/ui/props/`. Läuft statisch, keine Bilddat
 - **Szene:** Wand (oben 64 %) mit Wandfeldern und Sockelleiste, Boden (unten 36 %), Farbton je Raum.
 - **Barrierefreiheit:** SVG ist `aria-hidden`, der Hotspot ist ein Button mit Namen; die Liste „Was gibt es hier?“ bleibt.
 - **Neue Props:** in `shapes.tsx` ergänzen und ein Stichwort in `props/index.tsx` eintragen.
+
+## Skins (WP06e, `app/src/skins.css`)
+
+Jeder Skin setzt nur die Tokens (`--bg --card --text --muted --line --accent --r`, Schrift); Komponenten bleiben gleich.
+
+- `skin-paper` (Zeitung): Zeitungspapier `#efe6d2`, Tinte `#1c1a16`, Rot `#8a1c14`; Playfair 800 + Source Serif 4; eckige Knöpfe. Dunkel: Grau-Braun.
+- `skin-plan` (Hotelplan): Blaupause `#e6edf0`, Petrol `#1f5f73`; Systemschrift; runde Knöpfe.
+- `skin-room` (Raum): immer dunkel-warm `#20160f`, Gold `#f0b860`; Source Serif 4.
+- `skin-file` (Akte): Aktenpapier `#d9c9a3`/`#f3e8c8`, Braun `#5a3a14`; Courier Prime; Reiter-Knöpfe.
+  Theorie und Rangliste ohne Skin. Ab 900 px: `.wrap` bis 1200 px, Navigation oben, `.cols2` zweispaltig.

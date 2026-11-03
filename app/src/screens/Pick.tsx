@@ -31,7 +31,7 @@ export function Pick({ slug }: { slug: string }) {
   };
 
   return (
-    <main id="main" className="pick">
+    <main id="main" className="pick wrap">
       <h1>{title}</h1>
       <p>Willkommen, Detektiv! Wer bist du?</p>
       {error && <p role="alert">{error}</p>}

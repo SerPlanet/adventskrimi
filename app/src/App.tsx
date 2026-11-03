@@ -18,6 +18,14 @@ const TABS = [
   { id: 'rangliste', label: 'Rangliste', icon: '🏆' },
 ] as const;
 
+const SKIN: Record<string, string> = {
+  zeitung: 'skin-paper',
+  hotel: 'skin-plan',
+  akte: 'skin-file',
+};
+
+const PLAIN = ['theorie', 'rangliste', 'einstellungen'];
+
 const FONT_PX = { normal: 18, large: 22, xl: 26 } as const;
 
 export function App({ slug, tab: route }: { slug: string; tab: string }) {
@@ -33,6 +41,12 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
     if (dark === 'auto') root.removeAttribute('data-theme');
     else root.setAttribute('data-theme', dark);
   }, [settings.font_size, settings.dark_mode]);
+
+  const skin = SKIN[route] ?? (PLAIN.includes(route) ? '' : 'skin-paper');
+  // the page behind the content takes the colour of the area too
+  useEffect(() => {
+    document.body.className = playerId ? skin : '';
+  }, [skin, playerId]);
 
   if (!playerId) return <Pick slug={slug} />;
 
@@ -72,7 +86,7 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
           </p>
         )}
       </header>
-      <main id="main" tabIndex={-1}>
+      <main id="main" tabIndex={-1} className={`wrap ${skin}`}>
         {view?.prolog && settings.explanations !== false && route !== 'einstellungen' && (
           <PageBubble />
         )}

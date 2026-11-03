@@ -5,13 +5,14 @@ import { setSlug } from './api';
 import { useRoute } from './route';
 import { SessionProvider } from './store';
 import './styles.css';
+import './skins.css';
 
 /** The link /#/<slug>/... chooses the game. Without a usable slug we only show a friendly note. */
 function Root() {
   const { slug, tab } = useRoute();
   if (!slug)
     return (
-      <main id="main" className="pick">
+      <main id="main" className="pick wrap">
         <h1>Berghotel Edelweiß</h1>
         <p role="alert">Bitte öffne den Link, den du bekommen hast.</p>
       </main>
