@@ -260,7 +260,7 @@ export const handlers = {
       let extra: Record<string, unknown> = {};
       if (req.op === 'check') {
         if (!req.answer) throw new ApiError('bad_request', 400);
-        const r = submitDaily(st, ctx, puzzle, req.answer);
+        const r = submitDaily(st, ctx, puzzle, req.answer, !isOnTime(st, now, tx.game.startDate));
         next = r.state;
         extra = { outcome: r.outcome };
       } else if (req.op === 'hint') {

@@ -27,6 +27,27 @@
     "casual_median_max_candidates": 4,
     "worst_max_candidates": 4
   },
+  "insights": {
+    "min_proofs": 2,
+    "sample_share": 0.6,
+    "sample_runs": 200,
+    "sample_min_success": 0.9,
+    "verdict_words": [
+      "war es",
+      "waren es",
+      "war nicht der",
+      "unschuldig",
+      "schuldig",
+      "Täter",
+      "Täterin",
+      "lügt",
+      "gelogen",
+      "Beweis",
+      "also",
+      "der Dieb",
+      "die Diebin"
+    ]
+  },
   "mind_share_min": 0.35,
   "daily_minutes_max": 10,
   "reading_wpm": 150

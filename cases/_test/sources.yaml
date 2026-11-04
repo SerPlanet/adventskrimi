@@ -5,25 +5,27 @@ sources:
       room: halle,
       npc: anna,
       topic: nacht,
-      days: { from: 1, to: 3 },
+      days: { from: 1, to: 5 },
       yields: [f_excl_ben],
     }
   - {
       id: src_ben,
+      unlock: { day_from: 3 },
       kind: talk,
       room: keller,
       npc: ben,
       topic: nacht,
-      days: { from: 1, to: 3 },
+      days: { from: 1, to: 5 },
       yields: [s_ben_keller, f_excl_ben_acc],
     }
   - {
       id: src_cora,
+      unlock: { day_from: 3 },
       kind: talk,
       room: halle,
       npc: cora,
       topic: nacht,
-      days: { from: 1, to: 3 },
+      days: { from: 1, to: 5 },
       yields: [s_cora_halle],
       presentation: dialog,
       lines:
@@ -37,7 +39,7 @@ sources:
       kind: inspect,
       room: halle,
       object: lampe,
-      days: [1, 2, 3],
+      days: [1, 2, 3, 4, 5],
       yields: [f_cora_keller],
       plaque: Sehr aufmerksam,
     }
@@ -46,7 +48,7 @@ sources:
       kind: inspect,
       room: keller,
       object: kiste,
-      days: [2, 3],
+      days: [2, 3, 4, 5],
       requires: p_code,
       lock:
         {
@@ -64,23 +66,23 @@ sources:
       kind: inspect,
       room: halle,
       object: lampe,
-      days: [2, 3],
+      days: [2, 3, 4, 5],
       yields: [f_lampe_an],
     }
-  - { id: src_news_a, kind: newspaper, days: [1, 2, 3], yields: [f_excl_ben, f_lampe_an] }
+  - { id: src_news_a, kind: newspaper, days: [1, 2, 3, 4, 5], yields: [f_excl_ben, f_lampe_an] }
   - {
       id: src_book_a,
       kind: hotelbook,
       room: halle,
-      days: [1, 2, 3],
+      days: [1, 2, 3, 4, 5],
       yields: [f_excl_ben, f_excl_ben_acc],
     }
-  - { id: src_news_b, kind: newspaper, days: [2, 3], yields: [f_excl_ben_acc, f_kiste_offen] }
+  - { id: src_news_b, kind: newspaper, days: [2, 3, 4, 5], yields: [f_excl_ben_acc, f_kiste_offen] }
   - {
       id: src_book_b,
       kind: hotelbook,
       room: keller,
-      days: [2, 3],
+      days: [2, 3, 4, 5],
       yields: [f_lampe_an, f_kiste_offen],
     }
   - {
@@ -89,6 +91,42 @@ sources:
       room: keller,
       npc: ben,
       topic: nacht,
-      days: [3],
+      days: [3, 4, 5],
       yields: [f_lampe_an, f_excl_ben],
+    }
+  - {
+      id: src_a1,
+      kind: inspect,
+      room: halle,
+      object: schrank_a,
+      days: [2, 3, 4, 5],
+      route: [a],
+      yields: [f_a1],
+    }
+  - {
+      id: src_a2,
+      kind: inspect,
+      room: halle,
+      object: kommode_a,
+      days: [2, 3, 4, 5],
+      route: [a],
+      yields: [f_a2],
+    }
+  - {
+      id: src_b1,
+      kind: inspect,
+      room: halle,
+      object: schrank_b,
+      days: [2, 3, 4, 5],
+      route: [b],
+      yields: [f_b1],
+    }
+  - {
+      id: src_b2,
+      kind: inspect,
+      room: halle,
+      object: kommode_b,
+      days: [2, 3, 4, 5],
+      route: [b],
+      yields: [f_b2],
     }

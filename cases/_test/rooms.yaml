@@ -9,6 +9,25 @@ rooms:
     scene: halle
     objects:
       - { id: lampe, name: Alte Lampe, text: Die Lampe flackert leicht., spot: { x: 70, y: 30 } }
+      - {
+          id: schrank_a,
+          name: Schrank,
+          text: Ein schmaler Schrank steht an der Wand.,
+          spot: { x: 15, y: 60 },
+        }
+      - {
+          id: kommode_a,
+          name: Kommode,
+          text: Auf der Kommode liegt eine Decke.,
+          spot: { x: 35, y: 70 },
+        }
+      - { id: schrank_b, name: Vitrine, text: Die Vitrine ist abgestaubt., spot: { x: 55, y: 72 } }
+      - {
+          id: kommode_b,
+          name: Sideboard,
+          text: Das Sideboard glänzt im Licht.,
+          spot: { x: 85, y: 62 },
+        }
   - id: keller
     name: Keller
     description: Ein kühler Keller mit einer schweren Kiste.

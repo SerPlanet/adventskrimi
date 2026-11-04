@@ -5,6 +5,8 @@ export const RoomObject = z.object({
   id: Id,
   name: z.string().min(1),
   text: CardText,
+  /** the detective's remark when looking at it: an observation, never a verdict (WP20) */
+  look_note: CardText.optional(),
   /** deko: not clickable, ansehen: look only, untersuchbar: can be examined for 1 action. Derived when absent. */
   klasse: z.enum(['deko', 'ansehen', 'untersuchbar']).optional(),
   /** vector prop of the library (ui/props); chosen by name when absent */

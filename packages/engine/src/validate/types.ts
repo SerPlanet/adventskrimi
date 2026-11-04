@@ -20,5 +20,6 @@ export const CHECK_NAMES = [
   'plan',
   'paper',
   'locks',
+  'insights',
 ] as const;
 export type CheckName = (typeof CHECK_NAMES)[number];

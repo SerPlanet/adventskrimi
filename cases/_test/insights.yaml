@@ -1,0 +1,3 @@
+insights:
+  - { id: i_halle, text: Was in der Halle geschah. }
+  - { id: i_keller, text: Wer sich nachts im Keller aufhielt., needs: [i_halle] }

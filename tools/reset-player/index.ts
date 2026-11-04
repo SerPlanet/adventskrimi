@@ -18,7 +18,8 @@ if (!slug || !name || !Number.isInteger(day) || day < 1 || day > 24) {
 
 const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1, prepare: false });
 try {
-  const [row] = await sql`select p.id, g.id as game from players p join games g on g.id = p.game_id
+  const [row] =
+    await sql`select p.id, p.state->>'corridor' as corridor, g.id as game from players p join games g on g.id = p.game_id
     where g.slug = ${slug} and p.name = ${name}`;
   if (!row) throw new Error(`no player "${name}" in game "${slug}" (staging)`);
   const id = row.id as string;
@@ -29,7 +30,9 @@ try {
     id,
     async (tx) => {
       const c = applyProfile(await tx.caseData(), tx.game.profile);
-      return newPlayer(makeCtx(c, tx.game.profile, tx.game.scoring));
+      // keep the player's corridor: the way of days 1-5 belongs to the person
+      const st = newPlayer(makeCtx(c, tx.game.profile, tx.game.scoring));
+      return row.corridor ? { ...st, corridor: row.corridor as string } : st;
     },
     { lock: true, slug },
   );

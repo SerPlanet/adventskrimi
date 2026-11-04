@@ -7,6 +7,7 @@ export * from './things';
 export * from './locks';
 export * from './narrative';
 export * from './movement';
+export * from './route';
 export * from './points';
 export * from './daily';
 export * from './dailypuzzle';

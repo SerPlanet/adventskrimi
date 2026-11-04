@@ -1,4 +1,5 @@
 import type { LoadedCase } from '../loader';
+import { guidedRoom, sourceOnRoute } from '../game/route';
 import { expandDays, type Profile } from '../schemas';
 
 /** Where and when a source can be used, given schedules, events and the room graph. */
@@ -10,9 +11,12 @@ export interface Reach {
   roomOn(sourceId: string, day: number): string | null;
   /** all days on which the source is available somewhere */
   daysOf(sourceId: string): number[];
+  /** the fixed room of a guided day (WP20), or null when the day is free */
+  guided(day: number): string | null;
 }
 
-export function buildReach(c: LoadedCase, profile: Profile): Reach {
+/** With a `corridor`, the days of the guided phase only offer what lies on that corridor's way. */
+export function buildReach(c: LoadedCase, profile: Profile, corridor?: string): Reach {
   const roomIds = c.rooms.rooms.map((r) => r.id);
   const adj = new Map<string, Set<string>>(roomIds.map((r) => [r, new Set()]));
   for (const r of c.rooms.rooms)
@@ -46,6 +50,8 @@ export function buildReach(c: LoadedCase, profile: Profile): Reach {
   const roomOn = (id: string, day: number): string | null => {
     const s = byId.get(id);
     if (!s || !expandDays(s.days).includes(day)) return null;
+    if (corridor !== undefined && !sourceOnRoute(c, s, corridor, day)) return null;
+    const fixed = corridor !== undefined ? (guidedRoom(c, corridor, day) ?? null) : null;
     if (s.kind === 'newspaper') return '*';
     let room = s.room ?? (s.object ? objRoom.get(s.object) : undefined);
     if (s.kind === 'talk' && s.npc) {
@@ -54,6 +60,7 @@ export function buildReach(c: LoadedCase, profile: Profile): Reach {
       room = at;
     }
     if (!room) return s.kind === 'hotelbook' ? '*' : null;
+    if (fixed && room !== fixed) return null;
     if (!rooms.has(room) || blocked(room, day)) return null;
     const pr = s.requires ? puzzleRoom.get(s.requires) : undefined;
     if (pr && !rooms.has(pr)) return null;
@@ -63,5 +70,7 @@ export function buildReach(c: LoadedCase, profile: Profile): Reach {
     const s = byId.get(id);
     return s ? expandDays(s.days).filter((d) => roomOn(id, d) !== null) : [];
   };
-  return { rooms, blocked, roomOn, daysOf };
+  const guided = (day: number) =>
+    corridor !== undefined ? (guidedRoom(c, corridor, day) ?? null) : null;
+  return { rooms, blocked, roomOn, daysOf, guided };
 }

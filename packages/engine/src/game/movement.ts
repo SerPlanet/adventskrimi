@@ -1,3 +1,4 @@
+import { corridorOf, guidedRoom } from './route';
 import type { GameCtx, PlayerState } from './state';
 
 export type EndDayResult =
@@ -6,8 +7,10 @@ export type EndDayResult =
 
 const blockedOn = (ctx: GameCtx, room: string, day: number) => ctx.reach.blocked(room, day);
 
-/** Rooms the player may choose when ending the day (profile movement + event blocks of the next day). */
+/** Rooms the player may choose when ending the day: the one guided room, or (free phase) profile movement + event blocks. */
 export function nextRooms(st: PlayerState, ctx: GameCtx): string[] {
+  const fixed = guidedRoom(ctx.c, corridorOf(ctx.c, st), st.day + 1);
+  if (fixed) return [fixed];
   const { rooms } = ctx.c.rooms;
   const here = rooms.find((r) => r.id === st.room);
   const pool =
@@ -23,9 +26,12 @@ export function nextRooms(st: PlayerState, ctx: GameCtx): string[] {
  */
 export function endDay(st: PlayerState, ctx: GameCtx, nextRoom?: string): EndDayResult {
   if (st.day > 24) return { ok: false, reason: 'game_over' };
-  const target = nextRoom ?? st.room;
+  // on guided days there is no choice: the corridor leads the way
+  const fixed = st.day < 24 ? guidedRoom(ctx.c, corridorOf(ctx.c, st), st.day + 1) : undefined;
+  if (fixed && nextRoom && nextRoom !== fixed) return { ok: false, reason: 'too_far' };
+  const target = fixed ?? nextRoom ?? st.room;
   if (!ctx.c.rooms.rooms.some((r) => r.id === target)) return { ok: false, reason: 'bad_room' };
-  if (st.day < 24) {
+  if (st.day < 24 && !fixed) {
     if (nextRoom && nextRoom !== st.room) {
       if (!nextRooms(st, ctx).includes(nextRoom)) {
         return { ok: false, reason: blockedOn(ctx, nextRoom, st.day + 1) ? 'blocked' : 'too_far' };

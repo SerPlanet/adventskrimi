@@ -14,9 +14,12 @@ const ctx = makeCtx(
   loadScoring(join(ROOT, 'config/scoring.json')),
 );
 
+// the question about the night is part of the free phase (unlock from day 3, WP20)
+const day3 = () => ({ ...newPlayer(ctx), day: 3 });
+
 describe('every question has an answer (02c §6)', () => {
   test('a source answers with its lines and holds the finds', () => {
-    const a = answerOf(newPlayer(ctx), ctx, { type: 'talk', npc: 'cora', topic: 'nacht' });
+    const a = answerOf(day3(), ctx, { type: 'talk', npc: 'cora', topic: 'nacht' });
     expect(a?.lines.map((l) => l.speaker)).toEqual(['Du', 'Cora']);
     expect(a?.finds).toEqual(['s_cora_halle']);
   });
@@ -29,11 +32,11 @@ describe('every question has an answer (02c §6)', () => {
 
   test('asking again gives the same answer, free of charge, nothing changes', () => {
     const q = { type: 'talk', npc: 'cora', topic: 'nacht' } as const;
-    const once = resolveAction(newPlayer(ctx), ctx, q).state;
+    const once = resolveAction(day3(), ctx, q).state;
     const again = resolveAction(once, ctx, q);
     expect(again.result.status).toBe('known');
     expect(again.state).toBe(once);
-    expect(answerOf(once, ctx, q)).toEqual(answerOf(newPlayer(ctx), ctx, q));
+    expect(answerOf(once, ctx, q)).toEqual(answerOf(day3(), ctx, q));
   });
 
   test('a person who is not here has no answer', () => {

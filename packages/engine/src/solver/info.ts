@@ -15,7 +15,8 @@ export interface Info {
   solutionIndex: number;
 }
 
-export function buildInfo(c: LoadedCase, profile: Profile): Info {
+/** With a `corridor` the info describes a player who walks only that guided route (WP20). */
+export function buildInfo(c: LoadedCase, profile: Profile, corridor?: string): Info {
   const space = buildSpace(c);
   const masks = new Map<string, Uint8Array>();
   for (const f of c.facts.facts) masks.set(f.id, maskOf(f, space, c));
@@ -34,7 +35,7 @@ export function buildInfo(c: LoadedCase, profile: Profile): Info {
     profile,
     space,
     base: baseMask(space),
-    reach: buildReach(c, profile),
+    reach: buildReach(c, profile, corridor),
     masks,
     solutionIndex: space.indexOf(sol),
   };

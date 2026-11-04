@@ -67,7 +67,9 @@ export async function adminPlayers(store: Store, body: unknown, now: Date = new 
     return { players: (await store.listPlayers(req.game_id)).map(publicPlayer) };
   }
   if (req.op === 'create') {
-    const state = await store.game(req.game_id, async (g) => newPlayer(await ctxOf(g)));
+    // the n-th player of a game gets the n-th corridor (WP20 §2)
+    const ordinal = (await store.listPlayers(req.game_id)).length;
+    const state = await store.game(req.game_id, async (g) => newPlayer(await ctxOf(g), ordinal));
     const p = await store.createPlayer(req.game_id, {
       name: req.player.name,
       avatar: req.player.avatar ?? null,

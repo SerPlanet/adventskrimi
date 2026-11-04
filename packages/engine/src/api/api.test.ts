@@ -150,7 +150,7 @@ describe('idempotency and costs (talking is free)', () => {
 describe('days, rooms, question of the day', () => {
   test('after end_day the page keeps the state "day over" until the next calendar day', async () => {
     expect(bodyOf(await call('state', { slug: 'test', player_id: a })).state.day_over).toBe(false);
-    await call('end_day', { slug: 'test', player_id: a, request_id: rid(), next_room: 'keller' });
+    await call('end_day', { slug: 'test', player_id: a, request_id: rid() });
     const v = bodyOf(await call('state', { slug: 'test', player_id: a })).state;
     expect(v.day_over).toBe(true);
     expect(v.can_play).toBe(false);
@@ -169,14 +169,20 @@ describe('days, rooms, question of the day', () => {
         })
       ).status,
     ).toBe(400);
-    const r = await call('end_day', {
-      slug: 'test',
-      player_id: a,
-      request_id: rid(),
-      next_room: 'keller',
-    });
+    // day 2 is guided: the corridor leads into the hall, there is no other choice
+    expect(
+      (
+        await call('end_day', {
+          slug: 'test',
+          player_id: a,
+          request_id: rid(),
+          next_room: 'keller',
+        })
+      ).status,
+    ).toBe(400);
+    const r = await call('end_day', { slug: 'test', player_id: a, request_id: rid() });
     expect(bodyOf(r).state.day).toBe(2);
-    expect(bodyOf(r).state.room.id).toBe('keller');
+    expect(bodyOf(r).state.room.id).toBe('halle');
     // day 2 has not arrived on day 1
     const early = await call('act', {
       slug: 'test',
@@ -506,5 +512,38 @@ describe('ranking and my points', () => {
     const anna = rows.find((r: { name: string }) => r.name === 'Anna-Spielerin');
     expect(anna.plaque_titles).toEqual(['Sehr aufmerksam']);
     expect(rows.find((r: { is_you: boolean }) => r.is_you).plaque_titles).toEqual([]);
+  });
+});
+
+describe('guided days in the view (WP20)', () => {
+  const stateOf = async (id: string) =>
+    bodyOf(await call('state', { slug: 'test', player_id: id })).state;
+  const setDay = (id: string, day: number) => {
+    const rec = store.players.get(id)!;
+    store.players.set(id, { ...rec, state: { ...rec.state, day, room: 'halle' } });
+  };
+
+  test('each player gets a corridor and only sees the things of their own way', async () => {
+    setDay(a, 2);
+    setDay(b, 2);
+    const ids = async (id: string) =>
+      (await stateOf(id)).room.objects.map((o: { id: string }) => o.id);
+    const forA = await ids(a);
+    const forB = await ids(b);
+    expect(forA).toContain('schrank_a');
+    expect(forA).not.toContain('schrank_b');
+    expect(forB).toContain('schrank_b');
+    expect(forB).not.toContain('schrank_a');
+  });
+
+  test('a question that is not unlocked yet is not offered, and the proof lists stay private', async () => {
+    setDay(a, 2);
+    const v = await stateOf(a);
+    const cora = v.room.npcs.find((n: { id: string }) => n.id === 'cora');
+    expect(cora.topics).toEqual([]);
+    expect(JSON.stringify(v)).not.toMatch(/supports|i_halle|i_keller|corridor/);
+    setDay(a, 3);
+    const later = (await stateOf(a)).room.npcs.find((n: { id: string }) => n.id === 'cora');
+    expect(later.topics).toHaveLength(1);
   });
 });

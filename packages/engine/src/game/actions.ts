@@ -1,6 +1,7 @@
 import { normalize } from '../puzzles';
 import type { Source } from '../schemas';
 import { budgetOf, costsAction } from './budget';
+import { corridorOf, sourceOnRoute } from './route';
 import { addLedger, type GameCtx, type PlayerState } from './state';
 
 export type Action =
@@ -61,10 +62,29 @@ function targetHere(a: Action, st: PlayerState, ctx: GameCtx): boolean {
   return room ? room === st.room : npcAt(target) === st.room;
 }
 
+/** Does the source exist for the player today? `unlock` (WP20) keeps a thing or question away until it holds. */
+export function unlockMet(s: Source, st: PlayerState): boolean {
+  const u = s.unlock;
+  if (!u) return true;
+  const seen = new Set(st.discoveries.map((d) => d.sourceId));
+  return (
+    (u.day_from === undefined || st.day >= u.day_from) &&
+    u.asked.every((id) => seen.has(id)) &&
+    u.has.every((id) => st.found.includes(id))
+  );
+}
+
+/** Is the source part of the player's way (guided days) and visible to them (`unlock`)? */
+export const existsFor = (s: Source, st: PlayerState, ctx: GameCtx): boolean =>
+  sourceOnRoute(ctx.c, s, corridorOf(ctx.c, st), st.day) && unlockMet(s, st);
+
 /** Sources of an action that exist in the player's room today (open or still locked). */
 export function hereSources(st: PlayerState, ctx: GameCtx, a: Action): Source[] {
   return ctx.c.sources.sources.filter(
-    (s) => matches(s, a) && [st.room, '*'].includes(ctx.reach.roomOn(s.id, st.day) ?? ''),
+    (s) =>
+      matches(s, a) &&
+      existsFor(s, st, ctx) &&
+      [st.room, '*'].includes(ctx.reach.roomOn(s.id, st.day) ?? ''),
   );
 }
 

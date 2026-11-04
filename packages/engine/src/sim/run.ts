@@ -65,7 +65,7 @@ export function simulate(
   from?: { state: PlayerState; until: number },
 ): SimResult {
   const rng: Rng = makeRng(seed);
-  let st: PlayerState = from?.state ?? newPlayer(ctx);
+  let st: PlayerState = from?.state ?? newPlayer(ctx, seed);
   const res: SimResult = {
     bot,
     seed,

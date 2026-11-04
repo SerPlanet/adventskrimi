@@ -130,6 +130,43 @@ export function checkRefs(c: LoadedCase): string[] {
     for (const y of s.yields)
       if (!items.has(y)) need('sources.yaml', s.id, factIds, y, 'fact/statement/item');
   }
+  const insights = dup(
+    'insights.yaml',
+    c.insights.insights.map((i) => i.id),
+  );
+  for (const i of c.insights.insights)
+    for (const n of i.needs) need('insights.yaml', `${i.id}.needs`, insights, n, 'insight');
+  const corridors = dup(
+    'routes.yaml',
+    c.routes.corridors.map((k) => k.id),
+  );
+  const guided = c.routes.corridors[0] ? Object.keys(c.routes.corridors[0].route).map(Number) : [];
+  for (const k of c.routes.corridors) {
+    for (const [day, room] of Object.entries(k.route)) {
+      if (Number(day) < 2) errs.push(`routes.yaml: ${k.id}: day ${day} (day 1 is the start room)`);
+      need('routes.yaml', `${k.id}.route.${day}`, rooms, room, 'room');
+    }
+    // all corridors guide the same days, without gaps from day 2
+    const days = Object.keys(k.route)
+      .map(Number)
+      .sort((a, b) => a - b);
+    if (
+      days.some((d, i) => d !== i + 2) ||
+      days.join() !== [...guided].sort((a, b) => a - b).join()
+    )
+      errs.push(`routes.yaml: ${k.id}: guided days must be the same 2..n for every corridor`);
+  }
+  for (const f of [...c.facts.facts, ...c.statements.statements])
+    for (const i of f.supports)
+      need('facts/statements', `${f.id}.supports`, insights, i, 'insight');
+  for (const s of c.sources.sources) {
+    for (const k of s.route ?? []) need('sources.yaml', `${s.id}.route`, corridors, k, 'corridor');
+    for (const a of s.unlock?.asked ?? [])
+      need('sources.yaml', `${s.id}.unlock.asked`, sources, a, 'source');
+    for (const h of s.unlock?.has ?? [])
+      if (!factIds.has(h) && !items.has(h))
+        errs.push(`sources.yaml: ${s.id}.unlock.has: unknown find "${h}"`);
+  }
   for (const p of c.puzzles.puzzles) {
     need('puzzles.yaml', p.id, rooms, p.room, 'room');
     need('puzzles.yaml', p.id, sources, p.unlocks, 'source');

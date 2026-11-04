@@ -55,8 +55,10 @@ export function planTempo(info: Info, budgetOf: (day: number) => number, beam = 
         .filter((y) => !st.found.has(y));
       const base = apply(st, free);
 
-      const options =
-        day === 1 || profile.movement === 'free' || base.room === null
+      const fixed = reach.guided(day);
+      const options = fixed
+        ? [fixed]
+        : day === 1 || profile.movement === 'free' || base.room === null
           ? [...reach.rooms]
           : [base.room, ...(adj.get(base.room) ?? [])];
       for (const room of options) {

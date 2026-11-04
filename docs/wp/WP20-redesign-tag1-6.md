@@ -6,19 +6,19 @@
 - **`insights.yaml` (neu, nur Server/Autor):** `{id, text, needs?: [id]}`. `needs` bildet die Kette. Der Client sieht sie nie.
 - **Beleg = bestehendes Fact/Statement.** Neues Feld `supports: [insight_id]`. Art (`kind`), Raum, Tag und Aktion stehen schon in `Source` (`talk`, `inspect`, `room`, `days`).
 - **`Source`:** neu `route?: [flur_id]` (nur Tag 1–5 sinnvoll; ohne Angabe gilt es für alle) und `unlock?: {day_from?, asked?: [id], has?: [item]}`. `unlock` gilt für Gesprächsfragen und für Dinge (Brett erscheint erst nach der Schlüsselfrage).
-- **Budget je Tag:** `config/profiles/*.json` bekommt `actions_by_day` (Tag 1: 1, Tag 2–5: 2, danach Profilwert). Keine Zahl im Code.
+- **Budget je Tag:** `config/profiles/*.yaml`: `actions_by_day: {default, days}` (Tag 1: 1, Tag 2–5: 2, danach `default`). Ersetzt `actions_per_day`. Keine Zahl im Code.
 - **Ansehen** liefert einen Kommentar des Detektivs (`look_note`, Beobachtung ohne Urteil). Das ist Inhalt, kein Mechanismus.
 
 ## 2. Zimmer-, Flur- und Routenmodell (1–20 Spieler)
-- Der Fall hat ~8 Gemeinschaftsräume und **3–4 Flure** (`corridors` in `rooms.yaml`). Ein Flur hat ein Zimmer-Vorlagen-Set (`zimmer_template`: Raum mit untersuchbaren Dingen).
-- **Route = Flur.** `routes.yaml`: je Flur der Raum für Tag 2, 3 (Zimmer), 4 und 5 (alle Flure treffen sich in dem Raum, in dem die Schneekugel gezeigt wird). Tag 1 ist für alle die Lobby.
-- **Zuweisung:** Der Spieler bekommt beim Anlegen den nächsten Flur reihum (`corridor` im Spielerstand, gespeichert). Optional kann `config/profiles/*.json` je Spieler `corridor` vorgeben. Ein Spieler: Flur 1.
+- Der Fall hat ~8 Gemeinschaftsräume und **3–4 Flure** (`corridors` in `routes.yaml`). Das Zimmer eines Flurs ist sein Raum an Tag 3 (ein normaler Raum in `rooms.yaml`).
+- **Route = Flur.** `routes.yaml`: je Flur der Raum für Tag 2 bis zum letzten geführten Tag (alle Flure gleich lang und am letzten Tag im selben Raum, bei der Schneekugel). Tag 1 ist für alle der Startraum (Lobby).
+- **Zuweisung:** Der Spieler bekommt beim Anlegen den nächsten Flur reihum (`corridor` im Spielerstand, gespeichert). Ein Spieler: Flur 1. (Eine Vorgabe je Spieler im Profil ist nicht gebaut, D81.)
 - Die Zimmernummer ist nur Anzeige (aus Flur und Reihenfolge erzeugt). Es werden keine 20 Zimmer erfunden. Gäste im selben Flur teilen Weg und Funde.
 - Ab Tag 6: freie Bewegung. Keine Sperrräume, keine Tagestore (D75). Zugang nur über Passwort-Ketten (`Source.lock`, WP18).
 - **Server-Filter:** Die API liefert für Tag 1–5 nur die Quellen des eigenen Flurs. Ab Tag 6 alle.
 
 ## 3. Rolle (Erzählvariante)
-`config/profiles/*.json`: `roles: [{id, name, anrede, intro}]` (Privatdetektiv, Journalist, Polizist, …). Erzähltexte verwenden `{rolle}`/`{anrede}`. Es gibt keinen Spielunterschied. Wahl und Anzeige gehören zu WP21.
+`config/profiles/*.yaml`: `roles: [{id, name, anrede, intro}]` (Privatdetektiv, Journalist, Polizist, …). Erzähltexte verwenden `{rolle}`/`{anrede}`. Es gibt keinen Spielunterschied. Wahl und Anzeige gehören zu WP21.
 
 ## 4. Validator (neu, in `tools/validate-case`)
 1. Jede Erkenntnis hat ≥2 Belege aus verschiedenen Quellen.

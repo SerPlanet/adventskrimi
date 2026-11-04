@@ -20,7 +20,15 @@ const CASE_FILES = {
   newspaper: ['newspaper.yaml', S.NewspaperFile],
   questions: ['questions.yaml', S.QuestionsFile],
   prolog: ['prolog.yaml', S.PrologFile],
+  insights: ['insights.yaml', S.InsightsFile],
+  routes: ['routes.yaml', S.RoutesFile],
 } as const;
+
+/**
+ * Files a case may omit until its content is on the WP20 structure (D81, removal in WP22/WP23):
+ * a missing file reads as empty, which switches the guided days and the insight checks off.
+ */
+const OPTIONAL = new Set(['insights', 'routes']);
 
 export type LoadedCase = {
   [K in keyof typeof CASE_FILES]: z.infer<(typeof CASE_FILES)[K][1]>;
@@ -41,8 +49,11 @@ export function loadCase(dir: string): LoadResult {
     try {
       raw = parse(readFileSync(join(dir, file), 'utf8'));
     } catch (e) {
-      errors.push(`${file}: cannot read/parse (${(e as Error).message.split('\n')[0]})`);
-      continue;
+      if (!(OPTIONAL.has(key) && (e as NodeJS.ErrnoException).code === 'ENOENT')) {
+        errors.push(`${file}: cannot read/parse (${(e as Error).message.split('\n')[0]})`);
+        continue;
+      }
+      raw = {};
     }
     const res = (schema as z.ZodType).safeParse(raw);
     if (res.success) data[key] = res.data;

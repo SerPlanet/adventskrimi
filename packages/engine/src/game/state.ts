@@ -2,6 +2,7 @@ import type { LoadedCase } from '../loader';
 import type { Category, Profile, Scoring } from '../schemas';
 import { buildReach, type Reach } from '../solver/reach';
 import type { FiledEntry } from './file';
+import { corridorFor, startRoom } from './route';
 
 export interface LedgerEntry {
   kind: string;
@@ -45,6 +46,8 @@ export interface PlayerState {
   /** day being played; 25 = all days finished */
   day: number;
   room: string;
+  /** guided route of days 1-5 (WP20); absent when the case has no routes */
+  corridor?: string;
   /** the room left when the last day ended (narrative, 02c §2) */
   prevRoom?: string;
   /** "Genauer untersuchen" used today (budget: game/budget.ts), reset when the day ends */
@@ -94,13 +97,12 @@ export function makeCtx(c: LoadedCase, profile: Profile, scoring: Scoring): Game
   return { c, profile, scoring, reach: buildReach(c, profile) };
 }
 
-/** Day 1 starts in the lobby if the case has one, else in the first room. */
-export function newPlayer(ctx: GameCtx): PlayerState {
-  const rooms = ctx.c.rooms.rooms;
-  const start = rooms.find((r) => r.id === 'lobby') ?? rooms[0];
+/** Day 1 starts in the start room; the n-th player of a game gets the n-th corridor round robin. */
+export function newPlayer(ctx: GameCtx, ordinal = 0): PlayerState {
   return {
     day: 1,
-    room: start?.id ?? '',
+    room: startRoom(ctx.c),
+    corridor: corridorFor(ctx.c, ordinal),
     actionsUsed: 0,
     started: false,
     found: [],

@@ -17,12 +17,22 @@ export const Profile = z.object({
       window_groups: z.record(Id, z.array(Id)).optional(),
     })
     .default({ exclude_facts: [], exclude_sources: [] }),
-  /** budget for "Genauer untersuchen" (02b §1, D62) */
-  actions_per_day: z.object({
+  /** budget for "Genauer untersuchen" (02b §1, D62, D76): `default`, with overrides by day */
+  actions_by_day: z.object({
     default: z.number().int().min(1),
-    /** prolog overrides by day */
-    prolog: z.record(z.coerce.number().pipe(Day), z.number().int().min(1)).default({}),
+    days: z.record(z.coerce.number().pipe(Day), z.number().int().min(1)).default({}),
   }),
+  /** narrative and address variants of the player (D78); no difference in play */
+  roles: z
+    .array(
+      z.object({
+        id: Id,
+        name: z.string().min(1),
+        anrede: z.string().min(1),
+        intro: z.string().min(1),
+      }),
+    )
+    .default([]),
   movement: z.enum(['free', 'neighbors']),
   hints: z.object({ tip_ladder: z.boolean().default(true), max_tips: z.number().int().default(2) }),
   early_accusation: z.boolean(),
@@ -45,6 +55,8 @@ export const Scoring = z.object({
     puzzle_hint: NonNeg,
   }),
   prolog_mini_case: NonNeg,
+  /** newspaper puzzle solved after its calendar day: points times this factor (D77) */
+  newspaper_puzzle_late_factor: z.number().min(0).max(1),
   first_discoverer: NonNeg,
   report_card: z.object({ per_category: NonNeg, days: z.array(Day).min(1) }),
   finale: z.object({ who: NonNeg, accomplice: NonNeg, when: NonNeg, where: NonNeg, proof: NonNeg }),
@@ -71,6 +83,15 @@ export const Quality = z.object({
     random_median_max_candidates: z.number().int(),
     casual_median_max_candidates: z.number().int(),
     worst_max_candidates: z.number().int(),
+  }),
+  /** insight evidence checks (WP20): proofs per insight, random-sample solvability */
+  insights: z.object({
+    min_proofs: z.number().int().min(1),
+    sample_share: z.number().min(0).max(1),
+    sample_runs: z.number().int().min(1),
+    sample_min_success: z.number().min(0).max(1),
+    /** words and phrases a proof must not contain (it never names a verdict, 02b §3) */
+    verdict_words: z.array(z.string().min(1)).min(1),
   }),
   mind_share_min: z.number().min(0).max(1),
   daily_minutes_max: z.number(),

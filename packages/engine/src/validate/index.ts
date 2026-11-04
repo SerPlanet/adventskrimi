@@ -11,6 +11,7 @@ import {
   checkUnique,
 } from './content';
 import { checkExplore } from './explore';
+import { checkInsights } from './insights';
 import { checkLocks } from './locks';
 import { checkPaper } from './paper';
 import { checkPlan } from './plan';
@@ -46,6 +47,7 @@ export function runChecks(
     plan: () => checkPlan(c),
     paper: () => checkPaper(c, quality),
     locks: () => checkLocks(c, quality),
+    insights: () => checkInsights(c, profile, quality),
   };
   return CHECK_NAMES.filter((n) => !only || n === only).map((n) => all[n]());
 }

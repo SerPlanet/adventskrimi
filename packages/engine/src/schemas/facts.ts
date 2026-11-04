@@ -26,6 +26,8 @@ const Tags = {
   reinterpreted_on: Day.optional(),
   /** a relation between figures that the case tells as a story, never names (02c §3) */
   relation: z.string().optional(),
+  /** insights this find is a proof (Beleg) of (WP20); the validator needs at least two per insight */
+  supports: z.array(Id).default([]),
 };
 
 export const Fact = z.intersection(z.object({ id: Id, text: CardText, ...Tags }), FactBody);
@@ -50,6 +52,19 @@ export const Source = z.object({
   topic: Id.optional(),
   days: Days,
   requires: Id.optional(),
+  /** days 1-5 only: the corridors that find this; absent = all. From day 6 everybody can use it. */
+  route: z.array(Id).min(1).optional(),
+  /**
+   * The thing or question does not exist for the player until this holds (WP20): from a day,
+   * after other sources were found (`asked`: source ids) or after finds were made (`has`).
+   */
+  unlock: z
+    .object({
+      day_from: Day.optional(),
+      asked: z.array(Id).default([]),
+      has: z.array(Id).default([]),
+    })
+    .optional(),
   /** fact or statement ids */
   yields: z.array(Id).min(1),
   /** neutral first-discoverer title, must not reveal place or content */

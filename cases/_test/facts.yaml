@@ -23,6 +23,7 @@ facts:
     }
   - {
       id: f_cora_keller,
+      supports: [i_keller],
       text: Cora war in der zweiten Nachthälfte im Keller.,
       type: presence,
       person: cora,
@@ -37,9 +38,38 @@ facts:
     state: offen
     effect: { category: where, excludes: [halle] }
   - id: f_lampe_an
+    supports: [i_halle]
     text: Die Lampe in der Halle brannte in der ersten Nachthälfte. Es war alles ruhig.
     type: object_state
     object: lampe
     window: w1
     state: an
     effect: { category: when, excludes: [w1] }
+  - id: f_a1
+    text: Anna war in der ersten Nachthälfte in der Halle.
+    type: presence
+    person: anna
+    window: w1
+    room: halle
+    supports: [i_halle]
+  - id: f_a2
+    text: Cora war in der ersten Nachthälfte in der Halle.
+    type: presence
+    person: cora
+    window: w1
+    room: halle
+    supports: [i_halle]
+  - id: f_b1
+    text: Anna war in der zweiten Nachthälfte in der Halle.
+    type: presence
+    person: anna
+    window: w2
+    room: halle
+    supports: [i_halle]
+  - id: f_b2
+    text: Ben war in der ersten Nachthälfte im Keller.
+    type: presence
+    person: ben
+    window: w1
+    room: keller
+    supports: [i_keller]

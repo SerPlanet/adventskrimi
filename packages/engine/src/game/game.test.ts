@@ -70,7 +70,7 @@ describe('only new finds change anything', () => {
   });
 
   test('talking has no limit: a second new find in a row works', () => {
-    const one = resolveAction(newPlayer(ctx), ctx, talkAnna).state;
+    const one = resolveAction(at(3, 'halle'), ctx, talkAnna).state;
     const r = resolveAction(one, ctx, { type: 'talk', npc: 'cora', topic: 'nacht' });
     expect(r.result.status).toBe('found');
   });
@@ -131,26 +131,27 @@ describe('movement', () => {
         scene: 'dach',
       });
     });
-    const st = newPlayer(c2);
+    const st = at(3, 'halle', newPlayer(c2));
     expect(endDay(st, c2, 'dach')).toEqual({ ok: false, reason: 'too_far' });
     expect(endDay(st, c2, 'nirgends')).toEqual({ ok: false, reason: 'bad_room' });
   });
 
   test('event block for tomorrow prevents entering a room', () => {
     const c2 = mk((c) => {
-      c.events.events.find((e) => e.day === 2)!.blocked_rooms = ['keller'];
+      c.events.events.push({ ...c.events.events[0]!, day: 4, blocked_rooms: ['keller'] });
     });
-    expect(nextRooms(newPlayer(c2), c2)).not.toContain('keller');
-    expect(endDay(newPlayer(c2), c2, 'keller')).toEqual({ ok: false, reason: 'blocked' });
+    const st = at(3, 'halle', newPlayer(c2));
+    expect(nextRooms(st, c2)).not.toContain('keller');
+    expect(endDay(st, c2, 'keller')).toEqual({ ok: false, reason: 'blocked' });
   });
 
   test('ending the day moves on in order; skipping keeps the position', () => {
-    const played = resolveAction(newPlayer(ctx), ctx, talkAnna).state;
+    const played = resolveAction(at(3, 'halle'), ctx, talkAnna).state;
     const r = endDay(played, ctx, 'keller');
-    expect(r.ok && r.state.day).toBe(2);
+    expect(r.ok && r.state.day).toBe(4);
     expect(r.ok && r.state.room).toBe('keller');
     expect(r.ok && r.state.actionsUsed).toBe(0);
-    const skip = endDay(newPlayer(ctx), ctx);
+    const skip = endDay(at(3, 'halle'), ctx);
     expect(skip.ok && skip.state.room).toBe('halle');
   });
 
@@ -160,7 +161,7 @@ describe('movement', () => {
       include: { exclude_facts: [], exclude_sources: [] },
     };
     const c2 = makeCtx(applyProfile(res.data, family), family, scoring);
-    expect(nextRooms(newPlayer(c2), c2).sort()).toEqual(['halle', 'keller']);
+    expect(nextRooms(at(3, 'halle', newPlayer(c2)), c2).sort()).toEqual(['halle', 'keller']);
   });
 });
 
@@ -274,8 +275,8 @@ describe('action budget: only examining costs, and only with a new find (D62)', 
   const lamp2: Action = { type: 'inspect', object: 'lampe' };
 
   test('budget comes from the profile, prolog days override', () => {
-    expect(budgetOf(ctx, 1)).toBe(friends.actions_per_day.prolog[1]);
-    expect(budgetOf(ctx, 20)).toBe(friends.actions_per_day.default);
+    expect(budgetOf(ctx, 1)).toBe(friends.actions_by_day.days[1]);
+    expect(budgetOf(ctx, 20)).toBe(friends.actions_by_day.default);
   });
 
   test('talking and a known or empty examination cost nothing, a new find costs one', () => {
@@ -314,7 +315,6 @@ describe('action budget: only examining costs, and only with a new find (D62)', 
 describe('full run, day 1 to 24 on the test case', () => {
   test('a bot plays every day in order without breaking any invariant', () => {
     let st = newPlayer(ctx);
-    const rooms = ctx.c.rooms.rooms.map((r) => r.id);
     const actions: Action[] = ctx.c.sources.sources.flatMap((s): Action[] => {
       if (s.kind === 'talk') return [{ type: 'talk', npc: s.npc!, topic: s.topic! }];
       if (s.kind === 'inspect') return [{ type: 'inspect', object: s.object! }];
@@ -326,7 +326,8 @@ describe('full run, day 1 to 24 on the test case', () => {
       st = readNewspaper(st, ctx).state;
       for (const p of ctx.c.puzzles.puzzles) st = solvePuzzle(st, ctx, p.id, p.answer).state;
       for (const a of actions) st = resolveAction(st, ctx, a).state;
-      const r = endDay(st, ctx, rooms[day % rooms.length]);
+      const options = nextRooms(st, ctx);
+      const r = endDay(st, ctx, options[day % options.length]);
       if (!r.ok) throw new Error(r.reason);
       st = r.state;
     }

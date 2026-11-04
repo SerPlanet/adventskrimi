@@ -82,6 +82,9 @@ async function loadCaseData(sql: Sql | Q, caseId: string): Promise<LoadedCase> {
     newspaper: paper[0],
     questions: { questions },
     prolog: prolog[0],
+    // a case loaded before WP20 has neither: no insights, no guided days
+    insights: { insights: meta.data.insights ?? [] },
+    routes: { corridors: meta.data.routes ?? [] },
   } as unknown as LoadedCase;
   caseCache.set(caseId, { at: Date.now(), data });
   return data;

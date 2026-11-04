@@ -12,6 +12,7 @@ import {
   dailyView,
   canPlayDay,
   dayOf,
+  existsFor,
   narrativeOf,
   nextRooms,
   questionOfDay,
@@ -105,26 +106,44 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       scene: room.scene,
       blocked: blockedToday,
       book: hasBook && !blockedToday,
-      objects: room.objects.map((o) => ({
-        id: o.id,
-        name: o.name,
-        text: o.text,
-        klasse: classOf(o, c),
-        lock: lockOf(st, ctx, o.id),
-        spot: o.spot,
-        prop: o.prop,
-        scale: o.scale,
-        layer: o.layer,
-        // state of the thing: opened once everything its inspect sources hold has been found
-        explored: c.sources.sources
-          .filter((x) => x.kind === 'inspect' && x.object === o.id)
-          .some((x) => x.yields.length > 0 && x.yields.every((y) => st.found.includes(y))),
-      })),
+      // a thing exists for the player once one of its sources does (WP20: route, unlock)
+      objects: room.objects
+        .filter((o) => {
+          const mine = c.sources.sources.filter((x) => x.object === o.id);
+          return !mine.length || mine.some((x) => existsFor(x, st, ctx));
+        })
+        .map((o) => ({
+          id: o.id,
+          name: o.name,
+          text: o.text,
+          look_note: o.look_note,
+          klasse: classOf(o, c),
+          lock: lockOf(st, ctx, o.id),
+          spot: o.spot,
+          prop: o.prop,
+          scale: o.scale,
+          layer: o.layer,
+          // state of the thing: opened once everything its inspect sources hold has been found
+          explored: c.sources.sources
+            .filter((x) => x.kind === 'inspect' && x.object === o.id)
+            .some((x) => x.yields.length > 0 && x.yields.every((y) => st.found.includes(y))),
+        })),
       npcs: blockedToday
         ? []
         : c.npcs.npcs
             .filter((n) => (n.schedule as Record<number, string>)[st.day] === st.room)
-            .map((n) => ({ id: n.id, name: n.name, role: n.role, topics: n.topics })),
+            .map((n) => ({
+              id: n.id,
+              name: n.name,
+              role: n.role,
+              // a question exists once one of its answers does (WP20: unlock)
+              topics: n.topics.filter((t) => {
+                const mine = c.sources.sources.filter(
+                  (x) => x.kind === 'talk' && x.npc === n.id && x.topic === t.id,
+                );
+                return !mine.length || mine.some((x) => existsFor(x, st, ctx));
+              }),
+            })),
     },
     map: {
       rooms: c.rooms.rooms.map((r) => ({

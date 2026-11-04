@@ -1,0 +1,4 @@
+# Test corridors: both guide day 2 into the hall and meet there (WP20 §2)
+corridors:
+  - { id: a, route: { 2: halle } }
+  - { id: b, route: { 2: halle } }

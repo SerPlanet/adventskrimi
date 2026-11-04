@@ -28,7 +28,7 @@ describe('narrative of the day (02c §2)', () => {
   });
 
   test('later days name the room left and the room entered, with an echo of the last find', () => {
-    let st = resolveAction(newPlayer(ctx), ctx, {
+    let st = resolveAction({ ...newPlayer(ctx), day: 3 }, ctx, {
       type: 'talk',
       npc: 'anna',
       topic: 'nacht',

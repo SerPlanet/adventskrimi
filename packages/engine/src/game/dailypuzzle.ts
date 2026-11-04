@@ -35,13 +35,14 @@ export function submitDaily(
   ctx: GameCtx,
   puzzle: DailyPuzzle,
   attempt: string,
+  late = false,
 ): { state: PlayerState; outcome: DailyOutcome } {
   const p = progressOf(st, puzzle.level);
   if (p.done) return { state: st, outcome: 'already_done' };
   const correct = checkDaily(puzzle, attempt);
   const next = put(st, { ...p, attempts: p.attempts + 1, solved: correct, done: correct });
   return {
-    state: correct ? awardDailyPuzzle(next, ctx, true, p.hints > 0) : next,
+    state: correct ? awardDailyPuzzle(next, ctx, true, p.hints > 0, late) : next,
     outcome: correct ? 'correct' : 'wrong',
   };
 }

@@ -1,5 +1,6 @@
 statements:
   - id: s_ben_keller
+    supports: [i_keller]
     npc: ben
     text: Ich war die ganze Nacht im Keller.
     claims: [{ type: presence, person: ben, window: w2, room: keller }]

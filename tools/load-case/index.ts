@@ -101,6 +101,9 @@ try {
       doors: c.rooms.doors,
       outside: c.rooms.outside,
       stairs: c.rooms.stairs,
+      // WP20: the chain of insights and the guided routes (server only, no extra table needed)
+      insights: c.insights.insights,
+      routes: c.routes.corridors,
     }),
   ];
   const known = await client.query('select 1 from case_meta where case_id = $1', [c.case.id]);
