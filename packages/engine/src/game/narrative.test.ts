@@ -69,9 +69,9 @@ describe.runIf(existsSync(join(ROOT, 'cases/berghotel')))('narrative on the real
       const finds = [...c.facts.facts, ...c.statements.statements].map((f) => f.text);
       for (const room of ctx.c.rooms.rooms)
         for (let day = 1; day <= 24; day++) {
-          const text = narrativeOf(
-            { ...newPlayer(ctx), day, room: room.id, prevRoom: room.id },
-            ctx,
+          const text = fillRole(
+            narrativeOf({ ...newPlayer(ctx), day, room: room.id, prevRoom: room.id }, ctx),
+            { name: 'Detektiv', anrede: 'Detektiv' },
           );
           expect(text).not.toContain('{');
           for (const f of finds) expect(text).not.toContain(f);

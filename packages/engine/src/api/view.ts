@@ -328,6 +328,8 @@ const startSalt = (tx: GameTx) => tx.game.slug;
 function claimOf(f: FactBody): FactBody {
   // strip id/text/tags: only the structural claim is needed for grid and timeline
   switch (f.type) {
+    case 'story':
+      return { type: 'story' };
     case 'presence':
     case 'absence':
       return { type: f.type, person: f.person, window: f.window, room: f.room };

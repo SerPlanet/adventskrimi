@@ -98,7 +98,9 @@ export function checkRefs(c: LoadedCase): string[] {
     need('world.yaml', `crime.${k}`, set, cr[k], k);
 
   const checkBody = (file: string, where: string, b: FactBody) => {
-    if (b.type === 'presence' || b.type === 'absence') {
+    if (b.type === 'story') {
+      // nothing to refer to
+    } else if (b.type === 'presence' || b.type === 'absence') {
       need(file, where, npcs, b.person, 'npc');
       need(file, where, windows, b.window, 'window');
       need(file, where, rooms, b.room, 'room');

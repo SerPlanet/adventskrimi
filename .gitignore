@@ -14,3 +14,6 @@ cases/berghotel/
 supabase/functions/_shared/engine.js
 test-results
 playwright-report
+
+# Archiv des alten Falls (Backup vor WP22, enthält die alte Lösung)
+cases/_archiv-berghotel-alt/

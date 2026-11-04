@@ -3,6 +3,8 @@ import { CardText, Category, Day, Days, Id, listFile } from './common';
 
 /** Solver-capable fact bodies (docs/04 §4). Shared by facts and statement claims. */
 export const FactBody = z.discriminatedUnion('type', [
+  /** a find of the story (motive, relation, arrival): no effect on the candidates, only evidence for an insight */
+  z.object({ type: z.literal('story') }),
   z.object({ type: z.literal('presence'), person: Id, window: Id, room: Id }),
   z.object({ type: z.literal('absence'), person: Id, window: Id, room: Id }),
   z.object({ type: z.literal('exclusion'), category: Category, candidate: Id }),

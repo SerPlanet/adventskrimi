@@ -2,10 +2,6 @@ id: family
 name: Familie
 # Subset of the full case (WP10).
 include:
-  rooms: [lobby, speisesaal, kueche, salon, bibliothek, keller]
-  npcs: [leitung, empfang, koch, sammler, magier]
-  exclude_facts: [f_empfang_w4]
-  exclude_sources: [i_uhrtuer]
   window_groups:
     w1: [w1, w2]
     w3: [w3, w4]
@@ -33,4 +29,4 @@ early_accusation_from_day: 20
 rumor_min_players: 3
 crowd_share: 0.5
 chess: false
-max_liars: 5
+max_liars: 7

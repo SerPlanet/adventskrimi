@@ -1,16 +1,16 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20 und WP21 erledigt**. **Nächstes Work Package: WP22.** Danach WP23 → WP13 Teil 2 (Menschen-Test) → WP14 (Launch). Code-Freeze 29.11., Start 1.12.
+Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20, WP21 und WP22 erledigt**. **Nächstes Work Package: WP23.** Danach → WP13 Teil 2 (Menschen-Test) → WP14 (Launch). Code-Freeze 29.11., Start 1.12.
 
 ## Nächste Work Packages
 | WP | Inhalt | Datei |
 |---|---|---|
-| WP22 | Inhalt Tag 1–5 (Sub-Agent), danach `insights.yaml`/`routes.yaml` für Berghotel | `docs/wp/WP22-inhalt-tag1-5.md` |
 | WP23 | Inhalt ab Tag 6 (Sub-Agent) | `docs/wp/WP23-inhalt-ab-tag6.md` |
 
 ## Erledigt (Kurzform, Details in `git log` und den WP-Dateien)
 - WP00–WP12, WP15–WP19: Engine, Schemas, Solver, Validator, Simulator, Edge Functions, Frontend, Rätsel, Raster, Zeitstrahl, Zeugnis, Anklage, Erkunden-Kern, Akte, Dialog, Schlösser, Zeitung, Verwaltung, A11y, `knip`.
 - WP13 Teil 1: `npm run timelapse` (beide Profile × 1/2/4/20 Spieler) ohne Fehler. `balance` grün, Lösetag 20.
+- WP22: Neuer Fall Berghotel Edelweiß (7 Figuren, 3 Flure, 12 Räume), Lösung lokal festgelegt (nur in `cases/berghotel/`), Tag 1–5 geschrieben (87 Quellen, 10 Erkenntnisse mit 7–10 Belegen, Typ `story`, Dialoge mit Folgefragen und `unlock`). `validate-case` grün für beide Profile (mit `quality.override.json`), Lösetag 17. Backup des alten Falls: `cases/_archiv-berghotel-alt/` (lokal).
 - WP21: Gute-Nacht-Screen (`GoodNight`), „Zum nächsten Tag“ → Erzähltext → Zeitung, Späträtsel mit Faktor („zählt 75 %“), EndDay ohne Raumliste auf geführten Tagen, Rollenwahl (`RoleCard`, Einstellung `role`), Plan und Orte nur mit eigenem Weg, `movement` entfernt (D82). Playwright (13), Lighthouse 100 grün; Browser-Abnahme Tag 1, Tag 2, Nachholer auf Staging (`_test`).
 - WP20: Erkenntnisse (`insights.yaml`, `supports`), Flure (`routes.yaml`, reihum, geführte Tage), `Source.route`/`unlock`, `actions_by_day`, Späträtsel-Faktor, `roles` im Profil, Validator `insights` (Regeln 1–8), Solver mit Flur. Test nur mit `cases/_test`.
 
@@ -22,8 +22,7 @@ Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20 und WP21 erledigt*
 
 ## Bekannt
 - Ein Spiel kopiert Profil und Punkte beim Anlegen (D64): nach Änderungen an `config/` (z. B. `actions_by_day`, `newspaper_puzzle_late_factor`) Staging-Spiele neu anlegen.
-- Berghotel hat noch kein `insights.yaml`/`routes.yaml` (D81): keine geführten Tage, Validator `insights` übersprungen. `balance` ist grün, rechnet aber noch mit dem alten Fall (Budget Tag 4–5 jetzt 2 statt 3). Neu kalibrieren erst nach WP22/WP23.
-- `balance` Freunde ist rot seit D82 (freie Bewegung, worst-Bot Berghotel). Neu kalibrieren in WP23.
+- `cases/berghotel/quality.override.json` lockert Lügennetz, Tempo-Fenster und Mindestzahlen bis WP23 (D84); `insights.yaml`/`routes.yaml` sind jetzt da, die Optional-Regel (D81) fällt in WP23. `balance` ist rot (Bots finden mit dem Teilfall Tag 1–5 plus Skelett der Tatnacht keine eindeutige Lösung), Neu-Kalibrierung in WP23. Der neue Fall ist noch nicht auf Staging geladen.
 - **Staging-Spiele `freunde` und `familie` haben noch den alten Profil-Snapshot (ohne `actions_by_day`, `roles`): sie laufen mit den deployten Functions nicht, bis ihr `config` neu geschrieben wird (D64). Die Änderung wurde mir verweigert; siehe „Mensch“.**
 - `test:int` hat keine Testdateien mehr (seit WP13); Bundle baut, Functions sind auf Staging deployt (Stand WP21). Staging-Spiel `e2e-wp20` (Fall `test`) ist ein Rest und darf gelöscht werden.
 - Prod: Migrationen 0000–0300 angewendet, kein Fall geladen, keine Functions deployt, `SUPABASE_PROD_ANON_KEY` fehlt. Neue Fall-Felder liegen in `case_meta.data`, keine Migration nötig.

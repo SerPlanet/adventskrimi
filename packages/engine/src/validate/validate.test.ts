@@ -248,3 +248,37 @@ describe('insight checks (WP20 §4)', () => {
     );
   });
 });
+
+describe('story finds (WP22)', () => {
+  test('a story fact and a story statement change no candidate and break no check', () => {
+    const c = structuredClone(good);
+    c.facts.facts.push({
+      id: 'f_story',
+      text: 'Der Laden der Brüder wurde im Herbst überfallen.',
+      type: 'story',
+      red_herring: false,
+      supports: [],
+    });
+    c.statements.statements.push({
+      id: 's_story',
+      npc: 'anna',
+      text: 'Ich komme erst am Sechsten.',
+      claims: [{ type: 'story' }],
+      truth: false,
+      red_herring: false,
+      supports: [],
+    });
+    c.sources.sources.push({
+      id: 'src_story',
+      kind: 'newspaper',
+      days: [1],
+      yields: ['f_story', 's_story'],
+    });
+    const failed = runChecks(c, friends, quality)
+      .filter((r) => !r.ok)
+      .map((r) => r.name);
+    expect(failed).not.toContain('truth');
+    expect(failed).not.toContain('unique');
+    expect(failed).not.toContain('refute');
+  });
+});

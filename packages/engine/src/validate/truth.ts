@@ -8,6 +8,8 @@ type Sol = Record<'who' | 'accomplice' | 'when' | 'where', string>;
 function holds(b: FactBody, c: LoadedCase): boolean | undefined {
   const sol = c.case.solution as Sol;
   switch (b.type) {
+    case 'story':
+      return true;
     case 'presence':
     case 'absence': {
       const at = c.world.positions[b.person]?.[b.window];
@@ -45,6 +47,7 @@ export function checkTruth(c: LoadedCase): CheckResult {
     else if (!h) errors.push(`fact ${f.id}: contradicts the world`);
   }
   for (const s of c.statements.statements) {
+    if (s.claims.every((cl) => cl.type === 'story')) continue; // its truth is told by the story
     const results = s.claims.map((cl) => holds(cl, c));
     if (results.includes(undefined))
       errors.push(`statement ${s.id}: claim not decidable from world.yaml`);

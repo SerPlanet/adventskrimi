@@ -64,7 +64,10 @@ function refutations(info: Info): Map<string, string | undefined> {
   const consistent = combine(info, reachable);
   const facts = info.c.facts.facts.filter((f) => reachable.has(f.id));
   const out = new Map<string, string | undefined>();
-  for (const s of info.c.statements.statements.filter((x) => !x.truth)) {
+  for (const s of info.c.statements.statements.filter(
+    // a story statement (no structural claim) is refuted by the evidence of the story, not here
+    (x) => !x.truth && x.claims.some((cl) => cl.type !== 'story'),
+  )) {
     let why: string | undefined;
     for (const cl of s.claims) {
       const direct = facts.find((f) => conflicts(cl, f));
