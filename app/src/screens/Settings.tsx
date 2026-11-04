@@ -3,7 +3,8 @@ import { useSession } from '../store';
 /** Einstellungen. Changes are saved at once; "Spieler wechseln" goes back to the name tiles. */
 export function Settings() {
   const { view, saveSettings, logout } = useSession();
-  const s = view?.player.settings ?? {};
+  if (!view) return null;
+  const s = view.player.settings;
   const save = (patch: Record<string, unknown>) => void saveSettings(patch);
 
   return (
@@ -21,6 +22,22 @@ export function Settings() {
             <option value="xl">Sehr groß</option>
           </select>
         </label>
+        {view.roles.length > 0 && (
+          <label>
+            Rolle (bis zum Ende von Tag 1)
+            <select
+              value={view.role.id}
+              disabled={view.role_locked}
+              onChange={(e) => save({ role: e.target.value })}
+            >
+              {view.roles.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label>
           Dunkelmodus
           <select

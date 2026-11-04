@@ -6,6 +6,7 @@ import { Pick } from './screens/Pick';
 import { Newspaper } from './screens/Newspaper';
 import { Tag } from './screens/Tag';
 import { Intro } from './screens/Intro';
+import { RoleCard } from './screens/RoleCard';
 import { Dossier } from './screens/Dossier';
 import { Theory } from './screens/Theory';
 import { Ranking } from './screens/Ranking';
@@ -81,7 +82,12 @@ export function App({ slug, tab: route }: { slug: string; tab: string }) {
     ended === null &&
     Number(memory.get(introKey) ?? 0) < view.day;
 
+  // on day 1 the player first says who they are, if the profile offers roles (D78)
+  const askRole =
+    showIntro && view?.day === 1 && view.roles.length > 0 && !view.role_chosen && !view.role_locked;
+
   const screen = (() => {
+    if (askRole) return <RoleCard />;
     switch (route) {
       case 'tag':
         return <Tag onNext={() => go('')} />;

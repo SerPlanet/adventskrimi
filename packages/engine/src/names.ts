@@ -8,6 +8,8 @@ import { Id } from './schemas';
  *   {anrede:<npc_id>}  form of address, falls back to the name
  */
 export const PLACEHOLDER = /\{(n|anrede):([a-z0-9_]+)\}/g;
+/** Placeholders of the player's role (D78): {rolle} = role name, {anrede} = form of address. */
+const ROLE_PLACEHOLDER = /\{(rolle|anrede)\}/g;
 const ANY_BRACES = /\{[^{}]*\}/g;
 
 export const NamesFile = z.object({
@@ -23,6 +25,21 @@ export function renderText(text: string, names: Names, defaults: Record<string, 
     if (name === undefined) return m;
     return kind === 'anrede' ? (names[id]?.anrede ?? name) : name;
   });
+}
+
+/** Every string inside `v` with the role placeholders filled (deep copy). */
+export function fillRole<T>(v: T, role: { name: string; anrede: string }): T {
+  const walk = (x: unknown): unknown => {
+    if (typeof x === 'string')
+      return x.replace(ROLE_PLACEHOLDER, (_m, k: string) =>
+        k === 'rolle' ? role.name : role.anrede,
+      );
+    if (Array.isArray(x)) return x.map(walk);
+    if (x && typeof x === 'object')
+      return Object.fromEntries(Object.entries(x).map(([k, y]) => [k, walk(y)]));
+    return x;
+  };
+  return walk(v) as T;
 }
 
 /** Every string inside `v` rendered (deep copy). For content that may still hold placeholders. */
@@ -60,6 +77,7 @@ export function placeholderErrors(c: LoadedCase): string[] {
   const walk = (v: unknown, path: string) => {
     if (typeof v === 'string') {
       for (const b of v.match(ANY_BRACES) ?? []) {
+        if (b === '{rolle}' || b === '{anrede}') continue;
         const m = /^\{(n|anrede):([a-z0-9_]+)\}$/.exec(b);
         const problem = !m
           ? 'malformed placeholder'

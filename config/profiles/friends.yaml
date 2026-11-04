@@ -3,7 +3,19 @@ name: Freunde
 actions_by_day:
   default: 4
   days: { 1: 1, 2: 2, 3: 2, 4: 2, 5: 2 }
-movement: neighbors
+roles:
+  - id: privatdetektiv
+    name: Privatdetektiv
+    anrede: Detektiv
+    intro: Du reist als Privatdetektiv an. Dein Blick für Kleinigkeiten ist dein wichtigstes Werkzeug.
+  - id: journalist
+    name: Journalist
+    anrede: Journalist
+    intro: Du reist als Journalist an. Du willst die Geschichte hinter den Geschichten finden.
+  - id: polizist
+    name: Polizist
+    anrede: Kommissar
+    intro: Du reist als Polizist an, eigentlich im Urlaub. Das Hinsehen kannst du trotzdem nicht lassen.
 hints: { tip_ladder: true, max_tips: 2 }
 early_accusation: true
 early_accusation_from_day: 20

@@ -24,10 +24,9 @@ const key = (s: State) => `${s.room}|${[...s.found].sort().join(',')}`;
  * "too late" ones may be pessimistic. The interface is stable; WP03 may swap the internals.
  */
 export function planTempo(info: Info, budgetOf: (day: number) => number, beam = 40): TempoResult {
-  const { c, reach, masks, profile } = info;
+  const { c, reach, masks } = info;
   const sources = c.sources.sources;
   const puzzleRoom = new Map(c.puzzles.puzzles.map((p) => [p.id, p.room]));
-  const adj = new Map(c.rooms.rooms.map((r) => [r.id, r.neighbors]));
   const remainingByDay: Record<number, number> = {};
 
   const apply = (s: State, ids: string[]): State => {
@@ -56,11 +55,7 @@ export function planTempo(info: Info, budgetOf: (day: number) => number, beam = 
       const base = apply(st, free);
 
       const fixed = reach.guided(day);
-      const options = fixed
-        ? [fixed]
-        : day === 1 || profile.movement === 'free' || base.room === null
-          ? [...reach.rooms]
-          : [base.room, ...(adj.get(base.room) ?? [])];
+      const options = fixed ? [fixed] : [...reach.rooms];
       for (const room of options) {
         if (reach.blocked(room, day) || !reach.rooms.has(room)) continue;
         let cur: State = { ...base, room };

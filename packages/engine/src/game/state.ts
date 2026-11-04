@@ -94,7 +94,7 @@ export interface GameCtx {
 }
 
 export function makeCtx(c: LoadedCase, profile: Profile, scoring: Scoring): GameCtx {
-  return { c, profile, scoring, reach: buildReach(c, profile) };
+  return { c, profile, scoring, reach: buildReach(c) };
 }
 
 /** Day 1 starts in the start room; the n-th player of a game gets the n-th corridor round robin. */

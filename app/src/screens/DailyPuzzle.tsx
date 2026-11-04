@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from '../store';
 
-type Daily = NonNullable<ReturnType<typeof useSession>['view']>['daily_puzzle'];
+type Daily = NonNullable<ReturnType<typeof useSession>['view']>['daily_puzzles'][number];
 
 const LEVEL = { easy: 'leicht', medium: 'mittel', hard: 'schwer' } as const;
 
@@ -70,15 +70,18 @@ function Sudoku({
   );
 }
 
-/** One frame for all kinds: prompt, play field, tip, skip, check. Wrong answers cost nothing. */
-export function DailyPuzzle() {
+/**
+ * One frame for all kinds: prompt, play field, tip, skip, check. Wrong answers cost nothing.
+ * The puzzle of an earlier newspaper stays solvable; after its day it counts a share (D77).
+ */
+export function DailyPuzzle({ day }: { day: number }) {
   const { view, daily, busy } = useSession();
-  const p = view?.daily_puzzle as Daily;
+  const p = view?.daily_puzzles.find((d) => d.day === day) as Daily | undefined;
   const [text, setText] = useState('');
   const [cells, setCells] = useState<number[]>([]);
   const [rooms, setRooms] = useState<string[]>([]);
   const [msg, setMsg] = useState('');
-  const key = p ? `${p.kind}:${p.level}:${view?.day}` : '';
+  const key = p ? `${p.kind}:${p.level}:${day}` : '';
 
   useEffect(() => {
     if (!p) return;
@@ -100,7 +103,7 @@ export function DailyPuzzle() {
         : text.trim() !== '';
 
   const check = async () => {
-    const r = await daily('check', attempt);
+    const r = await daily(day, 'check', attempt);
     setMsg(
       r?.outcome === 'correct'
         ? 'Richtig! Das hast du gut gelöst.'
@@ -113,8 +116,15 @@ export function DailyPuzzle() {
   return (
     <section className="card" aria-labelledby="dp-title">
       <h2 id="dp-title">
-        Rätsel des Tages: {p.title} <small>({LEVEL[p.level]})</small>
+        {p.late ? `Rätsel von Tag ${day}` : 'Rätsel des Tages'}: {p.title}{' '}
+        <small>({LEVEL[p.level as keyof typeof LEVEL]})</small>
       </h2>
+      {p.late && !closed && (
+        <p className="small" role="note">
+          Dieses Rätsel ist von einem früheren Tag. Du kannst es jederzeit lösen, es zählt{' '}
+          {view?.late_percent} % der Punkte.
+        </p>
+      )}
       <p>{p.prompt}</p>
 
       {p.kind === 'sudoku' && (
@@ -170,16 +180,14 @@ export function DailyPuzzle() {
         </label>
       )}
 
-      {p.hints.map((h, i) => (
+      {p.hints.map((h: string, i: number) => (
         <p key={h}>
           💡 Tipp {i + 1}: {h}
         </p>
       ))}
       {p.solution && <p>🔑 Lösung: {p.solution}</p>}
       {closed ? (
-        <p role="status">
-          {p.solved ? '✅ Gelöst.' : 'Das Rätsel ist beendet. Morgen gibt es ein neues.'}
-        </p>
+        <p role="status">{p.solved ? '✅ Gelöst.' : 'Das Rätsel ist beendet.'}</p>
       ) : (
         <>
           <div className="row wrap">
@@ -189,12 +197,12 @@ export function DailyPuzzle() {
             <button
               disabled={busy}
               onClick={async () =>
-                setMsg((await daily('hint'))?.solution ? 'Hier ist die Lösung.' : '')
+                setMsg((await daily(day, 'hint'))?.solution ? 'Hier ist die Lösung.' : '')
               }
             >
               {p.hints.length === 0 ? 'Tipp 1' : p.hints.length === 1 ? 'Tipp 2' : 'Lösung zeigen'}
             </button>
-            <button className="link" disabled={busy} onClick={() => void daily('skip')}>
+            <button className="link" disabled={busy} onClick={() => void daily(day, 'skip')}>
               Überspringen
             </button>
           </div>

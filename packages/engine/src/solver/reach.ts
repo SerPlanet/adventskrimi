@@ -1,6 +1,6 @@
 import type { LoadedCase } from '../loader';
 import { guidedRoom, sourceOnRoute } from '../game/route';
-import { expandDays, type Profile } from '../schemas';
+import { expandDays } from '../schemas';
 
 /** Where and when a source can be used, given schedules, events and the room graph. */
 export interface Reach {
@@ -16,25 +16,10 @@ export interface Reach {
 }
 
 /** With a `corridor`, the days of the guided phase only offer what lies on that corridor's way. */
-export function buildReach(c: LoadedCase, profile: Profile, corridor?: string): Reach {
+export function buildReach(c: LoadedCase, corridor?: string): Reach {
   const roomIds = c.rooms.rooms.map((r) => r.id);
-  const adj = new Map<string, Set<string>>(roomIds.map((r) => [r, new Set()]));
-  for (const r of c.rooms.rooms)
-    for (const n of r.neighbors) {
-      adj.get(r.id)?.add(n);
-      adj.get(n)?.add(r.id);
-    }
-  const rooms = new Set<string>();
-  if (profile.movement === 'free') roomIds.forEach((r) => rooms.add(r));
-  else if (roomIds[0]) {
-    const stack = [roomIds[0]];
-    while (stack.length) {
-      const r = stack.pop() as string;
-      if (rooms.has(r)) continue;
-      rooms.add(r);
-      adj.get(r)?.forEach((n) => stack.push(n));
-    }
-  }
+  // from the free phase on every room is reachable; only keys (locks) and events close doors
+  const rooms = new Set<string>(roomIds);
   const blockedBy = new Map<number, Set<string>>(
     c.events.events.map((e) => [e.day, new Set(e.blocked_rooms)]),
   );

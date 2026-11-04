@@ -183,22 +183,30 @@ export function HotelPlan(props: { pick?: string; onPick?: (id: string) => void 
         <li>
           <i className="who">A</i> Person (Zahl: mehrere Personen)
         </li>
-        <li>
-          <span className="swatch stairs" aria-hidden="true" /> Treppe zu Keller und Dachboden
-        </li>
+        {stairs.length > 0 && (
+          <li>
+            <span className="swatch stairs" aria-hidden="true" /> Treppe
+          </li>
+        )}
         <li>
           <span className="swatch door" aria-hidden="true" /> Tür
         </li>
       </ul>
-      {everywhere && <p className="small">Du kannst überall hin.</p>}
+      {view.map.guided_next ? (
+        <p className="small">Dein Weg für morgen steht fest. Du musst nichts wählen.</p>
+      ) : (
+        everywhere && <p className="small">Du kannst überall hin.</p>
+      )}
       {peeked && !props.onPick && (
         <p className="card" role="status">
           <strong>{peeked.name}:</strong>{' '}
           {peeked.id === here
             ? 'Hier bist du gerade.'
-            : everywhere || near.has(peeked.id)
-              ? 'Du kannst morgen dorthin gehen. Wähle den Raum bei „Gute Nacht“.'
-              : 'Von hier aus nicht in einem Schritt zu erreichen.'}
+            : view.map.guided_next
+              ? 'Dein Weg führt dich morgen dorthin.'
+              : everywhere || near.has(peeked.id)
+                ? 'Du kannst morgen dorthin gehen. Wähle den Raum bei „Gute Nacht“.'
+                : 'Von hier aus nicht in einem Schritt zu erreichen.'}
         </p>
       )}
     </div>

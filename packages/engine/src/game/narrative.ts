@@ -1,18 +1,28 @@
 import type { GameCtx, PlayerState } from './state';
 
+/** The page after "Tag beenden": how the day ends in the room the player is leaving. */
+export function nightOf(st: PlayerState, ctx: GameCtx): string {
+  const room = ctx.c.rooms.rooms.find((r) => r.id === st.room);
+  const left = ctx.c.rooms.rooms.find((r) => r.id === (st.prevRoom ?? st.room)) ?? room;
+  return (
+    left?.abend ?? `Der Tag im Raum „${left?.name ?? 'Hotel'}“ ist zu Ende. Du legst dich schlafen.`
+  );
+}
+
 /**
  * The opening of a day (02c §2): three to five sentences in the Du-form about the last step and
  * the new room, never about the case. Built from the room blocks `abgang`/`ankunft`, the
  * morning of the day and an echo of the last thing the player did (who or what, never what came
  * of it). Without a block the room name carries the sentence.
  */
-export function narrativeOf(st: PlayerState, ctx: GameCtx): string {
+export function narrativeOf(st: PlayerState, ctx: GameCtx, role?: { intro: string }): string {
   const { c } = ctx;
   const room = c.rooms.rooms.find((r) => r.id === st.room);
   if (!room) return '';
   const parts: string[] = [];
   if (st.day === 1) {
     parts.push(c.prolog.arrival ?? 'Du kommst im Hotel an.');
+    if (role) parts.push(role.intro);
   } else {
     const prev = c.rooms.rooms.find((r) => r.id === (st.prevRoom ?? st.room));
     if (prev) parts.push(prev.abgang ?? `Du verlässt den Raum „${prev.name}“.`);

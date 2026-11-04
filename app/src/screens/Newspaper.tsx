@@ -13,6 +13,8 @@ export function Newspaper() {
   const [error, setError] = useState('');
 
   const shown = day ?? Math.max(1, Math.min(view?.day ?? 1, latest));
+  // the puzzle of every readable issue stays solvable
+  const hasPuzzle = !!view?.daily_puzzles.some((d) => d.day === shown);
 
   useEffect(() => {
     if (!playerId || latest < 1) return;
@@ -66,14 +68,14 @@ export function Newspaper() {
           <Issue p={paper} />
         </div>
       )}
-      {shown === view?.day && (view?.question || view?.daily_puzzle) && (
+      {(hasPuzzle || (shown === view?.day && view?.question)) && (
         <div className="corners corner">
-          {view.daily_puzzle && (
+          {hasPuzzle && (
             <section className="box" aria-label="Rätsel-Ecke">
-              <DailyPuzzle />
+              <DailyPuzzle day={shown} />
             </section>
           )}
-          {view.question && <Question />}
+          {shown === view?.day && view?.question && <Question />}
         </div>
       )}
     </article>

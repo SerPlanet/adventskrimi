@@ -36,6 +36,8 @@ export const Room = z.object({
   /** narrative building blocks (02c §2): leaving the room, entering it; one or two sentences each */
   abgang: z.string().optional(),
   ankunft: z.string().optional(),
+  /** the evening in this room, told on the page after "Tag beenden" (WP21); a default without it */
+  abend: z.string().optional(),
   /** connecting room (hall): drawn as a corridor */
   corridor: z.boolean().optional(),
   scene: z.string().min(1),

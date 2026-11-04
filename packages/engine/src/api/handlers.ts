@@ -36,10 +36,10 @@ import {
   type PlayerState,
 } from '../game';
 import { applyProfile } from '../solver/profile';
-import { renameCase, renderAll } from '../names';
+import { fillRole, renameCase, renderAll } from '../names';
 import { generateNewspaper, namesOf } from './newspaper';
 import { ApiError, Requests, type GameTx, type PlayerTx, type Settings } from './types';
-import { buildView } from './view';
+import { buildView, roleOf } from './view';
 
 /** Placeholders like {n:leitung} are always rendered, even if the stored case still has them. */
 const rendered = new WeakMap<object, LoadedCase>();
@@ -129,7 +129,11 @@ export const handlers = {
         result.status === 'found'
           ? { status: 'found', new_items: result.newItems, points: result.points, answer }
           : { status: result.status, message: result.message, answer };
-      return { result: out, plaque, state: view(tx, ctx, now, next) };
+      return {
+        result: fillRole(out, roleOf(ctx, tx.player.settings)),
+        plaque,
+        state: view(tx, ctx, now, next),
+      };
     });
   },
 
@@ -254,22 +258,25 @@ export const handlers = {
       requirePlayable(tx, now);
       const ctx = await ctxOf(tx);
       const st = tx.player.state;
-      const level = dailyLevel(st);
-      const puzzle = dailyPuzzleFor(tx.game.slug, st.day, level);
+      // the puzzle of any newspaper the player may read; solved after its day it counts less
+      const day = req.day ?? st.day;
+      if (day > readableDays(st, now, tx.game.startDate)) throw new ApiError('bad_request', 400);
+      const late = day !== bonusDay(st, now, tx.game.startDate);
+      const puzzle = dailyPuzzleFor(tx.game.slug, day, dailyLevel(st, day));
       let next = st;
       let extra: Record<string, unknown> = {};
       if (req.op === 'check') {
         if (!req.answer) throw new ApiError('bad_request', 400);
-        const r = submitDaily(st, ctx, puzzle, req.answer, !isOnTime(st, now, tx.game.startDate));
+        const r = submitDaily(st, ctx, puzzle, day, req.answer, late);
         next = r.state;
         extra = { outcome: r.outcome };
       } else if (req.op === 'hint') {
-        const h = hintDaily(st, puzzle);
+        const h = hintDaily(st, puzzle, day);
         if (!h) throw new ApiError('no_hint', 400);
         next = h.state;
         extra = { hint: h.text, solution: h.solution };
       } else {
-        next = skipDaily(st, puzzle);
+        next = skipDaily(st, puzzle, day);
       }
       if (next !== st) await tx.save(next);
       return { ...extra, state: view(tx, ctx, now, next) };
@@ -302,8 +309,13 @@ export const handlers = {
 
   async settings(tx: PlayerTx, req: Req<'settings'>, now: Date) {
     const merged: Settings = { ...tx.player.settings, ...req.settings };
-    await tx.save(tx.player.state, merged);
     const ctx = await ctxOf(tx);
+    const role = req.settings.role;
+    if (role !== undefined && role !== tx.player.settings.role) {
+      if (!ctx.profile.roles.some((r) => r.id === role)) throw new ApiError('bad_request', 400);
+      if (tx.player.state.day > 1) throw new ApiError('role_locked', 403);
+    }
+    await tx.save(tx.player.state, merged);
     return { state: buildView(tx, { ...tx.player, settings: merged }, ctx, now) };
   },
 

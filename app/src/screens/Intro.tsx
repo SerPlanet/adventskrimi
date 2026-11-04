@@ -10,6 +10,9 @@ export function Intro({ onDone }: { onDone: () => void }) {
   return (
     <section className="intro" aria-labelledby="intro-h">
       <h1 id="intro-h">Tag {view.day}</h1>
+      {view.day === 1 && view.roles.length > 0 && (
+        <p className="small">Deine Rolle: {view.role.name}</p>
+      )}
       <p className="story">{view.narrative}</p>
       <button ref={go} className="primary" onClick={onDone}>
         Weiter

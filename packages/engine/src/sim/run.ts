@@ -98,7 +98,7 @@ export function simulate(
     }
     if (bot === 'optimal' || bot === 'greedy') {
       const p = dailyPuzzleFor(salt, day, 'medium');
-      st = submitDaily(st, ctx, p, p.answer).state;
+      st = submitDaily(st, ctx, p, day, p.answer).state;
     }
 
     // things can unlock further things (item, then use it), so the careful bots go round again

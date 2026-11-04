@@ -12,8 +12,13 @@ import {
   dailyView,
   canPlayDay,
   dayOf,
+  bonusDay,
+  corridorOf,
   existsFor,
+  guidedRoom,
   narrativeOf,
+  nightOf,
+  ownWay,
   nextRooms,
   questionOfDay,
   rankOf,
@@ -21,8 +26,18 @@ import {
   type GameCtx,
   type PlayerState,
 } from '../game';
+import { fillRole } from '../names';
 import type { FactBody } from '../schemas';
 import type { GameTx, PlayerRecord } from './types';
+
+/** The role of a player (D78): their choice, else the first of the profile, else a plain default. */
+export function roleOf(ctx: GameCtx, settings: { role?: string }) {
+  const roles = ctx.profile.roles;
+  return (
+    roles.find((r) => r.id === settings.role) ??
+    roles[0] ?? { id: 'detektiv', name: 'Detektiv', anrede: 'Detektiv', intro: '' }
+  );
+}
 
 /**
  * The only shape a client ever sees. It is built from what the player has unlocked:
@@ -78,6 +93,34 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
   });
 
   const room = c.rooms.rooms.find((r) => r.id === st.room);
+  const role = roleOf(ctx, player.settings);
+  const corridor = corridorOf(c, st);
+  // on guided days only the way of the player's own corridor is on the plan (WP20, WP21)
+  const walk = guidedRoom(c, corridor, st.day) ? new Set(ownWay(c, corridor)) : null;
+  const shown = (id: string) => !walk || walk.has(id) || id === st.room;
+  // the last day the player ended: what they did that day (the "good night" page)
+  const lastEnded = Math.max(0, ...st.finishedDays);
+  const ofThatDay = st.discoveries.filter((d) => d.day === lastEnded);
+  const night = lastEnded
+    ? {
+        day: lastEnded,
+        talks: new Set(
+          ofThatDay
+            .filter((d) => c.sources.sources.find((s) => s.id === d.sourceId)?.kind === 'talk')
+            .map((d) => d.sourceId),
+        ).size,
+        finds: ofThatDay.reduce((n, d) => n + d.itemIds.length, 0),
+        text: nightOf(st, ctx),
+        room: room && { id: room.id, name: room.name },
+      }
+    : null;
+  // the puzzles of all newspapers the player may read; after the calendar day they count less (D77)
+  const readable = Math.max(0, Math.min(24, today, st.day));
+  const dailyPuzzles = Array.from({ length: readable }, (_, i) => i + 1).map((day) => ({
+    day,
+    late: day !== bonusDay(st, now, startDate),
+    ...dailyView(st, dailyPuzzleFor(startSalt(tx), day, dailyLevel(st, day)), day),
+  }));
   const blockedToday = ctx.reach.blocked(st.room, st.day);
   const q = questionOfDay(ctx, st.day);
   const qp = st.questions[st.day];
@@ -87,7 +130,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     (s) => s.kind === 'hotelbook' && [st.room, '*'].includes(ctx.reach.roomOn(s.id, st.day) ?? ''),
   );
 
-  return {
+  const out = {
     player: { id: player.id, name: player.name, avatar: player.avatar, settings: player.settings },
     today,
     start_date: startDate,
@@ -123,10 +166,19 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
           prop: o.prop,
           scale: o.scale,
           layer: o.layer,
-          // state of the thing: opened once everything its inspect sources hold has been found
-          explored: c.sources.sources
-            .filter((x) => x.kind === 'inspect' && x.object === o.id)
-            .some((x) => x.yields.length > 0 && x.yields.every((y) => st.found.includes(y))),
+          // state of the thing: opened once everything it holds for the player today has been found
+          explored: (() => {
+            const today = c.sources.sources.filter(
+              (x) =>
+                x.kind === 'inspect' &&
+                x.object === o.id &&
+                existsFor(x, st, ctx) &&
+                ctx.reach.roomOn(x.id, st.day) === st.room,
+            );
+            return (
+              today.length > 0 && today.every((x) => x.yields.every((y) => st.found.includes(y)))
+            );
+          })(),
         })),
       npcs: blockedToday
         ? []
@@ -146,17 +198,21 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
             })),
     },
     map: {
-      rooms: c.rooms.rooms.map((r) => ({
-        id: r.id,
-        name: r.name,
-        neighbors: r.neighbors,
-        plan: r.plan,
-        corridor: r.corridor,
-      })),
-      doors: c.rooms.doors,
+      rooms: c.rooms.rooms
+        .filter((r) => shown(r.id))
+        .map((r) => ({
+          id: r.id,
+          name: r.name,
+          neighbors: r.neighbors.filter(shown),
+          plan: r.plan,
+          corridor: r.corridor,
+        })),
+      doors: c.rooms.doors.filter((d) => shown(d.a) && shown(d.b)),
       outside: c.rooms.outside,
-      stairs: c.rooms.stairs,
+      stairs: c.rooms.stairs.filter((s) => shown(s.room)),
       next_rooms: st.day <= 24 ? nextRooms(st, ctx) : [],
+      // tomorrow is a guided day: the corridor decides, there is nothing to choose
+      guided_next: guidedRoom(c, corridor, st.day + 1) !== undefined,
     },
     finds,
     // pocketed documents: title and the full text, readable again at any time
@@ -181,7 +237,14 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       return { id, name: i?.name ?? id, text: i?.text ?? '' };
     }),
     // what the morning looks like (02c §2), and whether the player's day is over (02c §9)
-    narrative: narrativeOf(st, ctx),
+    narrative: narrativeOf(st, ctx, role),
+    role: { id: role.id, name: role.name },
+    // the choice is open until the end of day 1
+    roles: ctx.profile.roles.map((r) => ({ id: r.id, name: r.name })),
+    role_chosen: player.settings.role !== undefined,
+    role_locked: st.day > 1,
+    night,
+    late_percent: Math.round(scoring.newspaper_puzzle_late_factor * 100),
     day_over: st.finishedDays.includes(today),
     question: q && {
       id: q.id,
@@ -194,8 +257,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       can_hint: !!q.hint && !qp?.done,
     },
     prolog: prolog && { goal: prolog.goal, intro: prolog.intro, tips: prolog.tips },
-    daily_puzzle:
-      st.day <= 24 ? dailyView(st, dailyPuzzleFor(startSalt(tx), st.day, dailyLevel(st))) : null,
+    daily_puzzles: dailyPuzzles,
     theory: st.theory,
     theory_history: st.theoryHistory ?? [],
     // public candidate lists (never the solution)
@@ -206,7 +268,8 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
         id,
         name: c.case.windows.find((w) => w.id === id)?.label ?? id,
       })),
-      where: c.case.categories.where.map((id) => ({ id, name: roomName(id) ?? id })),
+      // on guided days only rooms of the player's own way are named
+      where: c.case.categories.where.filter(shown).map((id) => ({ id, name: roomName(id) ?? id })),
     },
     // the role is only told for people the player has met (a find from a talk or a statement)
     people: c.npcs.npcs.map((n) => ({
@@ -234,6 +297,7 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     story: st.accused && today >= 24 ? resolutionOf(ctx, st) : null,
     newspaper_days: Math.max(0, Math.min(24, today, st.day)),
   };
+  return fillRole(out, role);
 }
 
 const LABELS: Record<string, string> = {

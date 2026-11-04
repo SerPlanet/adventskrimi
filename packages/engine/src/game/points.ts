@@ -34,11 +34,12 @@ export function awardDailyPuzzle(
   hintUsed: boolean,
   /** solved after its calendar day: points times `newspaper_puzzle_late_factor` (D77), never below 0 */
   late = false,
+  day = st.day,
 ): PlayerState {
   const base = ctx.scoring.day;
   const full = !solved ? 0 : hintUsed ? withTip(base.puzzle, ctx.scoring) : base.puzzle;
   const pts = late ? Math.floor(full * ctx.scoring.newspaper_puzzle_late_factor) : full;
-  return addLedger(st, { kind: 'puzzle', ref: String(st.day), points: pts, day: st.day });
+  return addLedger(st, { kind: 'puzzle', ref: String(day), points: pts, day });
 }
 
 export const awardMiniCase = (st: PlayerState, ctx: GameCtx): PlayerState =>

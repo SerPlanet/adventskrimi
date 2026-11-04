@@ -7,17 +7,12 @@ export type EndDayResult =
 
 const blockedOn = (ctx: GameCtx, room: string, day: number) => ctx.reach.blocked(room, day);
 
-/** Rooms the player may choose when ending the day: the one guided room, or (free phase) profile movement + event blocks. */
+/** Rooms the player may choose when ending the day: the one guided room, or (free phase) every room not blocked by an event. */
 export function nextRooms(st: PlayerState, ctx: GameCtx): string[] {
   const fixed = guidedRoom(ctx.c, corridorOf(ctx.c, st), st.day + 1);
   if (fixed) return [fixed];
   const { rooms } = ctx.c.rooms;
-  const here = rooms.find((r) => r.id === st.room);
-  const pool =
-    ctx.profile.movement === 'free'
-      ? rooms.map((r) => r.id)
-      : [st.room, ...(here?.neighbors ?? [])];
-  return pool.filter((r) => !blockedOn(ctx, r, st.day + 1));
+  return rooms.map((r) => r.id).filter((r) => !blockedOn(ctx, r, st.day + 1));
 }
 
 /**

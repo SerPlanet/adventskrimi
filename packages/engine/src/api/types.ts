@@ -8,6 +8,8 @@ export const SettingsSchema = z
     font_size: z.enum(['normal', 'large', 'xl']),
     explanations: z.boolean(),
     dark_mode: z.enum(['auto', 'light', 'dark']),
+    /** role of the profile (narrative and address only, D78); changeable until the end of day 1 */
+    role: z.string().max(40),
   })
   .partial()
   .strict();
@@ -153,6 +155,8 @@ export const Requests = {
     request_id: RequestId,
     op: z.enum(['check', 'hint', 'skip']),
     answer: z.string().max(200).optional(),
+    /** the puzzle of an earlier newspaper; absent = today's day of the player */
+    day: Day.optional(),
   }),
   object_puzzle: z.object({
     slug: Slug,

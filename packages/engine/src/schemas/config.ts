@@ -33,7 +33,6 @@ export const Profile = z.object({
       }),
     )
     .default([]),
-  movement: z.enum(['free', 'neighbors']),
   hints: z.object({ tip_ladder: z.boolean().default(true), max_tips: z.number().int().default(2) }),
   early_accusation: z.boolean(),
   early_accusation_from_day: Day,

@@ -40,7 +40,7 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
     );
 
   // 1. at least `min_proofs` proofs from different sources
-  const global = buildReach(c, profile);
+  const global = buildReach(c);
   for (const i of insights) {
     const n = sourcesOfInsight(global, i.id).size;
     if (n < cfg.min_proofs)
@@ -50,7 +50,7 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
   // 2. every corridor (or everybody, without corridors) reaches every insight by two sources
   //    at least, so no single source decides; each corridor alone names the solution (3.)
   const reaches: [string, Reach][] = corridors.length
-    ? corridors.map((k) => [k, buildReach(c, profile, k)] as [string, Reach])
+    ? corridors.map((k) => [k, buildReach(c, k)] as [string, Reach])
     : [['all', global]];
   for (const [name, reach] of reaches)
     for (const i of insights) {
@@ -67,7 +67,7 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
 
   // 4. every corridor yields the same number of insights and the same proof pattern in the guided days
   const pattern = (k: string) => {
-    const reach = buildReach(c, profile, k);
+    const reach = buildReach(c, k);
     const got = new Set<string>();
     for (const s of sources)
       if (reach.daysOf(s.id).some((d) => d <= last)) s.yields.forEach((y) => got.add(y));
@@ -98,7 +98,7 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
         .map((s) => s.object),
     ).size;
   for (const k of c.routes.corridors) {
-    const reach = buildReach(c, profile, k.id);
+    const reach = buildReach(c, k.id);
     for (let d = 2; d <= last; d++) {
       const need = budgetOf({ profile }, d) + 1;
       const have = proofThings(reach, d, k.route[d] as string);

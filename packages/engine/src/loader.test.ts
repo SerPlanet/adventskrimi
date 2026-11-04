@@ -2,7 +2,7 @@ import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { loadCase, loadProfile, loadQuality, loadScoring } from './loader';
+import { loadCase, loadQuality, loadScoring } from './loader';
 import { CardText, Fact, Scoring } from './schemas';
 
 const TEST_CASE = join(__dirname, '../../../cases/_test');
@@ -59,8 +59,6 @@ describe('schemas', () => {
   });
 
   test('config files load', () => {
-    expect(loadProfile(join(CONFIG, 'profiles/family.yaml')).movement).toBe('free');
-    expect(loadProfile(join(CONFIG, 'profiles/friends.yaml')).movement).toBe('neighbors');
     expect(loadQuality(join(CONFIG, 'quality.json')).card_words_max).toBe(60);
   });
 });

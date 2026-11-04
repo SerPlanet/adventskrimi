@@ -42,3 +42,9 @@ export function sourceOnRoute(
   if (!s.route || day > guidedLastDay(c) || day === 1) return true;
   return corridor !== undefined && s.route.includes(corridor);
 }
+
+/** The rooms of a corridor's guided way, day 1 first. */
+export const ownWay = (c: LoadedCase, corridor: string | undefined): string[] => [
+  startRoom(c),
+  ...Object.values(c.routes.corridors.find((k) => k.id === corridor)?.route ?? {}),
+];

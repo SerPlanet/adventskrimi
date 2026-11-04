@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { loadCase, loadProfile, loadScoring, type LoadedCase } from '../loader';
-import { renameCase } from '../names';
+import { fillRole, renameCase } from '../names';
 import { applyProfile } from '../solver';
 import { endDay, makeCtx, narrativeOf, newPlayer, resolveAction, type GameCtx } from './index';
 
@@ -50,7 +50,9 @@ describe('narrative of the day (02c §2)', () => {
     ];
     let st = newPlayer(ctx);
     for (let day = 1; day <= 24; day++) {
-      const text = narrativeOf({ ...st, day, prevRoom: 'keller' }, ctx);
+      const raw = narrativeOf({ ...st, day, prevRoom: 'keller' }, ctx);
+      // the view fills the role placeholders ({rolle}, {anrede}) for the player
+      const text = fillRole(raw, { name: 'Detektiv', anrede: 'Detektiv' });
       expect(text).not.toContain('{');
       for (const f of finds) expect(text).not.toContain(f);
       st = { ...st, day };

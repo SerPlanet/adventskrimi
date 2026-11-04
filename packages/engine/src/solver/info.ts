@@ -35,7 +35,7 @@ export function buildInfo(c: LoadedCase, profile: Profile, corridor?: string): I
     profile,
     space,
     base: baseMask(space),
-    reach: buildReach(c, profile, corridor),
+    reach: buildReach(c, corridor),
     masks,
     solutionIndex: space.indexOf(sol),
   };

@@ -388,11 +388,15 @@ describe('puzzle of the day', () => {
     call('daily_puzzle', { slug: 'test', player_id: player, request_id: rid(), ...body });
   // level "medium" is the default; day 1 is a sudoku
   const answer = () => generateDaily('test', 1, 'medium').answer;
+  const puzzleOf = (state: { daily_puzzles: { day: number }[] }, day: number) =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    state.daily_puzzles.find((d) => d.day === day) as any;
 
   test('the state offers the puzzle without answer or solution', async () => {
     const s = bodyOf(await call('state', { slug: 'test', player_id: a })).state;
-    expect(s.daily_puzzle.kind).toBe('sudoku');
-    const text = JSON.stringify(s.daily_puzzle);
+    const p = puzzleOf(s, 1);
+    expect(p.kind).toBe('sudoku');
+    const text = JSON.stringify(s.daily_puzzles);
     expect(text).not.toContain(answer());
     expect(text).not.toContain('solutionText');
   });
@@ -410,7 +414,7 @@ describe('puzzle of the day', () => {
   test('a tip halves the points', async () => {
     const h = await daily(b, { op: 'hint' });
     expect(bodyOf(h).hint).toBeTruthy();
-    expect(bodyOf(h).state.daily_puzzle.hints).toHaveLength(1);
+    expect(puzzleOf(bodyOf(h).state, 1).hints).toHaveLength(1);
     const right = await daily(b, { op: 'check', answer: answer() });
     expect(bodyOf(right).state.points).toBe(1);
   });
@@ -420,12 +424,36 @@ describe('puzzle of the day', () => {
     await daily(a, { op: 'hint' });
     const last = await daily(a, { op: 'hint' });
     expect(bodyOf(last).solution).toBe(true);
-    expect(bodyOf(last).state.daily_puzzle.done).toBe(true);
+    expect(puzzleOf(bodyOf(last).state, 1).done).toBe(true);
     expect(bodyOf(last).state.points).toBe(0);
     expect((await daily(a, { op: 'hint' })).status).toBe(400);
     const skip = await daily(b, { op: 'skip' });
-    expect(bodyOf(skip).state.daily_puzzle.done).toBe(true);
+    expect(puzzleOf(bodyOf(skip).state, 1).done).toBe(true);
     expect(bodyOf(skip).state.points).toBe(0);
+  });
+
+  test('the puzzle of an earlier newspaper stays solvable and counts a share, never a minus', async () => {
+    const st = store.players.get(a)!;
+    store.players.set(a, { ...st, state: { ...st.state, day: 3 } });
+    const view = bodyOf(await call('state', { slug: 'test', player_id: a }, DAY3)).state;
+    expect(view.daily_puzzles.map((d: { day: number }) => d.day)).toEqual([1, 2, 3]);
+    expect(puzzleOf(view, 1).late).toBe(true);
+    expect(puzzleOf(view, 3).late).toBe(false);
+    expect(view.late_percent).toBe(Math.round(scoring.newspaper_puzzle_late_factor * 100));
+    const late = await call(
+      'daily_puzzle',
+      { slug: 'test', player_id: a, request_id: rid(), op: 'check', day: 1, answer: answer() },
+      DAY3,
+    );
+    expect(bodyOf(late).outcome).toBe('correct');
+    expect(bodyOf(late).state.points).toBe(Math.floor(3 * scoring.newspaper_puzzle_late_factor));
+    // a day that has not arrived yet cannot be played
+    const ahead = await call(
+      'daily_puzzle',
+      { slug: 'test', player_id: a, request_id: rid(), op: 'skip', day: 4 },
+      DAY3,
+    );
+    expect(ahead.status).toBe(400);
   });
 
   test('same request_id twice changes nothing', async () => {
@@ -545,5 +573,74 @@ describe('guided days in the view (WP20)', () => {
     setDay(a, 3);
     const later = (await stateOf(a)).room.npcs.find((n: { id: string }) => n.id === 'cora');
     expect(later.topics).toHaveLength(1);
+  });
+});
+
+describe('good night, role and the plan on guided days (WP21)', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const stateOf = async (id: string, now = DAY1): Promise<any> =>
+    bodyOf(await call('state', { slug: 'test', player_id: id }, now)).state;
+  const setDay = (id: string, day: number) => {
+    const rec = store.players.get(id)!;
+    store.players.set(id, { ...rec, state: { ...rec.state, day, room: 'halle' } });
+  };
+
+  test('after end_day the page tells the evening, the day and what comes next', async () => {
+    await call('act', { slug: 'test', player_id: a, request_id: rid(), action: talk });
+    expect((await stateOf(a)).map.guided_next).toBe(true);
+    await call('end_day', { slug: 'test', player_id: a, request_id: rid() });
+    const v = await stateOf(a);
+    expect(v.night.day).toBe(1);
+    expect(v.night.talks).toBe(1);
+    expect(v.night.finds).toBeGreaterThan(0);
+    expect(v.night.text).toContain('Halle');
+    expect(v.night.room.name).toBe('Halle');
+    expect(v.can_play).toBe(false);
+  });
+
+  test('a latecomer can play the next day at once', async () => {
+    await call('end_day', { slug: 'test', player_id: a, request_id: rid() }, DAY3);
+    expect((await stateOf(a, DAY3)).can_play).toBe(true);
+  });
+
+  test('the role is chosen from the profile, fills the address, and is locked after day 1', async () => {
+    const before = await stateOf(a);
+    expect(before.role_chosen).toBe(false);
+    expect(before.roles.map((r: { id: string }) => r.id)).toEqual([
+      'privatdetektiv',
+      'journalist',
+      'polizist',
+    ]);
+    expect(
+      (await call('settings', { slug: 'test', player_id: a, settings: { role: 'zauberer' } }))
+        .status,
+    ).toBe(400);
+    const set = await call('settings', {
+      slug: 'test',
+      player_id: a,
+      settings: { role: 'polizist' },
+    });
+    expect(bodyOf(set).state.role.name).toBe('Polizist');
+    expect(bodyOf(set).state.narrative).toContain('Kommissar');
+    expect(JSON.stringify(bodyOf(set).state)).not.toMatch(/\{rolle\}|\{anrede\}/);
+    setDay(a, 2);
+    const late = await call('settings', {
+      slug: 'test',
+      player_id: a,
+      settings: { role: 'journalist' },
+    });
+    expect(late.status).toBe(403);
+    expect(bodyOf(late).error).toBe('role_locked');
+  });
+
+  test('on guided days the plan and the room names show only the own way', async () => {
+    setDay(a, 2);
+    const v = await stateOf(a, DAY3);
+    expect(v.map.rooms.map((r: { id: string }) => r.id)).toEqual(['halle']);
+    expect(v.options.where.map((r: { id: string }) => r.id)).toEqual(['halle']);
+    setDay(a, 3);
+    const free = await stateOf(a, DAY3);
+    expect(free.map.rooms).toHaveLength(2);
+    expect(free.map.guided_next).toBe(false);
   });
 });

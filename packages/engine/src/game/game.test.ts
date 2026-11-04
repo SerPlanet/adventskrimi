@@ -119,21 +119,8 @@ describe('only new finds change anything', () => {
 });
 
 describe('movement', () => {
-  test('neighbors mode: unknown or distant rooms are rejected', () => {
-    const c2 = mk((c) => {
-      c.rooms.rooms.push({
-        id: 'dach',
-        name: 'Dach',
-        description: 'Windig.',
-        neighbors: [],
-        objects: [],
-        plan: { x: 0, y: 20, w: 4, h: 4 },
-        scene: 'dach',
-      });
-    });
-    const st = at(3, 'halle', newPlayer(c2));
-    expect(endDay(st, c2, 'dach')).toEqual({ ok: false, reason: 'too_far' });
-    expect(endDay(st, c2, 'nirgends')).toEqual({ ok: false, reason: 'bad_room' });
+  test('an unknown room is rejected', () => {
+    expect(endDay(at(3, 'halle'), ctx, 'nirgends')).toEqual({ ok: false, reason: 'bad_room' });
   });
 
   test('event block for tomorrow prevents entering a room', () => {
@@ -155,13 +142,8 @@ describe('movement', () => {
     expect(skip.ok && skip.state.room).toBe('halle');
   });
 
-  test('free movement allows any room', () => {
-    const family = {
-      ...loadProfile(join(ROOT, 'config/profiles/family.yaml')),
-      include: { exclude_facts: [], exclude_sources: [] },
-    };
-    const c2 = makeCtx(applyProfile(res.data, family), family, scoring);
-    expect(nextRooms(at(3, 'halle', newPlayer(c2)), c2).sort()).toEqual(['halle', 'keller']);
+  test('free phase: every room can be chosen', () => {
+    expect(nextRooms(at(3, 'halle'), ctx).sort()).toEqual(['halle', 'keller']);
   });
 });
 

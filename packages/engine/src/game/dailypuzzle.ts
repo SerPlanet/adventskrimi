@@ -3,8 +3,8 @@ import { awardDailyPuzzle } from './points';
 import type { DailyProgress, GameCtx, PlayerState } from './state';
 
 /** Everybody gets the same level: medium (D71, no easier options). Once started it stays. */
-export function dailyLevel(st: PlayerState): Level {
-  return st.daily[st.day]?.level ?? 'medium';
+export function dailyLevel(st: PlayerState, day = st.day): Level {
+  return st.daily[day]?.level ?? 'medium';
 }
 
 const cache = new Map<string, DailyPuzzle>();
@@ -20,11 +20,11 @@ export function dailyPuzzleFor(salt: string, day: number, level: Level): DailyPu
   return p;
 }
 
-const progressOf = (st: PlayerState, level: Level): DailyProgress =>
-  st.daily[st.day] ?? { level, attempts: 0, hints: 0, solved: false, done: false };
-const put = (st: PlayerState, p: DailyProgress): PlayerState => ({
+const progressOf = (st: PlayerState, level: Level, day: number): DailyProgress =>
+  st.daily[day] ?? { level, attempts: 0, hints: 0, solved: false, done: false };
+const put = (st: PlayerState, day: number, p: DailyProgress): PlayerState => ({
   ...st,
-  daily: { ...st.daily, [st.day]: p },
+  daily: { ...st.daily, [day]: p },
 });
 
 export type DailyOutcome = 'correct' | 'wrong' | 'already_done';
@@ -34,15 +34,16 @@ export function submitDaily(
   st: PlayerState,
   ctx: GameCtx,
   puzzle: DailyPuzzle,
+  day: number,
   attempt: string,
   late = false,
 ): { state: PlayerState; outcome: DailyOutcome } {
-  const p = progressOf(st, puzzle.level);
+  const p = progressOf(st, puzzle.level, day);
   if (p.done) return { state: st, outcome: 'already_done' };
   const correct = checkDaily(puzzle, attempt);
-  const next = put(st, { ...p, attempts: p.attempts + 1, solved: correct, done: correct });
+  const next = put(st, day, { ...p, attempts: p.attempts + 1, solved: correct, done: correct });
   return {
-    state: correct ? awardDailyPuzzle(next, ctx, true, p.hints > 0, late) : next,
+    state: correct ? awardDailyPuzzle(next, ctx, true, p.hints > 0, late, day) : next,
     outcome: correct ? 'correct' : 'wrong',
   };
 }
@@ -51,28 +52,33 @@ export function submitDaily(
 export function hintDaily(
   st: PlayerState,
   puzzle: DailyPuzzle,
+  day: number,
 ): { state: PlayerState; text: string; solution: boolean } | null {
-  const p = progressOf(st, puzzle.level);
+  const p = progressOf(st, puzzle.level, day);
   if (p.done) return null;
   const hints = Math.min(p.hints + 1, 3);
   if (hints <= 2)
     return {
-      state: put(st, { ...p, hints }),
+      state: put(st, day, { ...p, hints }),
       text: puzzle.hints[hints - 1] as string,
       solution: false,
     };
-  return { state: put(st, { ...p, hints, done: true }), text: puzzle.solutionText, solution: true };
+  return {
+    state: put(st, day, { ...p, hints, done: true }),
+    text: puzzle.solutionText,
+    solution: true,
+  };
 }
 
 /** Skipping is always possible, gives 0 points and costs nothing else. */
-export function skipDaily(st: PlayerState, puzzle: DailyPuzzle): PlayerState {
-  const p = progressOf(st, puzzle.level);
-  return p.done ? st : put(st, { ...p, done: true });
+export function skipDaily(st: PlayerState, puzzle: DailyPuzzle, day: number): PlayerState {
+  const p = progressOf(st, puzzle.level, day);
+  return p.done ? st : put(st, day, { ...p, done: true });
 }
 
 /** Client view of the puzzle of the day: the public part plus how far the player got. */
-export function dailyView(st: PlayerState, puzzle: DailyPuzzle) {
-  const p = st.daily[st.day];
+export function dailyView(st: PlayerState, puzzle: DailyPuzzle, day: number) {
+  const p = st.daily[day];
   const shown = p?.hints ?? 0;
   return {
     ...publicPuzzle(puzzle),

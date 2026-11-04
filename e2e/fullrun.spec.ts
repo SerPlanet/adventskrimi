@@ -3,7 +3,7 @@ import postgres from 'postgres';
 import { connInfo, readEnv } from '../tools/lib/db';
 
 // A fresh player plays all 24 days one after the other on the last calendar day (catch-up):
-// narrative, newspaper, "Tag beenden", "Nächsten Tag spielen", report cards on 10/14/18/22,
+// narrative, newspaper, "Tag beenden", "Zum nächsten Tag", report cards on 10/14/18/22,
 // accusation from day 20 and the resolution. One player only: no rumours, no plaques, and the
 // paper must still be fine. Own games "e2e-*" on staging; the players are deleted at the end.
 test.use({ actionTimeout: 15_000 });
@@ -60,6 +60,9 @@ for (const g of GAMES) {
 
     await page.goto(`/?now=${NOW}#/e2e-${g}`);
     await page.getByRole('button', { name: new RegExp(nameOf(g)) }).click();
+    // day 1 starts with the question who you are (the role is only an address, D78)
+    await expect(page.getByRole('heading', { name: 'Wer bist du?' })).toBeVisible();
+    await page.getByRole('button', { name: 'Weiter' }).click();
 
     for (let day = 1; day <= 24; day++) {
       // narrative, then the newspaper of this day
@@ -117,7 +120,7 @@ for (const g of GAMES) {
           await expect(page.getByText(new RegExp(`Tag ${day}:`))).toBeVisible();
           await nav(page, 'Tag');
         }
-        await page.getByRole('button', { name: 'Nächsten Tag spielen' }).click();
+        await page.getByRole('button', { name: 'Zum nächsten Tag' }).click();
       } else {
         await expect(page.getByText('Der Fall ist abgeschlossen')).toBeVisible();
       }

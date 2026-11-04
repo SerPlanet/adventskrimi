@@ -3,6 +3,8 @@ import { useSession, type ActResult, type Action } from '../store';
 import { FindCard } from './FindCard';
 import { FileFind } from '../ui/file/FileButton';
 import { EndDay } from './EndDay';
+import { GoodNight } from './GoodNight';
+import { DayChip } from '../ui/DayChip';
 import { Popup } from '../ui/Popup';
 import { Dialog } from '../ui/Dialog';
 import { LockPanel } from '../ui/LockPanel';
@@ -18,18 +20,9 @@ type Open =
   | { kind: 'doc'; id: string }
   | { kind: 'night' };
 
-/** Day status (02c §9): red when the day is over, green while it can still be played. */
-function Chip({ over }: { over: boolean }) {
-  return (
-    <span className={`daychip ${over ? 'over' : 'open'}`} role="status">
-      <span aria-hidden="true">●</span> {over ? 'Tag beendet' : 'Tag noch nicht abgeschlossen'}
-    </span>
-  );
-}
-
 /** The day: place, who is here, status, floor plan, room scene with hotspots, popups. */
 export function Tag({ onNext }: { onNext: () => void }) {
-  const { view, act, busy, pocket, ended, startNext } = useSession();
+  const { view, act, busy, pocket, ended } = useSession();
   const [open, setOpen] = useState<Open | null>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
@@ -57,29 +50,7 @@ export function Tag({ onNext }: { onNext: () => void }) {
     );
 
   // the page stays after "Tag beenden"; a latecomer may go on to the next day
-  if (view.day_over || ended !== null)
-    return (
-      <section className="card dayover" aria-labelledby="over-h">
-        <h1 id="over-h">Gute Nacht</h1>
-        <Chip over />
-        <p>
-          {view.can_play
-            ? 'Du bist dem Spiel noch ein Stück hinterher. Du kannst den nächsten Tag gleich spielen.'
-            : 'Morgen früh liegt eine neue Zeitung bereit. Komm gern um 0 Uhr oder später wieder.'}
-        </p>
-        {view.can_play && (
-          <button
-            className="primary"
-            onClick={() => {
-              startNext();
-              onNext();
-            }}
-          >
-            Nächsten Tag spielen
-          </button>
-        )}
-      </section>
-    );
+  if (view.day_over || ended !== null) return <GoodNight onNext={onNext} />;
 
   const run = async (a: Action) => {
     setMsg('');
@@ -127,7 +98,7 @@ export function Tag({ onNext }: { onNext: () => void }) {
       {room && (
         <header className="dayhead">
           <h1 id="room-h">{room.name}</h1>
-          <Chip over={false} />
+          <DayChip over={false} />
           <p>
             {room.npcs.length
               ? `Hier sind: ${room.npcs.map((n) => n.name).join(', ')}.`
