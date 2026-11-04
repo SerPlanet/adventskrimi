@@ -5,9 +5,13 @@ const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabi
 /** Small modal card: focus trap, Esc and close button, focus returns to the opener. */
 export function Popup(props: { title: string; onClose: () => void; children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
-  const { onClose } = props;
+  // Keep the latest handler in a ref: an inline onClose must not re-run the effect (it would
+  // pull focus back to the box after every checkbox toggle).
+  const closeRef = useRef(props.onClose);
+  closeRef.current = props.onClose;
 
   useEffect(() => {
+    const onClose = () => closeRef.current();
     const opener = document.activeElement as HTMLElement | null;
     box.current?.focus();
     const onKey = (e: KeyboardEvent) => {
@@ -32,10 +36,10 @@ export function Popup(props: { title: string; onClose: () => void; children: Rea
       document.removeEventListener('keydown', onKey);
       opener?.focus?.();
     };
-  }, [onClose]);
+  }, []);
 
   return (
-    <div className="scrim" onClick={onClose}>
+    <div className="scrim" onClick={props.onClose}>
       <div
         ref={box}
         className="popup"
@@ -47,7 +51,7 @@ export function Popup(props: { title: string; onClose: () => void; children: Rea
       >
         <div className="row between">
           <h2>{props.title}</h2>
-          <button onClick={onClose} aria-label="Schließen">
+          <button onClick={props.onClose} aria-label="Schließen">
             ✕
           </button>
         </div>

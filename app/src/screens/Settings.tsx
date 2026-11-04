@@ -41,6 +41,19 @@ export function Settings() {
           Der Hotel-Page erklärt mir die ersten Tage
         </label>
       </div>
+      <details className="card">
+        <summary>So funktioniert’s</summary>
+        <ol>
+          <li>Jeden Tag bringt die Zeitung neue Meldungen. Lies sie zuerst.</li>
+          <li>Im Hotel kannst du alles ansehen und mit allen Personen reden. Das ist gratis.</li>
+          <li>„Genauer untersuchen“ kostet eine Aktion. Du hast nur wenige pro Tag.</li>
+          <li>Was dir wichtig scheint, legst du selbst in die Akte.</li>
+          <li>Zeit-Tabelle und Raster füllst du selbst aus. Das Spiel prüft nichts.</li>
+          <li>Eine Aussage kann falsch sein. Ein Fakt stimmt immer.</li>
+          <li>Mit „Gute Nacht“ beendest du den Tag. Verpasste Tage holst du nach.</li>
+          <li>Ab Tag 20 kannst du die Täterin oder den Täter anklagen.</li>
+        </ol>
+      </details>
       <button onClick={logout}>Spieler wechseln</button>
     </>
   );

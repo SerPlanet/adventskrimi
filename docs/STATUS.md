@@ -1,8 +1,8 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-03 · WP15–WP19 und Aufräumen (WP06i) erledigt. Nächstes: WP11 (Admin) → `docs/wp/WP11-admin.md`, dann WP12, WP13, WP14.
+Stand: 2026-11-04 · WP11 und WP12 erledigt. Nächstes: WP13 (Testlauf), WP14 (Launch).
 
-Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/Feinschliff → WP13 Testlauf → WP14 Launch. Code-Freeze 29.11., Start 1.12.
+Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → WP11 ✓ → WP12 ✓ → **WP13** Testlauf → WP14 Launch. Code-Freeze 29.11., Start 1.12.
 
 ## Erledigt (Kurzform, Details in `git log` und den WP-Dateien)
 - Kern: Engine, Schemas, Solver, Validator (10 Prüfungen + `plan`), Simulator mit Bots, Edge Functions, Frontend, Rätsel des Tages, Objekt-Rätsel, Raster, Zeitstrahl, Theorie, Zeugnis, Anklage, Rangliste, Plaketten.
@@ -21,6 +21,8 @@ Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/
 - WP18: Schlösser (`Source.lock`, `game/locks.ts`, `ui/LockPanel.tsx`): Versuch zeigt den Versuchstext mit Hinweis auf die Fundstelle, das Rätsel erscheint erst nach dem Versuch (kein „Rätsel im Raum“). Validator `locks` (Hinweis, Belohnung, Hälfte cross-room). 22 Schlösser im Berghotel (Sub-Agent), `balance` grün.
 
 - WP11: Verwaltung unter `/#/admin` (Token, nicht verlinkt): Übersicht je Spieler (Tag, Tage beendet, Funde, Akte, Punkte, Anklage, ohne Theorie/Lösung), Spieler anlegen, Zeitung neu erzeugen, Export JSON, Zeitraffer (Staging), „Heute ist Tag N“. Nicht gebaut: Spieler deaktivieren, Zeugnis-Knopf, Gemeinsames Finale (kein Bedarf im Spielablauf).
+
+- WP12: Popup-Fokus (Checkbox behält Fokus, Dialog-Abstände, 2 Spalten), Zeit-Tabelle mit fester Raumspalte und Tastaturtest (`e2e/polish.spec.ts`, 360/768/1440 px ohne Querscroll), „So funktioniert’s“ in den Einstellungen, `npm run plain` (Satz-/Wortlänge), Lighthouse-Schwelle 95 (alle 6 Reiter 100). Nicht gebaut: Hilfeknopf „Ich komme nicht weiter“ (D71), Vorlesen, WebKit (nicht installiert). Offen: Mensch-Test mit Person ≥60 (WP13).
 
 ## Offen im Inhalt (WP10b-Nacharbeit, später)
 - Je Raum/Tag mehr untersuchbare Funde als Aktionen nur in Salon, Küche, Lobby; Tage 1–5 haben fast keine Untersuchen-Funde, Dachboden erst ab Tag 20 (Grenzen und Bots neu kalibrieren, `docs/07`).

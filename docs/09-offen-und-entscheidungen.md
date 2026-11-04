@@ -92,3 +92,4 @@ Neue Einträge: eine Zeile. Agenten tragen Defaults hier ein, statt zu fragen (s
 | D72 | WP16: Spielerstand hat `filed` (Akte), `table` (Zeitstrahl-Tabelle) und `grid` als Pflichtfelder; Zeitung liefert `articles` (id, title, text) statt headline/gossip; Rätselstufe ist für alle `medium` (keine Erleichterung, D71). Neue Fall-Datei-Felder: `newspaper.yaml` `articles`. |
 | D73 | Tests laufen nur in eigenen Staging-Spielen (`e2e-*`), nie in `freunde`, `familie`, `test`. `npm run reset-player` setzt Testspieler zurück (löscht alles, was der Spieler tat, und die gespeicherten Zeitungen des Spiels). |
 
+- D72 (WP12): Kein Hilfeknopf „Ich komme nicht weiter“ (widerspricht D71/Invariante 14); stattdessen „So funktioniert’s“ in den Einstellungen. WebKit-Smoke entfällt (nicht installiert), Chrome genügt.

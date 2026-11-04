@@ -15,7 +15,7 @@ const env = Object.fromEntries(
 const API = `${env.SUPABASE_STAGING_URL}/functions/v1`;
 const BASE = 'http://localhost:4173';
 const NOW = encodeURIComponent('2026-12-02T12:00:00+01:00');
-const THRESHOLD = 90;
+const THRESHOLD = 95;
 
 async function admin(body) {
   const res = await fetch(`${API}/admin_players`, {

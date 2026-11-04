@@ -146,6 +146,12 @@
   text-align: left;
   vertical-align: top;
 }
+.timetable tbody th {
+  position: sticky;
+  left: 0;
+  background: var(--card);
+  min-width: 5.5rem;
+}
 .timetable thead th {
   background: color-mix(in srgb, var(--card) 80%, var(--line));
 }

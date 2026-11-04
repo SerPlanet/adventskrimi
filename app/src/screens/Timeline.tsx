@@ -7,7 +7,7 @@ import { Popup } from '../ui/Popup';
  * the people. Only what the player enters; nothing is checked, filled in or marked.
  */
 export function Timeline() {
-  const { view, setNote, busy } = useSession();
+  const { view, setNote } = useSession();
   const [open, setOpen] = useState<{ window: string; room: string } | null>(null);
   if (!view) return null;
   const windows = view.options.when;
@@ -15,10 +15,18 @@ export function Timeline() {
   const people = view.people;
   const table = view.notes.table;
   const names = (ids: string[]) => ids.map((id) => people.find((p) => p.id === id)?.name ?? id);
-  const ids = open ? (table[`${open.window}|${open.room}`] ?? []) : [];
+  // Local copy while the dialog is open: the checkboxes stay enabled (and keep keyboard focus)
+  // during the request, quick toggles never overwrite each other.
+  const [draft, setDraft] = useState<string[]>([]);
+  const ids = open ? draft : [];
+  const openCell = (window: string, room: string) => {
+    setDraft(table[`${window}|${room}`] ?? []);
+    setOpen({ window, room });
+  };
   const toggle = (id: string) => {
     if (!open) return;
     const next = ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
+    setDraft(next);
     void setNote({ kind: 'cell', window: open.window, room: open.room, persons: next });
   };
 
@@ -52,7 +60,7 @@ export function Timeline() {
                       <button
                         className="cell"
                         aria-label={`${r.name}, ${w.name}: ${who.length ? who.join(', ') : 'leer'}`}
-                        onClick={() => setOpen({ window: w.id, room: r.id })}
+                        onClick={() => openCell(w.id, r.id)}
                       >
                         {who.length ? who.join(', ') : '＋'}
                       </button>
@@ -77,7 +85,6 @@ export function Timeline() {
                   <input
                     type="checkbox"
                     checked={ids.includes(p.id)}
-                    disabled={busy}
                     onChange={() => toggle(p.id)}
                   />
                   {p.name}

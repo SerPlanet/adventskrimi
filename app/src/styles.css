@@ -488,10 +488,29 @@ ul.plain li {
   background: var(--card);
   border: 2px solid var(--accent);
   border-radius: 1rem;
-  padding: 0.8rem 1rem;
+  padding: 1rem 1.2rem;
   width: min(100%, 30rem);
   max-height: 90vh;
+  max-height: 90dvh;
   overflow: auto;
+}
+.popup > * {
+  margin-block: 0;
+}
+.popup > * + * {
+  margin-top: 0.9rem;
+}
+.popup h2 {
+  margin: 0;
+}
+.popup ul.plain {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.2rem 0.6rem;
+  margin-block: 0;
+}
+.popup ul.plain > li {
+  margin: 0;
 }
 .chip {
   border-radius: 999px;
@@ -564,4 +583,7 @@ ul.plain li {
   .dialog {
     grid-template-columns: 7rem 1fr;
   }
+}
+.popup label.radio {
+  margin: 0;
 }

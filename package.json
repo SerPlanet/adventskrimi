@@ -33,7 +33,8 @@
     "test:int": "npm run build:functions && vitest run --config vitest.int.config.ts",
     "deploy:functions": "npm run build:functions && supabase functions deploy --use-api",
     "e2e": "playwright test",
-    "a11y": "node tools/lighthouse/index.mjs"
+    "a11y": "node tools/lighthouse/index.mjs",
+    "plain": "node tools/plain-check/index.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
