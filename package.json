@@ -25,6 +25,7 @@
     "validate-case": "tsx tools/validate-case/index.ts",
     "simulate": "tsx tools/simulate/index.ts",
     "balance": "tsx tools/balance/index.ts",
+    "timelapse": "tsx tools/timelapse/index.ts",
     "fast-forward": "tsx tools/fast-forward/index.ts",
     "reset-player": "tsx tools/reset-player/index.ts",
     "hotspot-editor": "node tools/hotspot-editor/index.mjs",

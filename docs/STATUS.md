@@ -1,6 +1,6 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-04 · WP11 und WP12 erledigt. Nächstes: WP13 (Testlauf), WP14 (Launch).
+Stand: 2026-11-04 · WP11, WP12, WP13 Teil 1 (Bot-Testlauf) erledigt. Offen: WP13 Teil 2 (Menschen-Test), WP14 (Launch).
 
 Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → WP11 ✓ → WP12 ✓ → **WP13** Testlauf → WP14 Launch. Code-Freeze 29.11., Start 1.12.
 
@@ -24,12 +24,13 @@ Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → WP11 ✓ → WP12 ✓ → **W
 
 - WP12: Popup-Fokus (Checkbox behält Fokus, Dialog-Abstände, 2 Spalten), Zeit-Tabelle mit fester Raumspalte und Tastaturtest (`e2e/polish.spec.ts`, 360/768/1440 px ohne Querscroll), „So funktioniert’s“ in den Einstellungen, `npm run plain` (Satz-/Wortlänge), Lighthouse-Schwelle 95 (alle 6 Reiter 100). Nicht gebaut: Hilfeknopf „Ich komme nicht weiter“ (D71), Vorlesen, WebKit (nicht installiert). Offen: Mensch-Test mit Person ≥60 (WP13).
 
+- WP13 Teil 1: `npm run timelapse` (offline, lokaler Fall): beide Profile × 1/2/4/20 Spieler, Tag 1–24 per API im Nachhol-Modus (Datum 24.12.), Anklage; keine Fehler, keine Geheimnisse im Payload, Punkte nie negativ/fallend, Zeitung nur bis zum eigenen Tag. `balance` grün, Lösetag optimal 20 (beide). `api.int.ts` gelöscht. `plain`-Check schlägt bei Satz >20 Wörtern an.
+
 ## Offen im Inhalt (WP10b-Nacharbeit, später)
 - Je Raum/Tag mehr untersuchbare Funde als Aktionen nur in Salon, Küche, Lobby; Tage 1–5 haben fast keine Untersuchen-Funde, Dachboden erst ab Tag 20 (Grenzen und Bots neu kalibrieren, `docs/07`).
 - Namen in `insider.yaml`; Stichprobe der Dialogtexte lesen.
 
 ## Bekannt
-- `tools/integration/api.int.ts` ist veraltet (Test `actions.used`, Altlast „Int-P“): reparieren oder löschen.
 - Ein Spiel kopiert Profil und Punkte beim Anlegen (D64): nach Änderungen an `config/` Staging-Spiele neu anlegen.
 - Prod: Migrationen 0000–0300 sind angewendet, kein Fall geladen, keine Functions deployt, `SUPABASE_PROD_ANON_KEY` fehlt in `.env`.
 
