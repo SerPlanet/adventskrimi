@@ -37,9 +37,9 @@ test.beforeAll(async () => {
   test.setTimeout(300_000);
   const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
   for (const c of CASES) {
-    const [g] = await sql`select id from games where slug = ${c.slug}`;
+    const [g] = await sql`select id from games where slug = ${'e2e-' + c.slug}`;
     await admin({ op: 'create', game_id: g?.id, player: { name: nameOf(c), avatar: '\u{1F9EA}' } });
-    execSync(`npx tsx tools/fast-forward/index.ts ${c.slug} ${nameOf(c)} ${c.day}`, {
+    execSync(`npx tsx tools/fast-forward/index.ts e2e-${c.slug} ${nameOf(c)} ${c.day}`, {
       stdio: 'ignore',
     });
     await sql`update players set state = jsonb_set(state, '{room}', to_jsonb(${c.room}::text)) where name = ${nameOf(c)}`;
@@ -59,7 +59,7 @@ for (const c of CASES) {
   }) => {
     test.setTimeout(120_000);
     const now = encodeURIComponent(`2026-12-0${c.day}T12:00:00+01:00`);
-    await page.goto(`/?now=${now}#/${c.slug}`);
+    await page.goto(`/?now=${now}#/e2e-${c.slug}`);
     await page.getByRole('button', { name: new RegExp(nameOf(c)) }).click();
     await page.getByRole('button', { name: 'Weiter' }).click();
     const bar = page.locator('.bar .actions');

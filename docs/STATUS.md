@@ -29,8 +29,8 @@ Reihenfolge: WP00–WP10 ✓ → WP06b–j ✓ → **WP11 Admin** → WP12 A11y/
 - Ein Spiel kopiert Profil und Punkte beim Anlegen (D64): nach Änderungen an `config/` Staging-Spiele neu anlegen.
 - Prod: Migrationen 0000–0300 sind angewendet, kein Fall geladen, keine Functions deployt, `SUPABASE_PROD_ANON_KEY` fehlt in `.env`.
 
-## Staging-Spiele
-/#/freunde (Mia, Noah Tag 6, Lena, Tom Tag 20) und /#/familie (Oma, Papa Tag 6, Lisa, Jonas Tag 20). Datum fälschen: `?now=2026-12-06T12:00:00+01:00`. Werkzeug: `npm run fast-forward -- <slug> <Name> <Tag>`.
+## Staging-Spiele (Tests nie in diesen!)
+/#/freunde und /#/familie: je „Detektiv A“, „Detektiv B“ (Tag 1, nichts gespielt), „Tag 6“ (bis Tag 5 vorgespielt) plus Altspieler. Datum fälschen: `?now=2026-12-24T12:00:00+01:00`. Zurücksetzen: `npm run reset-player -- <slug> "<Name>" <Tag>` (nur Staging). Playwright und Lighthouse nutzen eigene Spiele `e2e-test`, `e2e-freunde`, `e2e-familie` und löschen ihre Spieler.
 
 ## Mensch (kann kein Agent tun)
 - [ ] Spieler-Namen und Profilwahl (Familie/Freunde) bereitstellen (WP14)

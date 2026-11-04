@@ -24,7 +24,7 @@ async function admin(body: object) {
 
 test.beforeAll(async () => {
   const sql = postgres({ ...connInfo('staging'), ssl: 'require', max: 1 });
-  const [g] = await sql`select id from games where name = 'Testspiel' limit 1`;
+  const [g] = await sql`select id from games where slug = 'e2e-test'`;
   await sql.end();
   gameId = g?.id as string;
   await admin({ op: 'create', game_id: gameId, player: { name: NAME, avatar: '\u{1F9EA}' } });
@@ -44,7 +44,7 @@ test('wrong or missing link shows a friendly note', async ({ page }) => {
 });
 
 test('name tile, newspaper, action, dossier, end of day, next day', async ({ page }) => {
-  await page.goto(`/?now=${NOW}#/test`);
+  await page.goto(`/?now=${NOW}#/e2e-test`);
 
   // name tiles -> newspaper
   await page.getByRole('button', { name: new RegExp(NAME) }).click();
@@ -258,7 +258,7 @@ test('timeline table: several people per cell, nothing checked; theory is saved'
   await sql`update players set settings = '{}'::jsonb, state = jsonb_set(jsonb_set(state, '{found}', '["f_cora_keller","s_cora_halle"]'::jsonb), '{discoveries}', '[{"sourceId":"src_lampe","itemIds":["f_cora_keller"],"day":1},{"sourceId":"src_cora","itemIds":["s_cora_halle"],"day":1}]'::jsonb) where name = ${NAME}`;
   await sql.end();
 
-  await page.goto(`/?now=${NOW}#/test`);
+  await page.goto(`/?now=${NOW}#/e2e-test`);
   await page.getByRole('button', { name: new RegExp(NAME) }).click();
   await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
   await page.getByRole('tab', { name: 'Zeit' }).click();
