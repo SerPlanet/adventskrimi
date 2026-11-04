@@ -32,7 +32,7 @@ Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20 und WP21 erledigt*
 /#/freunde und /#/familie: „Detektiv A“, „Detektiv B“, „Tag 6“ plus Altspieler. Datum fälschen: `?now=2026-12-24T12:00:00+01:00`. Zurücksetzen: `npm run reset-player -- <slug> "<Name>" <Tag>`. Playwright/Lighthouse nutzen `e2e-*`.
 
 ## Mensch (kann kein Agent tun)
-- [ ] Staging: `config` der Spiele `freunde` und `familie` neu schreiben (Profil und Scoring aus `config/` laden, wie `create-game`), sonst sind sie kaputt. Oder die Spiele neu anlegen.
+- [ ] Staging: `npm run refresh-config -- --slug freunde --yes`, danach dasselbe mit `familie` (schreibt nur `games.config`; ohne `--yes` Vorschau der Felder, prod nur mit `--env prod --yes`).
 - [ ] Spieler-Namen, Profilwahl und Rollen bereitstellen (WP14)
 - [ ] Prod: `SUPABASE_PROD_ANON_KEY` in `.env`, Fall laden, Functions deployen, Spiele anlegen (WP14)
 - [ ] Domain/Link verteilen; Namen in `insider.yaml`; ab 16.11. Tag 1–10 selbst durchspielen

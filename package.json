@@ -30,6 +30,7 @@
     "reset-player": "tsx tools/reset-player/index.ts",
     "hotspot-editor": "node tools/hotspot-editor/index.mjs",
     "create-game": "tsx tools/create-game/index.ts",
+    "refresh-config": "tsx tools/refresh-config/index.ts",
     "build:functions": "node tools/build-functions/index.mjs",
     "test:int": "npm run build:functions && vitest run --config vitest.int.config.ts",
     "deploy:functions": "npm run build:functions && supabase functions deploy --use-api",
