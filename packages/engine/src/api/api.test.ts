@@ -251,6 +251,30 @@ describe('first discoverer', () => {
   });
 });
 
+describe('admin overview (WP11)', () => {
+  test('counts and flags only: no theory, no find text, no solution; regen forgets a stored paper', async () => {
+    await call('set_theory', { slug: 'test', player_id: a, theory: { who: 'anna' } });
+    await call('act', { slug: 'test', player_id: a, request_id: rid(), action: talk });
+    const o = (await adminPlayers(store, { op: 'overview', game_id: 'g1' }, DAY3)) as unknown as {
+      today: number;
+      players: { name: string }[];
+    };
+    expect(o.today).toBe(3);
+    const row = o.players.find((p) => p.name === 'Anna-Spielerin')!;
+    expect(row).toMatchObject({ finds: 1, accused: false, days_finished: 0 });
+    const json = JSON.stringify(o);
+    expect(json).not.toContain('"theory"');
+    expect(json).not.toMatch(/solution|Ben ist als Dieb/);
+    expect(
+      ((await adminPlayers(store, { op: 'games' })) as { games: unknown[] }).games,
+    ).toHaveLength(1);
+    await call('newspaper', { slug: 'test', player_id: a, day: 1 });
+    expect(await adminPlayers(store, { op: 'regen_paper', game_id: 'g1', day: 1 })).toEqual({
+      regenerated: 1,
+    });
+  });
+});
+
 describe('newspaper and scoreboard', () => {
   test('two simultaneous first requests produce one newspaper', async () => {
     // both players are on day 2 (the issue of day 2 is readable from there)

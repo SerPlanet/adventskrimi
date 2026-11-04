@@ -156,6 +156,9 @@ function gameTx(sql: Sql | Q, game: GameRecord, base: Sql | Q): GameTx {
         await sql`select content from newspaper where game_id = ${game.id} and day = ${day}`;
       return r?.content as NewspaperContent | undefined;
     },
+    async dropNewspaper(day) {
+      await sql`delete from newspaper where game_id = ${game.id} and day = ${day}`;
+    },
     async storeNewspaper(day, content) {
       await sql`insert into newspaper (game_id, day, content) values (${game.id}, ${day}, ${sql.json(content as any)})
                 on conflict (game_id, day) do nothing`;
@@ -226,6 +229,18 @@ export class PgStore implements Store {
     return r
       ? { id: r.id as string, name: r.name as string, profile: r.profile as string }
       : undefined;
+  }
+
+  async listGames() {
+    const rows = await this
+      .sql`select id, slug, name, profile, to_char(start_date, 'YYYY-MM-DD') as start_date from games order by slug`;
+    return rows.map((r: any) => ({
+      id: r.id,
+      slug: r.slug,
+      name: r.name,
+      profile: r.profile,
+      startDate: r.start_date,
+    }));
   }
 
   async listPlayers(gameId: string) {

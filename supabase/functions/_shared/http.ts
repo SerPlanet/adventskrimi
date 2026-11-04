@@ -77,11 +77,11 @@ export function serveAdmin() {
     if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
     if (req.method !== 'POST') return json(405, { ok: false, error: 'method_not_allowed' });
     try {
-      clock(req);
+      const now = clock(req);
       const token = Deno.env.get('ADMIN_TOKEN') ?? '';
       if (token.length < 16 || !same(req.headers.get('x-admin-token') ?? '', token))
         throw new ApiError('forbidden', 403);
-      return json(200, { ok: true, ...(await adminPlayers(getStore(), await readBody(req))) });
+      return json(200, { ok: true, ...(await adminPlayers(getStore(), await readBody(req), now)) });
     } catch (e) {
       if (e && typeof e === 'object' && 'issues' in e)
         return json(400, { ok: false, error: 'bad_request' });

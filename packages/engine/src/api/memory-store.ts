@@ -64,6 +64,9 @@ export class MemoryStore implements Store {
       async newspaper(day) {
         return self.papers.get(day);
       },
+      async dropNewspaper(day) {
+        self.papers.delete(day);
+      },
       async storeNewspaper(day, content) {
         if (!self.papers.has(day)) self.papers.set(day, content);
         return self.papers.get(day) as NewspaperContent;
@@ -130,6 +133,13 @@ export class MemoryStore implements Store {
   async gameBySlug(slug: string) {
     const g = this.gameRecord;
     return g.slug === slug ? { id: g.id, name: g.name, profile: g.profile.id } : undefined;
+  }
+
+  async listGames() {
+    const g = this.gameRecord;
+    return [
+      { id: g.id, slug: g.slug, name: g.name, profile: g.profile.id, startDate: g.startDate },
+    ];
   }
 
   async listPlayers() {

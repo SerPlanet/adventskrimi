@@ -79,6 +79,8 @@ export interface GameTx {
   newspaper(day: number): Promise<NewspaperContent | undefined>;
   /** Insert once; on a race the first writer wins and its content is returned. */
   storeNewspaper(day: number, content: NewspaperContent): Promise<NewspaperContent>;
+  /** admin: forget a stored paper so that it is made again from the case (never touches points) */
+  dropNewspaper(day: number): Promise<void>;
 }
 
 export interface PlayerTx extends GameTx {
@@ -102,6 +104,9 @@ export interface Store {
   game<T>(gameId: string, fn: (tx: GameTx) => Promise<T>): Promise<T>;
   gameBySlug(slug: string): Promise<{ id: string; name: string; profile: string } | undefined>;
   listPlayers(gameId: string): Promise<PlayerRecord[]>;
+  listGames(): Promise<
+    { id: string; slug: string; name: string; profile: string; startDate: string }[]
+  >;
   createPlayer(
     gameId: string,
     p: { name: string; avatar: string | null; isDuo: boolean; state: PlayerState },

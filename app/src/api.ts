@@ -30,6 +30,41 @@ function clockOverride(): string | null {
   }
 }
 
+/** Admin calls carry the secret token (kept in this tab only) and the test clock on staging. */
+export async function adminCall<T>(token: string, body: object): Promise<Reply<T>> {
+  const now = clockOverride();
+  try {
+    const res = await fetch(`${__API_URL__}/admin_players`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': token,
+        ...(__ANON_KEY__ ? { apikey: __ANON_KEY__ } : {}),
+        ...(now ? { 'x-game-now': now } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
+    if (json.ok) return json as Reply<T>;
+    const message =
+      json.error === 'forbidden' ? 'Das Token passt nicht.' : 'Das hat nicht geklappt.';
+    return { ok: false, error: json.error, message };
+  } catch {
+    return { ok: false, error: 'offline', message: OFFLINE };
+  }
+}
+
+/** Test clock of this tab (staging only; the server refuses it in production). */
+export const setClock = (iso: string | null) => {
+  try {
+    if (iso) sessionStorage.setItem('advent.now', iso);
+    else sessionStorage.removeItem('advent.now');
+  } catch {
+    /* no storage: the clock stays real */
+  }
+};
+export const clockNow = (): string | null => clockOverride();
+
 let currentSlug = '';
 /** The game of the current link; sent with every request. */
 export const setSlug = (s: string) => {

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { Admin } from './screens/Admin';
 import { setSlug } from './api';
 import { useRoute } from './route';
 import { SessionProvider } from './store';
@@ -17,6 +18,7 @@ function Root() {
         <p role="alert">Bitte öffne den Link, den du bekommen hast.</p>
       </main>
     );
+  if (slug === 'admin') return <Admin />;
   setSlug(slug);
   return (
     <SessionProvider key={slug} slug={slug}>
