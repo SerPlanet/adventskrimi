@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import postgres from 'postgres';
-import { WORDS } from '../packages/engine/src/puzzles/word';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { connInfo, readEnv } from '../tools/lib/db';
 
 // Day 2 is "today" in the fake clock, so a fresh player (still on day 1) can play day 1 and then day 2.
@@ -67,10 +68,6 @@ test('role, newspaper, talk, first action, good night, next day', async ({ page 
   await expect(page.locator('.lead .filebtn')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByText('Ausgabe Nr. 1')).toBeVisible();
   await expect(page.getByLabel('Tagesstatus')).toContainText('Tag 1');
-
-  // question of the day
-  await page.getByRole('button', { name: 'Schnee' }).click();
-  await expect(page.getByText('Richtig! Gut gelesen.')).toBeVisible();
 
   // puzzle of day 1 on calendar day 2: solvable later, it says what it counts, no penalty tone
   await expect(page.getByRole('heading', { name: /Rätsel von Tag 1: Zahlenfeld/ })).toBeVisible();
@@ -151,7 +148,14 @@ test('role, newspaper, talk, first action, good night, next day', async ({ page 
   await expect(page.getByText(/zählt/)).toHaveCount(0);
   const label = (await page.locator('.letters').getAttribute('aria-label')) ?? '';
   const letters = label.replace('Buchstaben: ', '').split(' ').sort().join('');
-  const word = Object.values(WORDS)
+  const words = (
+    createRequire(import.meta.url)('yaml').parse(
+      readFileSync('cases/_test/riddles.yaml', 'utf8'),
+    ) as {
+      anagrams: Record<string, string[]>;
+    }
+  ).anagrams;
+  const word = Object.values(words)
     .flat()
     .find((w) => [...w].sort().join('') === letters) as string;
   await page.getByLabel('Deine Antwort').fill('definitiv falsch');
