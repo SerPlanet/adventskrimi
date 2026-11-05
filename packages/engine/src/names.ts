@@ -77,7 +77,7 @@ export function placeholderErrors(c: LoadedCase): string[] {
   const walk = (v: unknown, path: string) => {
     if (typeof v === 'string') {
       for (const b of v.match(ANY_BRACES) ?? []) {
-        if (b === '{rolle}' || b === '{anrede}') continue;
+        if (b === '{rolle}' || b === '{anrede}' || b === '{auftrag}') continue;
         const m = /^\{(n|anrede):([a-z0-9_]+)\}$/.exec(b);
         const problem = !m
           ? 'malformed placeholder'

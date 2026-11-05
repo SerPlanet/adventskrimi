@@ -7,11 +7,9 @@ export interface Answer {
   finds: string[];
 }
 
-const NOTHING = 'Dazu weiß ich nichts.';
-
 /**
- * The answer to a question or a shown item (02c §6). Every question has one: without a source in
- * this room today, the figure says it knows nothing. Free of charge, repeatable, nothing changes.
+ * The answer to a question or a shown item (02c §6). Every question that is offered has one; a
+ * question of the story can be asked again and gives the same answer. Free of charge.
  */
 export function answerOf(st: PlayerState, ctx: GameCtx, a: Action): Answer | undefined {
   if (a.type !== 'talk' && a.type !== 'use') return undefined;
@@ -23,14 +21,8 @@ export function answerOf(st: PlayerState, ctx: GameCtx, a: Action): Answer | und
       ? (npc.topics.find((t) => t.id === a.topic)?.label ?? '')
       : 'Ich zeige dir etwas.';
   const src = openSources(st, ctx, a)[0];
-  if (!src)
-    return {
-      lines: [
-        { speaker: 'Du', text: label },
-        { speaker: npc.name, text: NOTHING },
-      ],
-      finds: [],
-    };
+  // a question that has no answer today is not offered, so there is nothing to say
+  if (!src) return undefined;
   const finds = src.yields.filter(
     (y) =>
       ctx.c.facts.facts.some((f) => f.id === y) ||
@@ -48,7 +40,7 @@ export function answerOf(st: PlayerState, ctx: GameCtx, a: Action): Answer | und
   return {
     lines: [
       { speaker: 'Du', text: label },
-      { speaker: npc.name, text: said || NOTHING },
+      { speaker: npc.name, text: said },
     ],
     finds,
   };

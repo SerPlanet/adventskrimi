@@ -169,6 +169,11 @@ export function checkRefs(c: LoadedCase): string[] {
       if (!factIds.has(h) && !items.has(h))
         errs.push(`sources.yaml: ${s.id}.unlock.has: unknown find "${h}"`);
   }
+  if (
+    !c.prolog.mission &&
+    c.events.events.some((e) => e.story.some((t) => t.includes('{auftrag}')))
+  )
+    errs.push('events.yaml: a story says {auftrag} but prolog.yaml has no mission');
   for (const p of c.puzzles.puzzles) {
     need('puzzles.yaml', p.id, rooms, p.room, 'room');
     need('puzzles.yaml', p.id, sources, p.unlocks, 'source');

@@ -1,5 +1,5 @@
 import type { Info } from '../solver/info';
-import { wordCount, type Quality } from '../schemas';
+import { expandDays, wordCount, type Quality } from '../schemas';
 import type { CheckResult } from './types';
 
 /** A visible text must not give the verdict (invariant 13). */
@@ -45,14 +45,19 @@ export function checkExplore(info: Info, quality: Quality): CheckResult {
       if (wordCount(l.text) > 60)
         errors.push(`source ${s.id}: a line has ${wordCount(l.text)} words`);
 
-  if (!quality.lie_web)
-    return { name: 'explore', ok: errors.length === 0, errors, note: 'lie web off' };
-
-  // every topic of every figure has an answer somewhere (a talk source); elsewhere "Dazu weiß ich nichts."
+  // every topic of every figure has an answer somewhere (a talk source); a question is only offered where it has an answer (WP22c)
   for (const n of c.npcs.npcs)
     for (const t of n.topics)
       if (!c.sources.sources.some((s) => s.kind === 'talk' && s.npc === n.id && s.topic === t.id))
         errors.push(`npc ${n.id}: topic ${t.id} has no answer`);
+
+  // a question of the course of the day: `until_day` lies inside the days of the source
+  for (const s of c.sources.sources)
+    if (s.until_day !== undefined && s.until_day < Math.min(...expandDays(s.days)))
+      errors.push(`source ${s.id}: until_day ${s.until_day} lies before its first day`);
+
+  if (!quality.lie_web)
+    return { name: 'explore', ok: errors.length === 0, errors, note: 'lie web off' };
 
   // lie web: every figure keeps something back, with a reason; mentioned by at least two others
   const stmts = c.statements.statements;

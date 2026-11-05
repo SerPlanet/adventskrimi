@@ -123,8 +123,10 @@ export const handlers = {
         }
       }
       if (next !== tx.player.state) await tx.save(next);
-      // every question gets an answer, also "Dazu weiß ich nichts." (02c §6)
-      const answer = result.status === 'unavailable' ? undefined : answerOf(next, ctx, req.action);
+      // every offered question has an answer; it is told from the state before, because a question
+      // that is asked only once is gone afterwards (WP22c)
+      const answer =
+        result.status === 'unavailable' ? undefined : answerOf(tx.player.state, ctx, req.action);
       const out =
         result.status === 'found'
           ? { status: 'found', new_items: result.newItems, points: result.points, answer }

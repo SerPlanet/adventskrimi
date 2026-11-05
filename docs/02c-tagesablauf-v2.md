@@ -20,7 +20,7 @@ Oben: Ort, wer sonst hier ist (Namen), Statuschip (§9). Darunter die Szene. **K
 - Querverbindungen über Räume und Tage (Code in Raum A, Schloss in Raum B) sind gewünscht.
 
 ## 6. Gespräche (wie im Videospiel)
-Tippen auf eine Person **startet sofort den Dialog**. Der Spieler wählt aus einer Liste von Fragen (mit „Zeigen“ eines Fundes). **Jede Frage hat eine Antwort**, auch „Dazu weiß ich nichts.“. Gespräche sind kostenlos. Jede Antwort hat **„In die Akte legen“**: Der Spieler übernimmt selbst, was ihn interessiert.
+Tippen auf eine Person **startet sofort den Dialog**. Der Spieler wählt aus einer Liste von Fragen (mit „Zeigen“ eines Fundes). **Jede angebotene Frage hat eine Antwort** (D87): Fragen zur Geschichte sind jederzeit wieder fragbar und geben dieselbe Antwort, reine Ablauf-Fragen sind nur einmal oder bis zu einem Tag fragbar (`once`, `until_day`). Eine Frage ohne Antwort wird nicht angeboten. Gespräche sind kostenlos. Jede Antwort hat **„In die Akte legen“**: Der Spieler übernimmt selbst, was ihn interessiert.
 
 ## 7. Akte: nur was der Spieler hineinlegt
 - Inhalt: vom Spieler eingelegte Artikel, Antworten und Notizen sowie Dokumente und Gegenstände im Inventar. Der Rest bleibt im **Verlauf** (nachlesbar, aber nicht sortiert).

@@ -87,6 +87,8 @@ export const PrologFile = z.object({
   ),
   /** day 1: how the player arrives, one to three sentences (02c §2) */
   arrival: CardText.optional(),
+  /** the task of the player, told on the day the story says `{auftrag}` and readable afterwards (WP22c) */
+  mission: CardText.optional(),
   mini_case: z.object({ title: z.string().min(1), text: CardText }),
   page_texts: z.array(z.object({ id: Id, text: CardText })).default([]),
 });

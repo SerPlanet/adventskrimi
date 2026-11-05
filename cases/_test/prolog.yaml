@@ -1,3 +1,4 @@
+mission: Du bist als {rolle} im Testhaus und klärst den Diebstahl. Man nennt dich {anrede}.
 arrival: Du erreichst das Testhaus im ersten Schnee und klopfst dir die Stiefel ab. Man begrüßt dich als {anrede}.
 days:
   - { day: 1, goal: Lerne die Halle kennen, intro: 'Willkommen im Testhaus. Sprich mit {n:anna}.' }

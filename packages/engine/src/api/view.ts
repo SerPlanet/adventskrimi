@@ -16,7 +16,7 @@ import {
   corridorOf,
   existsFor,
   guidedRoom,
-  narrativeOf,
+  dayCards,
   nightOf,
   ownWay,
   nextRooms,
@@ -188,13 +188,17 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
               id: n.id,
               name: n.name,
               role: n.role,
-              // a question exists once one of its answers does (WP20: unlock)
-              topics: n.topics.filter((t) => {
-                const mine = c.sources.sources.filter(
-                  (x) => x.kind === 'talk' && x.npc === n.id && x.topic === t.id,
-                );
-                return !mine.length || mine.some((x) => existsFor(x, st, ctx));
-              }),
+              // a question is offered when an answer exists for it today (WP20 unlock, WP22c once)
+              topics: n.topics.filter((t) =>
+                c.sources.sources.some(
+                  (x) =>
+                    x.kind === 'talk' &&
+                    x.npc === n.id &&
+                    x.topic === t.id &&
+                    existsFor(x, st, ctx) &&
+                    ctx.reach.roomOn(x.id, st.day) === st.room,
+                ),
+              ),
             })),
     },
     map: {
@@ -237,12 +241,16 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
       return { id, name: i?.name ?? id, text: i?.text ?? '' };
     }),
     // what the morning looks like (02c §2), and whether the player's day is over (02c §9)
-    narrative: narrativeOf(st, ctx, role),
-    // the opening as cards: the story of the day (if any), then the way into the room
-    narrative_cards: [
-      ...(c.events.events.find((e) => e.day === st.day)?.story ?? []),
-      narrativeOf(st, ctx, role),
-    ],
+    // the opening of the day as cards: mood of the day, then the way into the room (re-readable as text)
+    narrative: dayCards(st, ctx, role).join(' '),
+    narrative_cards: dayCards(st, ctx, role),
+    // the task of the player, from the day the story tells it on (WP22c)
+    mission:
+      c.prolog.mission &&
+      st.day >=
+        (c.events.events.find((e) => e.story.some((t) => t.includes('{auftrag}')))?.day ?? 25)
+        ? c.prolog.mission
+        : null,
     role: { id: role.id, name: role.name },
     // the choice is open until the end of day 1
     roles: ctx.profile.roles.map((r) => ({ id: r.id, name: r.name })),

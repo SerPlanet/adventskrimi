@@ -28,6 +28,13 @@ export function checkTexts(info: Info, q: Quality): CheckResult {
       return t ? [[`source ${s.id} popup`, t] as [string, string]] : [];
     }),
   ];
+  // the card of the way into a room: the room left, the room entered, an echo of up to 15 words
+  const maxOf = (f: (r: (typeof c.rooms.rooms)[number]) => string | undefined) =>
+    Math.max(0, ...c.rooms.rooms.map((r) => wordCount(f(r) ?? '')));
+  if (maxOf((r) => r.abgang) + maxOf((r) => r.ankunft) + 15 > q.card_words_max)
+    errors.push(
+      `way card: longest "abgang" and "ankunft" plus an echo exceed ${q.card_words_max} words`,
+    );
   for (const [where, text] of cards) {
     const w = wordCount(text);
     if (w > q.card_words_max) errors.push(`${where}: ${w} words (max ${q.card_words_max})`);

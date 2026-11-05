@@ -67,6 +67,13 @@ export const Source = z.object({
       has: z.array(Id).default([]),
     })
     .optional(),
+  /**
+   * A question of the story can be asked again and again and gives the same answer. A question
+   * of the course of the day (WP22c) is asked once (`once`) or only until a day (`until_day`):
+   * after that it is no longer offered.
+   */
+  once: z.boolean().optional(),
+  until_day: Day.optional(),
   /** fact or statement ids */
   yields: z.array(Id).min(1),
   /** neutral first-discoverer title, must not reveal place or content */

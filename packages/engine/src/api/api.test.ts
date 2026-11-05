@@ -638,7 +638,13 @@ describe('good night, role and the plan on guided days (WP21)', () => {
     const v = await stateOf(a, DAY3);
     expect(v.narrative_cards).toHaveLength(3);
     expect(v.narrative_cards[0]).toBe('Der Morgen ist hell und still.');
-    expect(v.narrative_cards[2]).toBe(v.narrative);
+    expect(v.narrative).toBe(v.narrative_cards.join(' '));
+    // the task is told in a card and stays readable from that day on (WP22c)
+    expect(v.narrative_cards[1]).toContain('Privatdetektiv');
+    expect(v.mission).toContain('Du bist als Privatdetektiv im Testhaus');
+    setDay(a, 2);
+    expect((await stateOf(a, DAY3)).mission).toBeNull();
+    setDay(a, 3);
     setDay(a, 2);
     expect((await stateOf(a, DAY3)).narrative_cards).toEqual([(await stateOf(a, DAY3)).narrative]);
   });

@@ -53,6 +53,10 @@ test('role, newspaper, talk, first action, good night, next day', async ({ page 
   await page.getByRole('button', { name: 'Weiter' }).click();
   // the day opens with a short narrative (02c §2), told with the role; then the newspaper
   await expect(page.getByRole('heading', { name: 'Tag 1' })).toBeVisible();
+  // card 1: the mood of the day, card 2: the arrival with the role
+  await expect(page.locator('.intro .story')).toContainText('Schnee');
+  await expect(page.getByText('Karte 1 von 2')).toBeVisible();
+  await page.getByRole('button', { name: 'Weiter' }).click();
   await expect(page.locator('.intro .story')).toContainText('Testhaus');
   await expect(page.locator('.intro .story')).toContainText('Man begrüßt dich als Journalist.');
   await expect(page.locator('.intro .story')).toContainText('Du reist als Journalist an.');
@@ -84,8 +88,6 @@ test('role, newspaper, talk, first action, good night, next day', async ({ page 
   // a tap on a person starts the conversation at once; every question has an answer
   await page.getByRole('button', { name: /Anna/ }).last().click();
   await expect(page.getByRole('dialog', { name: /Gespräch mit Anna/ })).toBeVisible();
-  await page.getByRole('button', { name: 'Das Wetter' }).click();
-  await expect(page.getByText('Dazu weiß ich nichts.')).toBeVisible();
   // dialog: speech bubbles; every answer can be put into the dossier on its own
   await page
     .getByRole('dialog')

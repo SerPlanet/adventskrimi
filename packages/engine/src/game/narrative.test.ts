@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest';
 import { loadCase, loadProfile, loadScoring, type LoadedCase } from '../loader';
 import { fillRole, renameCase } from '../names';
 import { applyProfile } from '../solver';
-import { endDay, makeCtx, narrativeOf, newPlayer, resolveAction, type GameCtx } from './index';
+import { endDay, makeCtx, dayCards, newPlayer, resolveAction, type GameCtx } from './index';
 
 const ROOT = join(__dirname, '../../../..');
 const scoring = loadScoring(join(ROOT, 'config/scoring.json'));
@@ -22,7 +22,7 @@ describe('narrative of the day (02c §2)', () => {
   const ctx = ctxOf(load('cases/_test'));
 
   test('day 1 is the arrival and the first room', () => {
-    const text = narrativeOf(newPlayer(ctx), ctx);
+    const text = dayCards(newPlayer(ctx), ctx).join(' ');
     expect(text).toContain('Testhaus');
     expect(text).toContain('Halle');
   });
@@ -36,10 +36,22 @@ describe('narrative of the day (02c §2)', () => {
     const r = endDay(st, ctx, 'keller');
     if (!r.ok) throw new Error(r.reason);
     st = r.state;
-    const text = narrativeOf(st, ctx);
+    const text = dayCards(st, ctx).join(' ');
     expect(text).toContain('Du lässt die warme Halle hinter dir.');
     expect(text).toContain('Im Keller riecht es nach Stein');
     expect(text).toContain('Das Gespräch mit Anna geht dir noch nach.');
+  });
+
+  test('every card of every day and room has at most 60 words (invariant 5)', () => {
+    const words = (t: string) => t.trim().split(/\s+/).length;
+    const mission = ctx.c.prolog.mission ?? '';
+    for (const room of ctx.c.rooms.rooms)
+      for (let day = 1; day <= 24; day++)
+        for (const card of dayCards(
+          { ...newPlayer(ctx), day, room: room.id, prevRoom: room.id },
+          ctx,
+        ))
+          expect(words(card.replace('{auftrag}', mission))).toBeLessThanOrEqual(60);
   });
 
   test('no placeholders, and no text of any find on any day', () => {
@@ -50,7 +62,7 @@ describe('narrative of the day (02c §2)', () => {
     ];
     let st = newPlayer(ctx);
     for (let day = 1; day <= 24; day++) {
-      const raw = narrativeOf({ ...st, day, prevRoom: 'keller' }, ctx);
+      const raw = dayCards({ ...st, day, prevRoom: 'keller' }, ctx).join(' ');
       // the view fills the role placeholders ({rolle}, {anrede}) for the player
       const text = fillRole(raw, { name: 'Detektiv', anrede: 'Detektiv' });
       expect(text).not.toContain('{');
@@ -70,7 +82,7 @@ describe.runIf(existsSync(join(ROOT, 'cases/berghotel')))('narrative on the real
       for (const room of ctx.c.rooms.rooms)
         for (let day = 1; day <= 24; day++) {
           const text = fillRole(
-            narrativeOf({ ...newPlayer(ctx), day, room: room.id, prevRoom: room.id }, ctx),
+            dayCards({ ...newPlayer(ctx), day, room: room.id, prevRoom: room.id }, ctx).join(' '),
             { name: 'Detektiv', anrede: 'Detektiv' },
           );
           expect(text).not.toContain('{');

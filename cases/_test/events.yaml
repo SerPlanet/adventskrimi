@@ -6,5 +6,5 @@ events:
       headline: Heller Morgen,
       text: Die Sonne scheint.,
       weather: Sonne,
-      story: [Der Morgen ist hell und still., Jemand hat über Nacht den Hof gefegt.],
+      story: [Der Morgen ist hell und still., '{auftrag}'],
     }

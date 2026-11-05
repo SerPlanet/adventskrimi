@@ -62,11 +62,14 @@ function targetHere(a: Action, st: PlayerState, ctx: GameCtx): boolean {
   return room ? room === st.room : npcAt(target) === st.room;
 }
 
-/** Does the source exist for the player today? `unlock` (WP20) keeps a thing or question away until it holds. */
+/** Does the source exist for the player? `unlock` (WP20) keeps a thing or question away until it holds, `once`/`until_day` take it away again (WP22c). */
 export function unlockMet(s: Source, st: PlayerState): boolean {
+  const seen = new Set(st.discoveries.map((d) => d.sourceId));
+  // a question of the course of the day: once, or only until a day (WP22c)
+  if (s.once && seen.has(s.id)) return false;
+  if (s.until_day !== undefined && st.day > s.until_day) return false;
   const u = s.unlock;
   if (!u) return true;
-  const seen = new Set(st.discoveries.map((d) => d.sourceId));
   return (
     (u.day_from === undefined || st.day >= u.day_from) &&
     u.asked.every((id) => seen.has(id)) &&

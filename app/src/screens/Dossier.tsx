@@ -78,6 +78,12 @@ export function Dossier() {
       <h1>
         Deine Akte <span className="stampmark">Vertraulich</span>
       </h1>
+      {view.mission && (
+        <details className="mission">
+          <summary>Dein Auftrag</summary>
+          <p>{view.mission}</p>
+        </details>
+      )}
       <div className="ftabs" role="tablist" aria-label="Reiter der Akte">
         {TABS.map(([id, label]) => (
           <button
