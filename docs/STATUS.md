@@ -1,15 +1,16 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20, WP21 und WP22 erledigt**. **Nächstes Work Package: WP23.** Danach → WP13 Teil 2 (Menschen-Test) → WP14 (Launch). Code-Freeze 29.11., Start 1.12.
+Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20, WP21, WP22 und WP23 Stufe 1 erledigt**. **Nächstes Work Package: WP23 Stufe 2 (Tag 15–24), dann Stufe 3 (Lockerungen weg, `balance`).** Danach → WP13 Teil 2 (Menschen-Test) → WP14 (Launch). Code-Freeze 29.11., Start 1.12.
 
 ## Nächste Work Packages
 | WP | Inhalt | Datei |
 |---|---|---|
-| WP23 | Inhalt ab Tag 6 (Sub-Agent) | `docs/wp/WP23-inhalt-ab-tag6.md` |
+| WP23 | Inhalt ab Tag 6, Stufe 2 und 3 offen (Sub-Agent) | `docs/wp/WP23-inhalt-ab-tag6.md` |
 
 ## Erledigt (Kurzform, Details in `git log` und den WP-Dateien)
 - WP00–WP12, WP15–WP19: Engine, Schemas, Solver, Validator, Simulator, Edge Functions, Frontend, Rätsel, Raster, Zeitstrahl, Zeugnis, Anklage, Erkunden-Kern, Akte, Dialog, Schlösser, Zeitung, Verwaltung, A11y, `knip`.
 - WP13 Teil 1: `npm run timelapse` (beide Profile × 1/2/4/20 Spieler) ohne Fehler. `balance` grün, Lösetag 20.
+- WP23 Stufe 1: 10 neue Erkenntnisse zur Tatnacht (20 gesamt), 25 neue Dinge (jeder Raum ≥5), 3 Passwort-Ketten (Salon→Keller, Küche→Werkstatt, Keller→Dachboden), 7 neue Nacht-Fragen mit `unlock`, keine Kalendersperren mehr (D75), Tagestexte Tag 7–14 (Karten, Zeitung, Rätsel, Wegkarten). `validate-case` grün (mit Override), Lösetag 9 (zu früh, Stufe 3). Ohne Override rot: Stichprobe 86 % (nötig 90), Tempo, Mindestzahlen, Lügennetz, Tag 15–24 ohne Zeitung/Karten.
 - WP22: Neuer Fall Berghotel Edelweiß (7 Figuren, 3 Flure, 12 Räume), Lösung lokal festgelegt (nur in `cases/berghotel/`), Tag 1–5 geschrieben (87 Quellen, 10 Erkenntnisse mit 7–10 Belegen, Typ `story`, Dialoge mit Folgefragen und `unlock`). `validate-case` grün für beide Profile (mit `quality.override.json`), Lösetag 17. Backup des alten Falls: `cases/_archiv-berghotel-alt/` (lokal).
 - WP22c: Tageseinstieg als Karten (Stimmung aus `events.story`, dann Weg-Karte), Fragen mit `once`/`until_day` (1 Ablauf-Frage im Fall, alle anderen Story), „Weiß ich nichts“ entfällt, Auftrag ab Tag 6 (`prolog.mission`, in der Akte nachlesbar). Texte Tag 7–24: WP23.
 - WP22b: Neue Regeln (Beleg je Weg höchstens einmal, Zeitung wiederholt nichts, jede Antwort bringt Neues), 3–4 Belege je Erkenntnis (37 insgesamt), Tag-6-Einstieg (4 Erzählkarten, Skandal-Zeitung mit 5 Artikeln). Override: Stichprobe 0,7 bis WP23.
