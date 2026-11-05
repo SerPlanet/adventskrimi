@@ -15,7 +15,7 @@ Das bisherige Tagesrätsel wird erweitert, kein zweites System. Jeder Typ: Erzeu
 | Typ (`kind`) | Daten im Fall (`riddles.yaml`) | Prüfung | UI | Barrierefreiheit |
 |---|---|---|---|---|
 | `sudoku` 4×4, 6×6 (9×9 später) | nichts (Generator, eindeutig) | Ziffernfolge | Feld mit Eingabefeldern | Pfeiltasten, Beschriftung „Zeile, Spalte“ |
-| `wordle` (5 Buchstaben, deutsch) | `wordle` Liste | Server prüft Wort in Liste und liefert Treffer je Buchstabe (Zeichen und Wort, nie nur Farbe) | Raster, Eingabe, 6 Versuche | Rückmeldung als Text |
+| `wordle` (5 Buchstaben, deutsch) | `wordle` Liste (nur Lösungswörter, ≥30) | Jede Folge aus 5 Buchstaben ist ein Tipp (D90), der Server liefert Treffer je Buchstabe (Zeichen und Wort, nie nur Farbe) | Raster, Eingabe, 6 Versuche | Rückmeldung als Text |
 | `word` (Anagramm) | `anagrams` je Stufe | Text | Buchstaben und Eingabe | Buchstaben als Text |
 | `cipher` (Caesar mit Beispiel) | `phrases` | Text | Geheimtext, Beispiel | Text vorlesbar |
 | `number` (Zahlenfolge/Rechenkette), `logic` | nichts (Generator) | Text | wie bisher | wie bisher |
@@ -27,7 +27,7 @@ Spätere Typen (Liste): Silbenrätsel, Schach-Mattaufgabe (feste Stellungen, Zug
 `questions.yaml`, `Question`, `questionOfDay`, `answerQuestion`, `state.questions`, `view.question`, Punkte `question`/`question_hint`, UI und Tests werden gelöscht.
 
 ## 4. Räume (Schritt 4, nach Ok)
-Jeder Raum hat mindestens ein Objekt-Rätsel (Zahlenschloss, Worträtsel, Code) zusätzlich zu den Dingen. Validator: jeder Raum mit Fund hat ≥ Budget+1 Dinge (unabhängig davon, ob ein Fund Beleg ist).
+Jeder Raum hat mindestens ein Objekt-Rätsel (`room_puzzles_min` in `config/quality.json`) zusätzlich zu den Dingen. Validator: jeder Raum hat auf jedem freien Tag ≥ Budget+1 Dinge mit Fund (`rooms_need_budget_plus_one`), Beleg oder nicht.
 
 ## 5. Inhalt (Schritt 5, nach Ok)
 Witze Tag 1–14, Raum-Rätsel, Zeitung Tag 7–14 an Tag 6 angleichen (Zahl, Arten, Tonlage). Tag 15–24: nur Rotation, Inhalt folgt (D80).
