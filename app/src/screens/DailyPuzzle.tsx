@@ -113,8 +113,8 @@ export function DailyPuzzle({ day }: { day: number }) {
         ? 'Richtig! Das hast du gut gelöst.'
         : r?.outcome === 'wrong'
           ? 'Das stimmt noch nicht. Versuch es gern noch einmal. Das kostet nichts.'
-          : r?.outcome === 'unknown_word'
-            ? 'Dieses Wort kenne ich nicht. Der Versuch zählt nicht. Probiere ein anderes Wort.'
+          : r?.outcome === 'invalid_input'
+            ? 'Bitte gib genau 5 Buchstaben ein. Der Versuch zählt nicht.'
             : r?.outcome === 'failed'
               ? 'Die Versuche sind aufgebraucht. Das ist nicht schlimm, morgen gibt es ein neues Rätsel.'
               : '',

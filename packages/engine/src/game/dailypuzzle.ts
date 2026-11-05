@@ -3,6 +3,7 @@ import {
   generateDaily,
   publicPuzzle,
   WORDLE_TRIES,
+  wordleGuess,
   wordleMarks,
   type DailyPuzzle,
   type Level,
@@ -38,7 +39,7 @@ const put = (st: PlayerState, day: number, p: DailyProgress): PlayerState => ({
   daily: { ...st.daily, [day]: p },
 });
 
-export type DailyOutcome = 'correct' | 'wrong' | 'failed' | 'unknown_word' | 'already_done';
+export type DailyOutcome = 'correct' | 'wrong' | 'failed' | 'invalid_input' | 'already_done';
 
 /** Wrong attempts cost nothing. A right answer pays full points, or half after a tip. */
 export function submitDaily(
@@ -56,8 +57,8 @@ export function submitDaily(
   let guesses = p.guesses;
   let exhausted = false;
   if (puzzle.kind === 'wordle') {
-    const g = attempt.trim().toUpperCase();
-    if (!puzzle.words?.includes(g)) return { state: st, outcome: 'unknown_word' };
+    const g = wordleGuess(attempt);
+    if (!g) return { state: st, outcome: 'invalid_input' };
     guesses = [...(p.guesses ?? []), g];
     exhausted = !correct && guesses.length >= WORDLE_TRIES;
   }

@@ -8,6 +8,7 @@ import {
   kindOfDay,
   publicPuzzle,
   LEVELS,
+  wordleGuess,
   wordleMarks,
 } from './index';
 
@@ -76,12 +77,19 @@ describe('puzzle of the day: 24 days x 3 levels', () => {
     expect(wordleMarks('ABEND', 'XXXXX')).toBe('nnnnn');
   });
 
-  test('wordle: the answer is in the list, the view never shows it or the list', () => {
+  test('wordle: the answer comes from the case list, the view never shows it', () => {
     const p = generateDaily('test', dayOf('wordle'), 'medium', cfg);
-    expect(p.words).toContain(p.answer);
-    const text = JSON.stringify(publicPuzzle(p));
-    expect(text).not.toContain(p.answer);
-    expect(text).not.toContain('words');
+    expect(cfg.wordle).toContain(p.answer);
+    expect(JSON.stringify(publicPuzzle(p))).not.toContain(p.answer);
+  });
+
+  test('wordle: any five letters are a guess, umlauts and ß keep the length (D90)', () => {
+    expect(wordleGuess('qqqqq')).toBe('QQQQQ');
+    expect(wordleGuess(' äpfel ')).toBe('APFEL');
+    expect(wordleGuess('Fußes')).toBe('FUSES');
+    expect(wordleGuess('Kerz')).toBeNull();
+    expect(wordleGuess('Kerze1')).toBeNull();
+    expect(wordleGuess('Kerzen')).toBeNull();
   });
 
   test('cipher: the example in the prompt fits and the plain sentence is accepted', () => {

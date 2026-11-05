@@ -20,6 +20,4 @@ export interface DailyPuzzle {
   solutionText: string;
   /** alternative accepted answers (normalized), e.g. other words with the same letters */
   alternatives?: string[];
-  /** wordle: the accepted guesses (server only) */
-  words?: string[];
 }

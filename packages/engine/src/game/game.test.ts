@@ -185,11 +185,12 @@ describe('points', () => {
   const right = { who: 'anna', accomplice: 'cora', when: 'w2', where: 'keller' } as const;
   const early = (st: PlayerState) => st.ledger.find((l) => l.kind === 'early_accusation')?.points;
 
-  test('wordle: an unknown word is free, six tries at most, the right word pays', () => {
+  test('wordle: a bad input is free, six tries at most, the right word pays', () => {
     const day = ctx.c.riddles.rotation.indexOf('wordle') + 1;
     const p = dailyPuzzleFor('t', day, 'medium', ctx.c.riddles);
-    const wrong = (p.words ?? []).filter((w) => w !== p.answer);
-    expect(submitDaily(base, ctx, p, day, 'QQQQQ').outcome).toBe('unknown_word');
+    const wrong = ctx.c.riddles.wordle.filter((w) => w !== p.answer);
+    expect(submitDaily(base, ctx, p, day, 'ABC').outcome).toBe('invalid_input');
+    expect(submitDaily(base, ctx, p, day, 'QQQQQ').outcome).toBe('wrong');
     let st = base;
     let last = '';
     for (let i = 0; i < 6; i++) {

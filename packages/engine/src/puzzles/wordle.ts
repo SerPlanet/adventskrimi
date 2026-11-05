@@ -22,17 +22,31 @@ export function wordleMarks(answer: string, guess: string): string {
   return marks.join('');
 }
 
-/** German five-letter word game: six tries, the server answers every guess with marks. */
+/**
+ * Umlauts and ß count as one letter: Ä→A, Ö→O, Ü→U, ß→S (D90), so a guess keeps its length.
+ * Returns the five letters of a guess, or null when it is not exactly five letters.
+ */
+export function wordleGuess(input: string): string | null {
+  const g = input
+    .trim()
+    .replace(/ß/g, 's') // before upper-casing, which would turn ß into SS
+    .toUpperCase()
+    .replace(/Ä/g, 'A')
+    .replace(/Ö/g, 'O')
+    .replace(/Ü/g, 'U');
+  return /^[A-Z]{5}$/.test(g) ? g : null;
+}
+
+/** German five-letter word game: six tries, any five letters are a guess, the server answers with marks. */
 export function generateWordle(
   rng: Rng,
   list: Riddles['wordle'],
-): Pick<DailyPuzzle, 'prompt' | 'data' | 'answer' | 'hints' | 'solutionText' | 'words'> {
+): Pick<DailyPuzzle, 'prompt' | 'data' | 'answer' | 'hints' | 'solutionText'> {
   const word = pick(rng, list);
   return {
     prompt: `Finde das Wort mit 5 Buchstaben. Du hast ${WORDLE_TRIES} Versuche. Nach jedem Versuch siehst du, welche Buchstaben stimmen.`,
     data: { length: word.length, tries: WORDLE_TRIES },
     answer: word,
-    words: list,
     hints: [
       `Das Wort fängt mit „${word[0]}“ an.`,
       `Es fängt mit „${word[0]}“ an und hört mit „${word[word.length - 1]}“ auf.`,

@@ -77,5 +77,5 @@ export const publicPuzzle = (p: DailyPuzzle) => ({
 });
 
 export { LEVELS };
-export { wordleMarks, WORDLE_TRIES } from './wordle';
+export { wordleGuess, wordleMarks, WORDLE_TRIES } from './wordle';
 export type { DailyPuzzle, Kind, Level };

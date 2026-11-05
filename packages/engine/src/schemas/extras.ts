@@ -87,8 +87,8 @@ export const RiddlesFile = z.object({
     medium: z.array(z.string().min(3)).min(1),
     hard: z.array(z.string().min(3)).min(1),
   }),
-  /** five-letter words (A-Z only): the answers and the accepted guesses of the wordle */
-  wordle: z.array(z.string().regex(/^[A-Z]{5}$/)).min(10),
+  /** solution words of the wordle (five letters A-Z; umlauts written as A, O, U, S, D90). Any five letters are a valid guess. */
+  wordle: z.array(z.string().regex(/^[A-Z]{5}$/)).min(30),
   /** short sentences for the Caesar cipher (letters and spaces) */
   phrases: z.array(z.string().regex(/^[A-Za-zÄÖÜäöüß ]{6,30}$/)).min(1),
 });
