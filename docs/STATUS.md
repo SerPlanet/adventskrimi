@@ -5,12 +5,13 @@ Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20, WP21, WP22 und WP
 ## Nächste Work Packages
 | WP | Inhalt | Datei |
 |---|---|---|
-| WP24 | Zeitung und Rätsel (Code zuerst) | `docs/wp/WP24-zeitung-raetsel.md` |
+| WP24 | Zeitung und Rätsel: Schritt 1–3 erledigt, Schritt 4–5 nach Ok des Menschen | `docs/wp/WP24-zeitung-raetsel.md` |
 | WP23 | Inhalt ab Tag 6, Stufe 2 und 3 offen (Sub-Agent) | `docs/wp/WP23-inhalt-ab-tag6.md` |
 
 ## Erledigt (Kurzform, Details in `git log` und den WP-Dateien)
 - WP00–WP12, WP15–WP19: Engine, Schemas, Solver, Validator, Simulator, Edge Functions, Frontend, Rätsel, Raster, Zeitstrahl, Zeugnis, Anklage, Erkunden-Kern, Akte, Dialog, Schlösser, Zeitung, Verwaltung, A11y, `knip`.
 - WP13 Teil 1: `npm run timelapse` (beide Profile × 1/2/4/20 Spieler) ohne Fehler. `balance` grün, Lösetag 20.
+- WP24 Schritt 3: Rätsel-Registry (neu `wordle`, `cipher`, Rotation und Wortlisten in `riddles.yaml`), Kontrollfrage entfernt, Zeitungsstruktur mit Witz und Validator-Check (`paper_required_through`, im Berghotel vorerst 0). Functions und Frontend sind NICHT neu deployt, der Fall nicht neu geladen. Playwright/Lighthouse nicht gelaufen (Staging hat noch den alten Stand).
 - WP23 Stufe 1: 10 neue Erkenntnisse zur Tatnacht (20 gesamt), 25 neue Dinge (jeder Raum ≥5), 3 Passwort-Ketten (Salon→Keller, Küche→Werkstatt, Keller→Dachboden), 7 neue Nacht-Fragen mit `unlock`, keine Kalendersperren mehr (D75), Tagestexte Tag 7–14 (Karten, Zeitung, Rätsel, Wegkarten). `validate-case` grün (mit Override), Lösetag 9 (zu früh, Stufe 3). Ohne Override rot: Stichprobe 86 % (nötig 90), Tempo, Mindestzahlen, Lügennetz, Tag 15–24 ohne Zeitung/Karten.
 - WP22: Neuer Fall Berghotel Edelweiß (7 Figuren, 3 Flure, 12 Räume), Lösung lokal festgelegt (nur in `cases/berghotel/`), Tag 1–5 geschrieben (87 Quellen, 10 Erkenntnisse mit 7–10 Belegen, Typ `story`, Dialoge mit Folgefragen und `unlock`). `validate-case` grün für beide Profile (mit `quality.override.json`), Lösetag 17. Backup des alten Falls: `cases/_archiv-berghotel-alt/` (lokal).
 - WP22c: Tageseinstieg als Karten (Stimmung aus `events.story`, dann Weg-Karte), Fragen mit `once`/`until_day` (1 Ablauf-Frage im Fall, alle anderen Story), „Weiß ich nichts“ entfällt, Auftrag ab Tag 6 (`prolog.mission`, in der Akte nachlesbar). Texte Tag 7–24: WP23.
