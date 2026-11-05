@@ -14,13 +14,12 @@ Arbeitstitel „Berghotel Edelweiß“. Ein Schneesturm sperrt den Pass, die Pol
 Hinweise aus Tag 1–5 können später neu bedeutsam werden („Neudeutung“). Alles aus dem Prolog landet im automatisch geführten **Hotelbuch** (nachlesbar).
 
 ## 3. Der Spieltag (≤10 Min.)
-1. **Zeitung** lesen (~2 Min.): Ereignis, Klatsch, Wetter, Anzeigen, Gerüchte, Ermittler des Tages, Rätsel des Tages.
+1. **Zeitung** lesen (~2 Min.), jeden Tag gleich aufgebaut (WP24): Kopf mit Datum und Wetter, Titelstory, 2–4 weitere Beiträge, Rätsel, Witz des Tages.
 2. **Hotel:** Du bist in einem Raum (Start: Raum vom Vortag, Tag 1 Lobby). Du siehst NPCs, Objekte, Auffälligkeiten.
 3. **Erkunden** (siehe `02b-erkunden.md`): Dinge ansehen (frei), Personen befragen (frei), Dokumente lesen (frei), Dinge genauer untersuchen (kostet 1 Aktion, Budget „x/y“ pro Tag).
-4. **Frage des Tages** (~1 Min.).
-5. **Rätsel des Tages** (optional, ≤3 Min., nur Punkte).
-6. **Tag beenden:** nächsten Raum wählen (§4). Danach ist der Tag abgeschlossen.
-Reihenfolge ist frei, außer „Tag beenden“ zuletzt. Ein Tag zählt als gespielt, wenn mindestens eine Aktion oder die Frage des Tages erledigt wurde.
+4. **Rätsel des Tages** (optional, ≤3 Min., nur Punkte, steht in der Zeitung).
+5. **Tag beenden:** nächsten Raum wählen (§4). Danach ist der Tag abgeschlossen.
+Reihenfolge ist frei, außer „Tag beenden“ zuletzt. Ein Tag zählt als gespielt, wenn mindestens eine Aktion erledigt wurde.
 
 ## 4. Räume und Bewegung
 Hotel = Graph aus Räumen (Familie 6, Freunde 9) mit Flur als Knoten. Beim Tag-Ende wählt man den Raum für den nächsten Tag. **Familie:** jeder Raum frei wählbar. **Freunde:** nur Nachbarräume. Konfigurierbar (`config/profiles`). Welche NPCs wann in welchem Raum sind, ist pro Tag fest vorgeschrieben (Tagesplan). Die Welt ist deterministisch und unabhängig von Spielern.
@@ -65,8 +64,8 @@ Fallakte, Verdächtigenraster, Zeitstrahl, Karte, Inventar, Theorie-Seite, Hotel
 - **Rätsel des Tages** (in der Zeitung): kommt aus einem Pool (Sudoku, Worträtsel, Zahlenrätsel, Logeleien; Schach nur Freunde). Hat **keinen Einfluss auf den Fall**, gibt nur Punkte. Schwierigkeit pro Spieler einstellbar (leicht/mittel/schwer). Tipp-Leiter, Überspringen ohne Abzug von Bestandspunkten.
 - **Objekt-Rätsel** (im Hotel, 6 Familie / 10 Freunde im ganzen Spiel): Schloss vor einer Quelle (Zahlencode, Chiffre, Wort aus gesammelten Buchstaben, Querverweis auf ein Detail aus einem anderen Raum, Widerspruch zwischen zwei Aussagen). Lösung gibt Zugriff auf den Fund. Höchstens 3 Min., immer mit Tipp-Leiter (Tipp 1, Tipp 2, Lösung zeigen). Kein Rätsel ist der einzige Weg zu einer Schlüssel-Tatsache (siehe `04`, Redundanz).
 
-## 10. Frage des Tages
-Eine Verständnisfrage mit 3 Antworten, lösbar aus der heutigen Zeitung oder dem eigenen Hotelbuch. Zwei Versuche. Sie prüft das Verständnis der Lage und gibt kleine Punkte. Die Lösung folgt nicht aus der Zeitung, das Spiel lebt von den täglichen Aktionen.
+## 10. Rätsel des Tages
+Ein Rätsel ohne Bezug zum Fall, nur zum Spaß. Der Typ wechselt nach einer Rotation im Fall (`riddles.yaml`): Zahlenfeld (Sudoku), Wörter raten (5 Buchstaben), Buchstabensalat, Geheimsatz, Zahlenrätsel, Logelei. Die Prüfung läuft auf dem Server. Der Tipp halbiert die Punkte dieses einen Rätsels. Überspringen kostet nichts. Details `docs/wp/WP24-zeitung-raetsel.md`.
 
 ## 11. Theorie, Zeugnisse, Anklage
 - **Theorie:** Jederzeit änderbar. Vier Felder: Wer, Wann, Wo, Komplize. Nur der Spieler sieht sie.

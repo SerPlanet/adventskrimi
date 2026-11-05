@@ -1,5 +1,6 @@
 import type { LoadedCase } from '../loader';
 import { wordCount, type Quality } from '../schemas';
+import { checkPaperStructure } from './paperstructure';
 import type { CheckResult } from './types';
 
 /** The newspaper tells facts, never lies and never verdicts (02c §3). */
@@ -10,7 +11,6 @@ const VERDICT = [
   /war der dieb/i,
   /ist ausgeschlossen/i,
 ];
-const ARTICLES_PER_DAY = { min: 3, max: 5 };
 const WORDS = { min: 50, max: 100 };
 
 /** Checks of docs/02c §2/§3 (WP19): articles, facts only, relations told, narrative blocks. */
@@ -30,13 +30,13 @@ export function checkPaper(c: LoadedCase, quality: Quality): CheckResult {
       else if (!facts.has(id)) errors.push(`article ${a.id}: unknown fact ${id}`);
     }
   }
+  // the fixed structure of every issue (WP24, D87)
+  const structure = checkPaperStructure(c);
+  errors.push(...structure.errors);
   if (!quality.lie_web)
-    return { name: 'paper', ok: errors.length === 0, errors, note: 'paper off' };
+    return { name: 'paper', ok: errors.length === 0, errors, note: `paper off; ${structure.note}` };
 
-  for (let day = 1; day <= 24; day++) {
-    const n = c.newspaper.articles.filter((a) => a.day === day).length;
-    if (n < ARTICLES_PER_DAY.min || n > ARTICLES_PER_DAY.max)
-      errors.push(`day ${day}: ${n} articles (${ARTICLES_PER_DAY.min}-${ARTICLES_PER_DAY.max})`);
+  for (let day = 1; day <= c.newspaper.paper_required_through; day++) {
     if (!c.events.events.find((e) => e.day === day)?.morgen)
       errors.push(`day ${day}: event without morgen`);
   }
@@ -56,6 +56,6 @@ export function checkPaper(c: LoadedCase, quality: Quality): CheckResult {
     name: 'paper',
     ok: errors.length === 0,
     errors,
-    note: `${c.newspaper.articles.length} articles`,
+    note: `${c.newspaper.articles.length} articles; ${structure.note}`,
   };
 }

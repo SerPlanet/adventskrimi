@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { makeCtx, questionOfDay } from '../game';
+import { makeCtx } from '../game';
 import { loadCase, loadProfile, loadScoring } from '../loader';
 import { renameCase } from '../names';
 import { applyProfile } from '../solver';
@@ -56,9 +56,6 @@ for (const dir of CASES) {
             );
             const bad = strings(paper).filter((t) => t.includes('{'));
             expect(bad, `day ${day}`).toEqual([]);
-            // the reader's question with its answers is part of the page, as the view serves it
-            if (c !== res.data)
-              expect(strings(questionOfDay(ctx, day)).filter((t) => t.includes('{'))).toEqual([]);
           }
         }
       });

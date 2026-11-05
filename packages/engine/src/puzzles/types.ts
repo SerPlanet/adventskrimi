@@ -1,6 +1,7 @@
+import type { RIDDLE_KINDS } from '../schemas';
 export type Level = 'easy' | 'medium' | 'hard';
 export const LEVELS: Level[] = ['easy', 'medium', 'hard'];
-export type Kind = 'sudoku' | 'word' | 'number' | 'logic';
+export type Kind = (typeof RIDDLE_KINDS)[number];
 
 /** Puzzle of the day. `answer` and `solutionText` stay on the server. */
 export interface DailyPuzzle {
@@ -19,4 +20,6 @@ export interface DailyPuzzle {
   solutionText: string;
   /** alternative accepted answers (normalized), e.g. other words with the same letters */
   alternatives?: string[];
+  /** wordle: the accepted guesses (server only) */
+  words?: string[];
 }

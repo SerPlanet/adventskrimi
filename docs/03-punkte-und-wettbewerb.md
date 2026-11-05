@@ -10,9 +10,8 @@ Alle Zahlen sind **Startwerte** und stehen in `config/scoring.json`. Der Simulat
 ## Tagespunkte (je Spieltag, maximal 14)
 | Quelle | Punkte |
 |---|---|
-| Tag gespielt (≥1 Aktion oder Frage) | +2 |
+| Tag gespielt (≥1 Aktion) | +2 |
 | Neuer Fund in der Akte | +2 pro Fund, Tagesdeckel +6 |
-| Frage des Tages richtig | +3 (mit Tipp +1) |
 | Rätsel des Tages gelöst | +3 (mit Tipp +1, Überspringen 0) |
 
 ## Besondere Punkte

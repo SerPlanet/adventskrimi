@@ -309,3 +309,60 @@ describe('what a corridor sees in the guided days (WP22b)', () => {
     expect(errorsOf(c).join()).toMatch(/answer src_anna only repeats finds from before/);
   });
 });
+
+describe('paper structure (WP24, D87)', () => {
+  const paper = (mutate: (c: LoadedCase) => void) =>
+    runChecks(broken(mutate), friends, quality).find((r) => r.name === 'paper')!;
+
+  test('an incomplete day is reported, a day after the limit only says content follows', () => {
+    const open = paper((c) => (c.newspaper.paper_required_through = 1));
+    expect(open.ok).toBe(false);
+    expect(open.errors.join('\n')).toContain('day 1: 0 jokes (need 1)');
+    const later = paper((c) => (c.newspaper.paper_required_through = 0));
+    expect(later.errors).toEqual([]);
+    expect(later.note).toContain('content follows (D80) from day 1');
+  });
+
+  test('a joke that names a figure, is too long, repeats a kind or carries a find is refused', () => {
+    const r = paper((c) => {
+      c.newspaper.paper_required_through = 2;
+      const fact = c.facts.facts[0]!.id;
+      c.newspaper.jokes = [
+        {
+          id: 'j1',
+          day: 1,
+          kind: 'flachwitz',
+          text: 'Warum hat Anna kalte Füße? Weil sie Schnee mag. Ach so. Ja.',
+        },
+        { id: fact, day: 2, kind: 'flachwitz', text: 'Kurz.' },
+      ];
+    });
+    const text = r.errors.join('\n');
+    expect(text).toContain('joke j1: longer than 2 sentences');
+    expect(text).toContain('joke j1: refers to a figure');
+    expect(text).toContain('same joke kind as day 1');
+    expect(text).toContain('carries a find');
+  });
+
+  test('the story count and the mix are checked', () => {
+    const r = paper((c) => {
+      c.newspaper.paper_required_through = 2;
+      c.newspaper.articles = [1, 2].flatMap((day) =>
+        ['klatsch', 'klatsch', 'bericht'].map((kind, i) => ({
+          id: `x${day}${i}`,
+          day,
+          title: 't',
+          text: 'a b c',
+          kind: kind as 'klatsch' | 'bericht',
+          traegt: [],
+        })),
+      );
+    });
+    expect(r.errors.join('\n')).toContain('same mix of story kinds as day 1');
+    const few = paper((c) => {
+      c.newspaper.paper_required_through = 1;
+      c.newspaper.articles = [];
+    });
+    expect(few.errors.join('\n')).toContain('day 1: 0 more stories (2-4)');
+  });
+});

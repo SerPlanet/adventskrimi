@@ -5,3 +5,4 @@ ads:
 plaque_titles: [Sehr aufmerksam, Spürnase]
 filler:
   - { id: fl1, text: Das Wetter bleibt winterlich. }
+paper_required_through: 0

@@ -18,7 +18,7 @@ const CASE_FILES = {
   puzzles: ['puzzles.yaml', S.PuzzlesFile],
   events: ['events.yaml', S.EventsFile],
   newspaper: ['newspaper.yaml', S.NewspaperFile],
-  questions: ['questions.yaml', S.QuestionsFile],
+  riddles: ['riddles.yaml', S.RiddlesFile],
   prolog: ['prolog.yaml', S.PrologFile],
   insights: ['insights.yaml', S.InsightsFile],
   routes: ['routes.yaml', S.RoutesFile],

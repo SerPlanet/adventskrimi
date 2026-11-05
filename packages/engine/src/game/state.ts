@@ -17,13 +17,6 @@ export interface Discovery {
   day: number;
 }
 
-export interface QuestionProgress {
-  attempts: number;
-  done: boolean;
-  correct: boolean;
-  hint: boolean;
-}
-
 export interface DailyProgress {
   level: 'easy' | 'medium' | 'hard';
   attempts: number;
@@ -31,6 +24,8 @@ export interface DailyProgress {
   hints: number;
   solved: boolean;
   done: boolean;
+  /** wordle: the guesses made so far */
+  guesses?: string[];
 }
 
 export interface PuzzleProgress {
@@ -63,8 +58,6 @@ export interface PlayerState {
   finishedDays: number[];
   /** final accusation handed in: theory is locked */
   accused: boolean;
-  /** question of the day progress by day */
-  questions: Record<number, QuestionProgress>;
   /** puzzle of the day progress by day */
   daily: Record<number, DailyProgress>;
   /** grid marks by "category:candidate" */
@@ -113,7 +106,6 @@ export function newPlayer(ctx: GameCtx, ordinal = 0): PlayerState {
     ledger: [],
     finishedDays: [],
     accused: false,
-    questions: {},
     daily: {},
     grid: {},
     table: {},

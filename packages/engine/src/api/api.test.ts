@@ -192,38 +192,6 @@ describe('days, rooms, question of the day', () => {
     });
     expect(early.status).toBe(403);
   });
-
-  test('question: right answer pays once, tip halves, wrong never costs points', async () => {
-    const right = await call('answer_daily', {
-      slug: 'test',
-      player_id: a,
-      request_id: rid(),
-      option_id: 'b',
-    });
-    expect(bodyOf(right).outcome.status).toBe('correct');
-    expect(bodyOf(right).state.points).toBe(2 + 3);
-    const hinted = await call('answer_daily', {
-      slug: 'test',
-      player_id: b,
-      request_id: rid(),
-      hint: true,
-    });
-    expect(bodyOf(hinted).hint).toBeTruthy();
-    const ok = await call('answer_daily', {
-      slug: 'test',
-      player_id: b,
-      request_id: rid(),
-      option_id: 'b',
-    });
-    expect(bodyOf(ok).state.points).toBe(2 + 1);
-    const wrong = await call('answer_daily', {
-      slug: 'test',
-      player_id: a,
-      request_id: rid(),
-      option_id: 'a',
-    });
-    expect(bodyOf(wrong).outcome.status).toBe('already_done');
-  });
 });
 
 describe('first discoverer', () => {
@@ -387,7 +355,7 @@ describe('puzzle of the day', () => {
   const daily = (player: string, body: object) =>
     call('daily_puzzle', { slug: 'test', player_id: player, request_id: rid(), ...body });
   // level "medium" is the default; day 1 is a sudoku
-  const answer = () => generateDaily('test', 1, 'medium').answer;
+  const answer = () => generateDaily('test', 1, 'medium', res.data.riddles).answer;
   const puzzleOf = (state: { daily_puzzles: { day: number }[] }, day: number) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state.daily_puzzles.find((d) => d.day === day) as any;
@@ -515,7 +483,13 @@ describe('object puzzle', () => {
 
 describe('ranking and my points', () => {
   test('breakdown adds up to the points and never has a negative entry', async () => {
-    await call('answer_daily', { slug: 'test', player_id: a, request_id: rid(), option_id: 'b' });
+    await call('daily_puzzle', {
+      slug: 'test',
+      player_id: a,
+      request_id: rid(),
+      op: 'check',
+      answer: generateDaily('test', 1, 'medium', res.data.riddles).answer,
+    });
     await call('act', {
       slug: 'test',
       player_id: a,

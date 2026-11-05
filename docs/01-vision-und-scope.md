@@ -24,7 +24,7 @@ Beide Profile nutzen dieselbe Engine, dieselbe Geschichte und denselben Fall (Fa
 Chat im Spiel · Hinweise an Mitspieler schenken/teilen · Beschatten · Lügen/Sabotage zwischen Spielern · Streaks, Verlustangst, Verfall · Passwörter/Registrierung · native App · Push-Benachrichtigungen (der Mensch erinnert im Gruppenchat) · Echtzeit-Mehrspieler · Wetten · Mitspielen des Menschen.
 
 ## Priorität (MoSCoW)
-- **Must:** Namenskachel-Anmeldung, Zeitung, Hotel-Karte und Räume, Aktionen (Befragen/Untersuchen/Benutzen), Fallakte, Raster, Zeitstrahl, Theorie, Frage des Tages, Rätsel des Tages, Punkte und Rangliste, Wochenzeugnis, Finale, Prolog (Tag 1–5), Fall Berghotel (Familie + Freunde), Solver/Validator, Admin-Ansicht (Lesen).
+- **Must:** Namenskachel-Anmeldung, Zeitung, Hotel-Karte und Räume, Aktionen (Befragen/Untersuchen/Benutzen), Fallakte, Raster, Zeitstrahl, Theorie, Rätsel des Tages, Punkte und Rangliste, Wochenzeugnis, Finale, Prolog (Tag 1–5), Fall Berghotel (Familie + Freunde), Solver/Validator, Admin-Ansicht (Lesen).
 - **Should:** Notizstufen (Auto/Halb/Manuell), Objekt-Rätsel, Erstentdecker-Plaketten, Gerüchte in der Zeitung, Simulator mit Bots.
 - **Could:** Frühanklage-Bonus, Vorlesen (Browser-TTS), Dunkelmodus, Schach-Rätsel.
 

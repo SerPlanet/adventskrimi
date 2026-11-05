@@ -35,33 +35,21 @@ async function loadCaseData(sql: Sql | Q, caseId: string): Promise<LoadedCase> {
     await sql`select solution, world, proof_questions from case_solution where case_id = ${caseId}`;
   if (!meta || !sol) throw new ApiError('case_not_loaded', 500);
   const get = (t: string) => rowsOf(sql, t, caseId);
-  const [
-    rooms,
-    npcs,
-    facts,
-    statements,
-    sources,
-    puzzles,
-    items,
-    events,
-    questions,
-    paper,
-    prolog,
-  ] = await Promise.all(
-    [
-      'case_rooms',
-      'case_npcs',
-      'case_facts',
-      'case_statements',
-      'case_sources',
-      'case_puzzles',
-      'case_items',
-      'case_events',
-      'case_questions',
-      'case_newspaper_templates',
-      'case_prolog',
-    ].map(get),
-  );
+  const [rooms, npcs, facts, statements, sources, puzzles, items, events, paper, prolog] =
+    await Promise.all(
+      [
+        'case_rooms',
+        'case_npcs',
+        'case_facts',
+        'case_statements',
+        'case_sources',
+        'case_puzzles',
+        'case_items',
+        'case_events',
+        'case_newspaper_templates',
+        'case_prolog',
+      ].map(get),
+    );
   const data = {
     case: {
       id: caseId,
@@ -80,7 +68,8 @@ async function loadCaseData(sql: Sql | Q, caseId: string): Promise<LoadedCase> {
     puzzles: { puzzles, items },
     events: { events },
     newspaper: paper[0],
-    questions: { questions },
+    // WP24: the riddle rotation and word lists travel with the case meta (no extra table)
+    riddles: meta.data.riddles,
     prolog: prolog[0],
     // a case loaded before WP20 has neither: no insights, no guided days
     insights: { insights: meta.data.insights ?? [] },
@@ -308,12 +297,6 @@ async function persist(q: Q, prev: PlayerRecord, next: PlayerState, settings: an
   for (const [day, dp] of Object.entries(next.daily))
     if (JSON.stringify(prev.state.daily[Number(day)]) !== JSON.stringify(dp))
       await q`insert into daily_puzzles (player_id, day, type, level, solved, hint_used)
-        values (${id}, ${Number(day)}, ${kindOfDay(Number(day))}, ${dp.level}, ${dp.solved}, ${dp.hints > 0})
+        values (${id}, ${Number(day)}, ${kindOfDay(c.riddles, Number(day))}, ${dp.level}, ${dp.solved}, ${dp.hints > 0})
         on conflict (player_id, day) do update set solved = excluded.solved, hint_used = excluded.hint_used`;
-  for (const [day, qp] of Object.entries(next.questions))
-    if (qp.done && !prev.state.questions[Number(day)]?.done) {
-      const qid = c.questions.questions.find((x) => x.day === Number(day))?.id ?? `q${day}`;
-      await q`insert into daily_answers (player_id, day, question_id, correct, hint_used)
-        values (${id}, ${Number(day)}, ${qid}, ${qp.correct}, ${qp.hint}) on conflict do nothing`;
-    }
 }

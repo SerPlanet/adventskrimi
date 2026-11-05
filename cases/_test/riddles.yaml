@@ -1,0 +1,7 @@
+rotation: [sudoku, wordle, word, cipher, number, logic]
+anagrams:
+  easy: [KERZE, SCHAL, TANNE, STERN]
+  medium: [WINTER, LATERNE, GLOCKEN, ZIMMER]
+  hard: [SCHLITTEN, SCHNEEMANN, BERGBAHN, LEBKUCHEN]
+wordle: [KERZE, SCHAL, TANNE, STERN, FROST, LICHT, APFEL, KUGEL, WOLLE, ENGEL, KISTE, TISCH]
+phrases: [Der Schnee fällt leise, Heute gibt es Suppe]

@@ -3,29 +3,6 @@ import { addLedger, withTip, type GameCtx, type PlayerState } from './state';
 
 const CATS: Category[] = ['who', 'accomplice', 'when', 'where'];
 
-const played = (st: PlayerState, ctx: GameCtx): PlayerState =>
-  addLedger(
-    { ...st, started: true },
-    { kind: 'day_played', ref: String(st.day), points: ctx.scoring.day.played, day: st.day },
-  );
-
-/** Question of the day: right = full, right with tip = halved, wrong = 0 (never negative). */
-export function awardQuestion(
-  st: PlayerState,
-  ctx: GameCtx,
-  correct: boolean,
-  hintUsed: boolean,
-): PlayerState {
-  const base = ctx.scoring.day;
-  const pts = !correct ? 0 : hintUsed ? withTip(base.question, ctx.scoring) : base.question;
-  return addLedger(played(st, ctx), {
-    kind: 'question',
-    ref: String(st.day),
-    points: pts,
-    day: st.day,
-  });
-}
-
 /** Puzzle of the day: skipping gives 0 and costs nothing. */
 export function awardDailyPuzzle(
   st: PlayerState,

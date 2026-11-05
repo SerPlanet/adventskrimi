@@ -8,9 +8,9 @@ import {
   awardFinds,
   awardMiniCase,
   awardPlaque,
-  awardQuestion,
   bonusDay,
   canPlayDay,
+  dailyPuzzleFor,
   dayOf,
   endDay,
   actionsLeft,
@@ -27,6 +27,7 @@ import {
   resolveAction,
   setTheory,
   solvePuzzle,
+  submitDaily,
   totalPoints,
   type Action,
   type GameCtx,
@@ -184,12 +185,25 @@ describe('points', () => {
   const right = { who: 'anna', accomplice: 'cora', when: 'w2', where: 'keller' } as const;
   const early = (st: PlayerState) => st.ledger.find((l) => l.kind === 'early_accusation')?.points;
 
-  test('question: full, halved with tip, 0 when wrong; idempotent per day', () => {
-    expect(total(awardQuestion(base, ctx, true, false))).toBe(2 + 3);
-    expect(total(awardQuestion(base, ctx, true, true))).toBe(2 + 1);
-    expect(total(awardQuestion(base, ctx, false, false))).toBe(2);
-    const once = awardQuestion(base, ctx, true, false);
-    expect(awardQuestion(once, ctx, true, false)).toEqual(once);
+  test('wordle: an unknown word is free, six tries at most, the right word pays', () => {
+    const day = ctx.c.riddles.rotation.indexOf('wordle') + 1;
+    const p = dailyPuzzleFor('t', day, 'medium', ctx.c.riddles);
+    const wrong = (p.words ?? []).filter((w) => w !== p.answer);
+    expect(submitDaily(base, ctx, p, day, 'QQQQQ').outcome).toBe('unknown_word');
+    let st = base;
+    let last = '';
+    for (let i = 0; i < 6; i++) {
+      const r = submitDaily(st, ctx, p, day, wrong[i] as string);
+      st = r.state;
+      last = r.outcome;
+    }
+    expect(last).toBe('failed');
+    expect(st.daily[day]?.done).toBe(true);
+    expect(total(st)).toBe(total(base));
+    expect(submitDaily(st, ctx, p, day, p.answer).outcome).toBe('already_done');
+    const win = submitDaily(base, ctx, p, day, p.answer.toLowerCase());
+    expect(win.outcome).toBe('correct');
+    expect(total(win.state)).toBe(total(base) + 3);
   });
 
   test('daily puzzle: full, tip, skipped', () => {

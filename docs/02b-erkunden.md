@@ -3,7 +3,7 @@
 Ersetzt das Aktionsbudget aus `02` §5. Gilt ab WP06c. Das Spiel fühlt sich an wie ein **Escape-Room-Krimi**: Räume ansehen, Dinge untersuchen, Dokumente lesen, Personen befragen, Widersprüche finden.
 
 ## 1. Tagesablauf (≤10 Min.)
-1. Zeitung lesen. 2. Du bist in **einem Raum** (Wahl am Vorabend, Bewegung wie in `02` §4). 3. **Frei erkunden**, alles ist kostenlos. 4. Fortschrittsanzeige „5 von 7 entdeckt“. 5. Frage des Tages (optional Rätsel des Tages). 6. „Gute Nacht“: Raum für morgen wählen.
+1. Zeitung lesen. 2. Du bist in **einem Raum** (Wahl am Vorabend, Bewegung wie in `02` §4). 3. **Frei erkunden**, alles ist kostenlos. 4. Fortschrittsanzeige „5 von 7 entdeckt“. 5. Rätsel des Tages (optional). 6. „Gute Nacht“: Raum für morgen wählen.
 **Ansehen ist frei, genaues Untersuchen kostet eine Aktion.** Es gibt ein kleines Tagesbudget (Konfiguration, Start: Familie 3, Freunde 3, Prolog 1–2). Das UI zeigt immer „Aktionen übrig (1/2)“. Kostenlos sind: Dinge ansehen (Nahansicht, Beschreibung), Gespräche, Zeigen eines Fundes, Dokumente lesen und erneut lesen, Gegenstände im Inventar ansehen. Eine Aktion kostet nur der Knopf „Genauer untersuchen“, und **nur wenn es etwas Neues liefert**. Der Knopf erscheint nur bei Dingen, an denen es heute etwas zu finden gibt, sonst steht dort nur die Beschreibung. Die Entscheidung des Spielers: welcher Raum, welche Dinge er genauer untersucht, was er daraus schließt.
 Es gibt drei Klassen von Dingen: **Deko** (nicht anklickbar, nur Bild), **Ansehen** (anklickbar, Nahansicht und Beschreibung, frei) und **Untersuchbar** (Nahansicht plus Knopf „Genauer untersuchen“, 1 Aktion).
 

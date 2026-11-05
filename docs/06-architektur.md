@@ -36,7 +36,7 @@
 Punkte sind nur ein Ledger. Gesamtpunkte = Summe. Nichts wird überschrieben.
 
 ## API (Edge Functions, alle POST, JSON)
-`lobby` (öffentlich: Namenskacheln eines Spiels per `slug`) · `state` (Spieler-/Tagesstatus + sichtbare Funde) · `open_day` · `act` (Befragen/Untersuchen/Benutzen) · `end_day` (nächster Raum) · `answer_daily` · `daily_puzzle` · `object_puzzle` · `set_theory` · `accuse` · `scoreboard` · `newspaper` · `settings` · `admin_*`.
+`lobby` (öffentlich: Namenskacheln eines Spiels per `slug`) · `state` (Spieler-/Tagesstatus + sichtbare Funde) · `open_day` · `act` (Befragen/Untersuchen/Benutzen) · `end_day` (nächster Raum) · `daily_puzzle` · `object_puzzle` · `set_theory` · `accuse` · `scoreboard` · `newspaper` · `settings` · `admin_*`.
 Jede mutierende Funktion trägt eine `request_id`, ist **idempotent** und liefert den neuen `state` zurück.
 
 ## Tageslogik

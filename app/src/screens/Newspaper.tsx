@@ -43,6 +43,7 @@ export function Newspaper() {
         <p className="issue">
           Ausgabe Nr. {shown} · {dateOf(view?.start_date, shown)}
         </p>
+        {paper?.weather && <p className="weather">🌨️ Wetter: {paper.weather}</p>}
       </header>
       <div className="issuenav" role="group" aria-label="Ausgabe wählen">
         <button
@@ -65,17 +66,16 @@ export function Newspaper() {
       {!paper && !error && <p role="status">Die Zeitung wird gedruckt …</p>}
       {paper && (
         <div key={shown} className="sheet">
-          <Issue p={paper} />
-        </div>
-      )}
-      {(hasPuzzle || (shown === view?.day && view?.question)) && (
-        <div className="corners corner">
-          {hasPuzzle && (
-            <section className="box" aria-label="Rätsel-Ecke">
-              <DailyPuzzle day={shown} />
-            </section>
-          )}
-          {shown === view?.day && view?.question && <Question />}
+          <Issue
+            p={paper}
+            riddle={
+              hasPuzzle && (
+                <section className="box riddle" aria-label="Rätsel-Ecke">
+                  <DailyPuzzle day={shown} />
+                </section>
+              )
+            }
+          />
         </div>
       )}
     </article>
@@ -94,62 +94,3 @@ const dateOf = (start: string | undefined, day: number): string => {
     timeZone: 'UTC',
   });
 };
-
-function Question() {
-  const { view, answer, hint } = useSession();
-  const [msg, setMsg] = useState('');
-  const q = view?.question;
-  if (!q) return null;
-
-  const pick = async (id: string) => {
-    const status = await answer(id);
-    setMsg(
-      status === 'correct'
-        ? 'Richtig! Gut gelesen.'
-        : status === 'wrong'
-          ? 'Das stimmt leider nicht. Du hast noch einen Versuch.'
-          : status === 'failed'
-            ? 'Das war leider nicht richtig. Morgen gibt es eine neue Frage.'
-            : '',
-    );
-  };
-
-  return (
-    <section className="box" aria-labelledby="q-title">
-      <h2 id="q-title">Leserfrage des Tages</h2>
-      <p>{q.text}</p>
-      {q.done ? (
-        <p role="status">
-          {q.correct
-            ? '✅ Richtig beantwortet.'
-            : '❌ Diesmal nicht richtig. Das ist nicht schlimm.'}
-        </p>
-      ) : (
-        <>
-          <ul className="options">
-            {q.options.map((o) => (
-              <li key={o.id}>
-                <button onClick={() => void pick(o.id)}>{o.text}</button>
-              </li>
-            ))}
-          </ul>
-          <p>Versuche übrig: {q.attempts_left}</p>
-          {q.can_hint && !q.hint && (
-            <button
-              className="link"
-              onClick={async () => setMsg((await hint()) ?? '')}
-              aria-describedby="hint-note"
-            >
-              Tipp zeigen
-            </button>
-          )}
-          <p id="hint-note" className="small">
-            Mit Tipp gibt es für diese Frage nur halbe Punkte.
-          </p>
-        </>
-      )}
-      {q.hint && !q.done && <p>💡 Tipp: {q.hint}</p>}
-      <p role="status">{msg}</p>
-    </section>
-  );
-}

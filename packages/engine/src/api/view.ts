@@ -20,7 +20,6 @@ import {
   nightOf,
   ownWay,
   nextRooms,
-  questionOfDay,
   rankOf,
   totalPoints,
   type GameCtx,
@@ -119,11 +118,9 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
   const dailyPuzzles = Array.from({ length: readable }, (_, i) => i + 1).map((day) => ({
     day,
     late: day !== bonusDay(st, now, startDate),
-    ...dailyView(st, dailyPuzzleFor(startSalt(tx), day, dailyLevel(st, day)), day),
+    ...dailyView(st, dailyPuzzleFor(startSalt(tx), day, dailyLevel(st, day), c.riddles), day),
   }));
   const blockedToday = ctx.reach.blocked(st.room, st.day);
-  const q = questionOfDay(ctx, st.day);
-  const qp = st.questions[st.day];
   const canPlay = canPlayDay(st, now, startDate);
   const prolog = c.prolog.days.find((d) => d.day === st.day);
   const hasBook = c.sources.sources.some(
@@ -259,16 +256,6 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     night,
     late_percent: Math.round(scoring.newspaper_puzzle_late_factor * 100),
     day_over: st.finishedDays.includes(today),
-    question: q && {
-      id: q.id,
-      text: q.text,
-      options: q.options,
-      attempts_left: 2 - (qp?.attempts ?? 0),
-      done: qp?.done ?? false,
-      correct: qp?.done ? qp.correct : undefined,
-      hint: qp?.hint ? q.hint : undefined,
-      can_hint: !!q.hint && !qp?.done,
-    },
     prolog: prolog && { goal: prolog.goal, intro: prolog.intro, tips: prolog.tips },
     daily_puzzles: dailyPuzzles,
     theory: st.theory,
@@ -316,7 +303,6 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
 const LABELS: Record<string, string> = {
   day_played: 'Tag gespielt',
   find: 'Neue Funde',
-  question: 'Frage des Tages',
   puzzle: 'Rätsel des Tages',
   plaque: 'Plaketten (Erste/r)',
   mini_case: 'Stollen-Übungsfall',

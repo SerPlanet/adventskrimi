@@ -49,7 +49,7 @@ export function generateNewspaper(
     ...gossip.map((text, i) => ({ id: `a${day}_k${i + 1}`, title: 'Klatsch und Tratsch', text })),
     ...c.newspaper.articles
       .filter((a) => a.day === day)
-      .map((a) => ({ id: a.id, title: a.title, text: a.text })),
+      .map((a) => ({ id: a.id, title: a.title, text: a.text, kind: a.kind })),
   ];
 
   const best = [...yesterday].sort((a, b) => b.points - a.points)[0];
@@ -68,4 +68,12 @@ export function generateNewspaper(
   };
   // every field of the page is rendered, whatever the stored case still holds
   return renderAll(paper, {}, namesOf(ctx));
+}
+
+/** The joke of the day comes straight from the case, so older stored papers show it too. */
+export function withJoke(ctx: GameCtx, paper: NewspaperContent): NewspaperContent {
+  const j = ctx.c.newspaper.jokes.find((x) => x.day === paper.day);
+  return j
+    ? { ...paper, joke: renderAll({ kind: j.kind, text: j.text }, {}, namesOf(ctx)) }
+    : paper;
 }

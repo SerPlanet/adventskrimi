@@ -1,10 +1,8 @@
 import {
-  answerQuestion,
   closeDay,
   endDay,
   fileAccusation,
   newPlayer,
-  questionOfDay,
   readNewspaper,
   resolveAction,
   solvePuzzle,
@@ -20,15 +18,7 @@ import { buildInfo, combine, count, reachableItems, remaining, type Info } from 
 import { planDay, chooseRoom, makeRng, type BotName, type Rng } from './bots';
 
 const CATS: Category[] = ['who', 'accomplice', 'when', 'where'];
-const MIND = [
-  'question',
-  'puzzle',
-  'mini_case',
-  'report_card',
-  'finale',
-  'proof',
-  'early_accusation',
-];
+const MIND = ['puzzle', 'mini_case', 'report_card', 'finale', 'proof', 'early_accusation'];
 const WATCH_DAYS = [10, 17, 24];
 
 export interface SimResult {
@@ -90,14 +80,8 @@ export function simulate(
       for (const p of ctx.c.puzzles.puzzles)
         if (p.room === st.room) st = solvePuzzle(st, ctx, p.id, p.answer).state;
 
-    const q = questionOfDay(ctx, day);
-    if (q) {
-      const pick =
-        bot === 'random' || bot === 'casual' ? (q.options[0]?.id ?? q.correct) : q.correct;
-      st = answerQuestion(st, ctx, pick).state;
-    }
     if (bot === 'optimal' || bot === 'greedy') {
-      const p = dailyPuzzleFor(salt, day, 'medium');
+      const p = dailyPuzzleFor(salt, day, 'medium', ctx.c.riddles);
       st = submitDaily(st, ctx, p, day, p.answer).state;
     }
 
@@ -124,7 +108,7 @@ export function simulate(
     )
       res.idleDays.push(day);
 
-    // reading load: texts of everything found today plus the question
+    // reading load: texts of everything found today plus the riddle
     const todays = st.found.slice(foundBefore);
     const text = [
       ...todays.map(
@@ -133,7 +117,6 @@ export function simulate(
           ctx.c.statements.statements.find((s) => s.id === id)?.text ??
           '',
       ),
-      q?.text ?? '',
     ].join(' ');
     res.maxMinutes = Math.max(res.maxMinutes, words(text) / wpm);
 

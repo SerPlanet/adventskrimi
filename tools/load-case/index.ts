@@ -72,7 +72,6 @@ const tables: Record<string, [string, unknown][]> = {
   case_puzzles: rows(c.puzzles.puzzles) as [string, unknown][],
   case_items: rows(c.puzzles.items) as [string, unknown][],
   case_events: c.events.events.map((e) => [String(e.day), e]),
-  case_questions: rows(c.questions.questions) as [string, unknown][],
   case_newspaper_templates: [['main', c.newspaper]],
   case_prolog: [['main', c.prolog]],
 };
@@ -104,6 +103,8 @@ try {
       // WP20: the chain of insights and the guided routes (server only, no extra table needed)
       insights: c.insights.insights,
       routes: c.routes.corridors,
+      // WP24: riddle rotation and word lists (server only)
+      riddles: c.riddles,
     }),
   ];
   const known = await client.query('select 1 from case_meta where case_id = $1', [c.case.id]);

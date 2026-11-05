@@ -40,10 +40,6 @@ export function checkRefs(c: LoadedCase): string[] {
     'puzzles.yaml',
     c.puzzles.items.map((i) => i.id),
   );
-  dup(
-    'questions.yaml',
-    c.questions.questions.map((q) => q.id),
-  );
   const objects = new Map<string, string>(); // object id -> room id
   for (const r of c.rooms.rooms) for (const o of r.objects) objects.set(o.id, r.id);
 
@@ -181,8 +177,5 @@ export function checkRefs(c: LoadedCase): string[] {
   for (const e of c.events.events)
     for (const r of [...e.blocked_rooms, ...e.bonus_rooms])
       need('events.yaml', `day ${e.day}`, rooms, r, 'room');
-  for (const q of c.questions.questions)
-    if (!q.options.some((o) => o.id === q.correct))
-      errs.push(`questions.yaml: ${q.id}: correct not an option`);
   return errs;
 }

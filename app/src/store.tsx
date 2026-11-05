@@ -39,8 +39,6 @@ interface Session {
   /** the day that was just ended on this page (the page stays, 02c §9); null otherwise */
   ended: number | null;
   startNext(): void;
-  answer(optionId: string): Promise<string | null>;
-  hint(): Promise<string | null>;
   saveSettings(s: Record<string, unknown>): Promise<void>;
   daily(
     day: number,
@@ -159,20 +157,6 @@ export function SessionProvider({ slug, children }: { slug: string; children: Re
           setNotice('Der Tag ist zu Ende. Gute Nacht.');
         }
         return r !== null;
-      },
-      async answer(optionId) {
-        const r = await run<{ outcome: { status: string } }>('answer_daily', {
-          request_id: newRequestId(),
-          option_id: optionId,
-        });
-        return r?.outcome.status ?? null;
-      },
-      async hint() {
-        const r = await run<{ hint: string }>('answer_daily', {
-          request_id: newRequestId(),
-          hint: true,
-        });
-        return r?.hint ?? null;
       },
       async daily(day, op, answer) {
         return run('daily_puzzle', { request_id: newRequestId(), day, op, answer });

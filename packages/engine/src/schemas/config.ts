@@ -48,8 +48,6 @@ export const Scoring = z.object({
     played: NonNeg,
     find: NonNeg,
     find_cap: NonNeg,
-    question: NonNeg,
-    question_hint: NonNeg,
     puzzle: NonNeg,
     puzzle_hint: NonNeg,
   }),

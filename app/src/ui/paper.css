@@ -152,3 +152,19 @@
     align-items: start;
   }
 }
+
+/* fixed order of every issue (WP24): head, lead, stories, riddle, joke */
+.front .riddle,
+.front .joke {
+  grid-column: 1 / -1;
+}
+.masthead .weather {
+  margin: 0.2rem 0 0;
+}
+.brief.anzeige {
+  border: 1px dashed var(--line);
+  padding: 0.5rem;
+}
+.brief.kurzmeldung p {
+  font-size: 0.95rem;
+}

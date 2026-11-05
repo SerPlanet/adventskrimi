@@ -4,25 +4,30 @@ import { normalize, rngFrom } from './rng';
 import { generateSudoku } from './sudoku';
 import { LEVELS, type DailyPuzzle, type Kind, type Level } from './types';
 import { generateWord } from './word';
+import { generateWordle } from './wordle';
+import { generateCipher } from './cipher';
+import type { Riddles } from '../schemas';
 
-/** Rotation over the days so every kind comes up regularly. */
-export const KINDS: Kind[] = ['sudoku', 'word', 'number', 'logic'];
-export const kindOfDay = (day: number): Kind => KINDS[(day - 1) % KINDS.length] as Kind;
+/** The riddle kind of a day: the rotation lives in the case (`riddles.yaml`, Invariante 12). */
+export const kindOfDay = (cfg: Riddles, day: number): Kind =>
+  cfg.rotation[(day - 1) % cfg.rotation.length] as Kind;
 
 const TITLES: Record<Kind, string> = {
   sudoku: 'Zahlenfeld',
   word: 'Buchstabensalat',
   number: 'Zahlenrätsel',
   logic: 'Logelei',
+  wordle: 'Wörter raten',
+  cipher: 'Geheimsatz',
 };
 
 /**
  * Puzzle of the day. Same salt + day + level always gives the same puzzle, independent of the player.
  * The salt keeps different games apart; the level is the player's choice (docs/02 §9).
  */
-export function generateDaily(salt: string, day: number, level: Level): DailyPuzzle {
+export function generateDaily(salt: string, day: number, level: Level, cfg: Riddles): DailyPuzzle {
   const rng = rngFrom(`${salt}:${day}:${level}`);
-  const kind = kindOfDay(day);
+  const kind = kindOfDay(cfg, day);
   const base = { kind, level, day, title: TITLES[kind] };
   switch (kind) {
     case 'sudoku': {
@@ -42,7 +47,11 @@ export function generateDaily(salt: string, day: number, level: Level): DailyPuz
       };
     }
     case 'word':
-      return { ...base, ...generateWord(rng, level) };
+      return { ...base, ...generateWord(rng, level, cfg.anagrams) };
+    case 'wordle':
+      return { ...base, ...generateWordle(rng, cfg.wordle) };
+    case 'cipher':
+      return { ...base, ...generateCipher(rng, cfg.phrases) };
     case 'number':
       return { ...base, ...generateNumber(rng, level) };
     case 'logic':
@@ -68,4 +77,5 @@ export const publicPuzzle = (p: DailyPuzzle) => ({
 });
 
 export { LEVELS };
+export { wordleMarks, WORDLE_TRIES } from './wordle';
 export type { DailyPuzzle, Kind, Level };

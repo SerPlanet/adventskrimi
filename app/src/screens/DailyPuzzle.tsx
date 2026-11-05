@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSession } from '../store';
+import { WordleBoard, type WordleGuess } from './Wordle';
 
 type Daily = NonNullable<ReturnType<typeof useSession>['view']>['daily_puzzles'][number];
 
@@ -100,16 +101,23 @@ export function DailyPuzzle({ day }: { day: number }) {
       ? cells.every((c) => c > 0)
       : p.kind === 'logic'
         ? rooms.every(Boolean)
-        : text.trim() !== '';
+        : p.kind === 'wordle'
+          ? text.trim().length === (p.data as { length: number }).length
+          : text.trim() !== '';
 
   const check = async () => {
     const r = await daily(day, 'check', attempt);
+    if (p.kind === 'wordle') setText('');
     setMsg(
       r?.outcome === 'correct'
         ? 'Richtig! Das hast du gut gelöst.'
         : r?.outcome === 'wrong'
           ? 'Das stimmt noch nicht. Versuch es gern noch einmal. Das kostet nichts.'
-          : '',
+          : r?.outcome === 'unknown_word'
+            ? 'Dieses Wort kenne ich nicht. Der Versuch zählt nicht. Probiere ein anderes Wort.'
+            : r?.outcome === 'failed'
+              ? 'Die Versuche sind aufgebraucht. Das ist nicht schlimm, morgen gibt es ein neues Rätsel.'
+              : '',
     );
   };
 
@@ -166,12 +174,27 @@ export function DailyPuzzle({ day }: { day: number }) {
           ))}
         </>
       )}
-      {(p.kind === 'word' || p.kind === 'number') && (
+      {p.kind === 'cipher' && (
+        <p className="cipher">
+          <span className="sr-only">Geheimsatz: </span>
+          <strong>{(p.data as { text: string }).text}</strong>
+        </p>
+      )}
+      {p.kind === 'wordle' && (
+        <WordleBoard
+          guesses={(p as unknown as { guesses: WordleGuess[] }).guesses}
+          tries={(p.data as { tries: number }).tries}
+          length={(p.data as { length: number }).length}
+        />
+      )}
+      {(p.kind === 'word' || p.kind === 'number' || p.kind === 'cipher' || p.kind === 'wordle') && (
         <label>
-          Deine Antwort
+          {p.kind === 'wordle' ? 'Dein Wort' : 'Deine Antwort'}
           <input
             type="text"
             inputMode={p.kind === 'number' ? 'numeric' : 'text'}
+            maxLength={p.kind === 'wordle' ? 5 : 80}
+            autoComplete="off"
             value={text}
             disabled={closed}
             onChange={(e) => setText(e.target.value)}

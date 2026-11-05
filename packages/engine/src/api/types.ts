@@ -46,8 +46,10 @@ export interface DayActivity {
 export interface NewspaperContent {
   day: number;
   /** the stories of the day (02c §3): the lead first; each can be put into the dossier */
-  articles: { id: string; title: string; text: string }[];
+  articles: { id: string; title: string; text: string; kind?: string }[];
   weather?: string;
+  /** joke of the day (WP24): the last box of the paper, never a proof */
+  joke?: { kind: string; text: string };
   blocked_rooms: string[];
   bonus_rooms: string[];
   ads: string[];
@@ -141,13 +143,6 @@ export const Requests = {
     player_id: PlayerId,
     request_id: RequestId,
     next_room: Id.optional(),
-  }),
-  answer_daily: z.object({
-    slug: Slug,
-    player_id: PlayerId,
-    request_id: RequestId,
-    option_id: Id.optional(),
-    hint: z.boolean().optional(),
   }),
   daily_puzzle: z.object({
     slug: Slug,

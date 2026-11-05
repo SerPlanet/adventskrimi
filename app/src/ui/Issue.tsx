@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Paper } from '../api';
 import { FileArticle } from './file/FileButton';
 import './paper.css';
@@ -12,7 +13,7 @@ function split(text: string): [string, string] {
  * One front page: the lead story, more stories, boxes. Every story can be put into the dossier
  * by the player (02c §3). The DOM order is the reading order on every width.
  */
-export function Issue({ p }: { p: Paper }) {
+export function Issue({ p, riddle }: { p: Paper; riddle?: ReactNode }) {
   const [top, ...more] = p.articles;
   const [lead, rest] = split(top?.text ?? '');
   const hasBook = p.plaques.length > 0 || p.detective_of_day || p.accusations?.length;
@@ -31,7 +32,7 @@ export function Issue({ p }: { p: Paper }) {
 
       <div className="briefs">
         {more.map((a) => (
-          <section key={a.id} className="brief">
+          <section key={a.id} className={`brief ${a.kind ?? ''}`}>
             <h3>{a.title}</h3>
             <p>{a.text}</p>
             <FileArticle day={p.day} id={a.id} />
@@ -54,12 +55,6 @@ export function Issue({ p }: { p: Paper }) {
       </div>
 
       <aside className="side" aria-label="Kästen">
-        {p.weather && (
-          <section className="box">
-            <h3>🌨️ Wetter</h3>
-            <p>{p.weather}</p>
-          </section>
-        )}
         {p.blocked_rooms.length > 0 && (
           <section className="box">
             <h3>⛔ Gesperrt</h3>
@@ -100,6 +95,13 @@ export function Issue({ p }: { p: Paper }) {
           </section>
         )}
       </aside>
+      {riddle}
+      {p.joke && (
+        <section className="box joke" aria-labelledby="joke-h">
+          <h3 id="joke-h">😄 Witz des Tages</h3>
+          <p>{p.joke.text}</p>
+        </section>
+      )}
     </div>
   );
 }

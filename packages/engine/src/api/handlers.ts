@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { LoadedCase } from '../loader';
 import {
-  answerQuestion,
   dailyLevel,
   dailyPuzzleFor,
   hintDaily,
@@ -28,7 +27,6 @@ import {
   fileFind,
   unfile,
   setCell,
-  questionHint,
   rankOf,
   readNewspaper,
   resolveAction,
@@ -37,7 +35,7 @@ import {
 } from '../game';
 import { applyProfile } from '../solver/profile';
 import { fillRole, renameCase, renderAll } from '../names';
-import { generateNewspaper, namesOf } from './newspaper';
+import { generateNewspaper, namesOf, withJoke } from './newspaper';
 import { ApiError, Requests, type GameTx, type PlayerTx, type Settings } from './types';
 import { buildView, roleOf } from './view';
 
@@ -64,6 +62,10 @@ function requirePlayable(tx: PlayerTx, now: Date) {
 
 /** The paper of a day, rendered (a stored paper may still hold placeholders); made once, then stored. */
 async function paperOf(tx: PlayerTx, ctx: GameCtx, day: number) {
+  return withJoke(ctx, await storedPaper(tx, ctx, day));
+}
+
+async function storedPaper(tx: PlayerTx, ctx: GameCtx, day: number) {
   const existing = await tx.newspaper(day);
   if (existing) return renderAll(existing, {}, namesOf(ctx));
   const fresh = generateNewspaper(
@@ -236,24 +238,6 @@ export const handlers = {
     });
   },
 
-  async answer_daily(tx: PlayerTx, req: Req<'answer_daily'>, now: Date) {
-    return once(tx, req.request_id, async () => {
-      requirePlayable(tx, now);
-      const ctx = await ctxOf(tx);
-      const st = tx.player.state;
-      if (req.hint) {
-        const h = questionHint(st, ctx);
-        if (!h) throw new ApiError('no_hint', 400);
-        await tx.save(h.state);
-        return { hint: h.hint, state: view(tx, ctx, now, h.state) };
-      }
-      if (!req.option_id) throw new ApiError('bad_request', 400);
-      const { state, outcome } = answerQuestion(st, ctx, req.option_id);
-      if (state !== st) await tx.save(state);
-      return { outcome, state: view(tx, ctx, now, state) };
-    });
-  },
-
   /** Puzzle of the day: check an answer, ask for a tip (tip 1, tip 2, solution) or skip. */
   async daily_puzzle(tx: PlayerTx, req: Req<'daily_puzzle'>, now: Date) {
     return once(tx, req.request_id, async () => {
@@ -264,7 +248,7 @@ export const handlers = {
       const day = req.day ?? st.day;
       if (day > readableDays(st, now, tx.game.startDate)) throw new ApiError('bad_request', 400);
       const late = day !== bonusDay(st, now, tx.game.startDate);
-      const puzzle = dailyPuzzleFor(tx.game.slug, day, dailyLevel(st, day));
+      const puzzle = dailyPuzzleFor(tx.game.slug, day, dailyLevel(st, day), ctx.c.riddles);
       let next = st;
       let extra: Record<string, unknown> = {};
       if (req.op === 'check') {
@@ -350,7 +334,6 @@ export const MUTATING: HandlerName[] = [
   'open_day',
   'act',
   'end_day',
-  'answer_daily',
   'daily_puzzle',
   'object_puzzle',
   'settings',

@@ -51,30 +51,47 @@ export const NewspaperFile = z.object({
         day: Day,
         title: z.string().min(1),
         text: z.string().min(1),
-        kind: z.enum(['klatsch', 'hintergrund']).default('klatsch'),
+        kind: z.enum(['bericht', 'klatsch', 'kurzmeldung', 'anzeige']).default('klatsch'),
         /** facts the article carries */
         traegt: z.array(Id).default([]),
       }),
     )
     .default([]),
+  /** joke of the day (WP24): 1-2 sentences, no link to the figures or the case, never a proof */
+  jokes: z
+    .array(
+      z.object({
+        id: Id,
+        day: Day,
+        kind: z.enum(['wortwitz', 'flachwitz', 'winter', 'hotel']),
+        text: z.string().min(1),
+      }),
+    )
+    .default([]),
+  /** last day the validator demands the full paper structure of; later days report "content follows" (D80) */
+  paper_required_through: z.number().int().min(0).max(24).default(24),
   plaque_titles: z.array(z.string().min(1)).default([]),
   filler: z.array(z.object({ id: Id, day: Day.optional(), text: z.string().min(1) })).default([]),
 });
 
-export const Question = z.object({
-  id: Id,
-  day: Day,
-  text: z.string().min(1),
-  options: z
-    .array(z.object({ id: Id, text: z.string().min(1) }))
-    .min(2)
-    .max(4),
-  correct: Id,
-  /** where the answer can be found */
-  from: z.enum(['newspaper', 'hotelbook']),
-  hint: z.string().optional(),
+/** Kinds of the riddle of the day (WP24, D88). */
+export const RIDDLE_KINDS = ['sudoku', 'wordle', 'word', 'cipher', 'number', 'logic'] as const;
+
+/** Riddle rotation and word lists of a case (Invariante 12: no content in code). Server only. */
+export const RiddlesFile = z.object({
+  /** day n uses entry (n-1) mod length */
+  rotation: z.array(z.enum(RIDDLE_KINDS)).min(1),
+  /** anagram words by level */
+  anagrams: z.object({
+    easy: z.array(z.string().min(3)).min(1),
+    medium: z.array(z.string().min(3)).min(1),
+    hard: z.array(z.string().min(3)).min(1),
+  }),
+  /** five-letter words (A-Z only): the answers and the accepted guesses of the wordle */
+  wordle: z.array(z.string().regex(/^[A-Z]{5}$/)).min(10),
+  /** short sentences for the Caesar cipher (letters and spaces) */
+  phrases: z.array(z.string().regex(/^[A-Za-zÄÖÜäöüß ]{6,30}$/)).min(1),
 });
-export const QuestionsFile = listFile('questions', Question);
 
 export const PrologFile = z.object({
   days: z.array(
@@ -95,4 +112,4 @@ export const PrologFile = z.object({
 
 export type Puzzle = z.infer<typeof Puzzle>;
 export type Event = z.infer<typeof Event>;
-export type Question = z.infer<typeof Question>;
+export type Riddles = z.infer<typeof RiddlesFile>;
