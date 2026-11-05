@@ -1,10 +1,11 @@
 # STATUS (Agenten pflegen diese Datei, höchstens 40 Zeilen)
 
-Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20, WP21, WP22 und WP23 Stufe 1 erledigt**. **Nächstes Work Package: WP23 Stufe 2 (Tag 15–24), dann Stufe 3 (Lockerungen weg, `balance`).** Danach → WP13 Teil 2 (Menschen-Test) → WP14 (Launch). Code-Freeze 29.11., Start 1.12.
+Stand: 2026-11-04 · Redesign beschlossen (D74–D83), **WP20, WP21, WP22 und WP23 Stufe 1 erledigt**. **Nächstes Work Package: WP24 (Zeitung und Rätsel, `docs/wp/WP24-zeitung-raetsel.md`), danach WP23 Stufe 2 und 3.** Danach → WP13 Teil 2 (Menschen-Test) → WP14 (Launch). Code-Freeze 29.11., Start 1.12.
 
 ## Nächste Work Packages
 | WP | Inhalt | Datei |
 |---|---|---|
+| WP24 | Zeitung und Rätsel (Code zuerst) | `docs/wp/WP24-zeitung-raetsel.md` |
 | WP23 | Inhalt ab Tag 6, Stufe 2 und 3 offen (Sub-Agent) | `docs/wp/WP23-inhalt-ab-tag6.md` |
 
 ## Erledigt (Kurzform, Details in `git log` und den WP-Dateien)
