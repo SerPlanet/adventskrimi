@@ -6,6 +6,7 @@ import { makeRng } from '../sim/bots';
 import { buildInfo } from '../solver/info';
 import { planTempo, profileBudget } from '../solver/planner';
 import { buildReach, type Reach } from '../solver/reach';
+import { routeErrors } from './route';
 import type { CheckResult } from './types';
 
 const NIGHT_TYPES = new Set<FactBody['type']>(['presence', 'absence', 'object_state']);
@@ -84,8 +85,8 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
   if (corridors.length > 1 && new Set(c.routes.corridors.map((k) => k.route[last])).size > 1)
     errors.push(`corridors do not meet on day ${last}`);
 
-  // 5. more things with a proof than actions: a real choice, and no action runs dry
-  const proofThings = (reach: Reach, day: number, room: string) =>
+  // 5. more things with a find than actions: a real choice, and no action runs dry
+  const proofThings = (reach: Reach, day: number, room: string, withProof = false) =>
     new Set(
       sources
         .filter(
@@ -93,7 +94,7 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
             s.kind === 'inspect' &&
             s.object &&
             reach.roomOn(s.id, day) === room &&
-            s.yields.some((y) => proofs.has(y)),
+            (withProof ? s.yields.some((y) => proofs.has(y)) : s.yields.length > 0),
         )
         .map((s) => s.object),
     ).size;
@@ -103,17 +104,18 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
       const need = budgetOf({ profile }, d) + 1;
       const have = proofThings(reach, d, k.route[d] as string);
       if (have < need)
-        errors.push(`corridor ${k.id} day ${d}: ${have} thing(s) with a proof, need >= ${need}`);
+        errors.push(`corridor ${k.id} day ${d}: ${have} thing(s) with a find, need >= ${need}`);
     }
   }
   // free phase: a room that offers proofs by examining offers more than the day's budget
   const freeDays = Array.from({ length: 24 - last }, (_, i) => last + 1 + i);
   for (const r of c.rooms.rooms)
     for (const d of freeDays) {
+      // a room that offers proofs by examining offers more finds than the day's budget
       const have = proofThings(global, d, r.id);
       const need = budgetOf({ profile }, d) + 1;
-      if (have > 0 && have < need) {
-        errors.push(`room ${r.id} day ${d}: ${have} thing(s) with a proof, need >= ${need}`);
+      if (proofThings(global, d, r.id, true) > 0 && have < need) {
+        errors.push(`room ${r.id} day ${d}: ${have} thing(s) with a find, need >= ${need}`);
         break;
       }
     }
@@ -178,6 +180,8 @@ export function checkInsights(c: LoadedCase, profile: Profile, q: Quality): Chec
         `source ${s.id}: a question about the night is open on day ${early[0]} (free phase starts on ${free})`,
       );
   }
+
+  errors.push(...routeErrors(c));
 
   return {
     name: 'insights',

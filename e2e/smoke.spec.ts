@@ -134,7 +134,7 @@ test('role, newspaper, talk, first action, good night, next day', async ({ page 
   await expect(page.getByRole('heading', { name: 'Gute Nacht' })).toBeFocused();
   await expect(page.getByText('Tag beendet')).toBeVisible();
   await expect(page.locator('.dayover .story')).toContainText('Halle');
-  await expect(page.getByText(/Heute: 0 Gespräche, 3 Funde./)).toBeVisible();
+  await expect(page.getByText(/Heute: 1 Gespräch, 3 Funde./)).toBeVisible();
   // a latecomer (calendar day 2) goes on at once: narrative first, then the newspaper
   await page.getByRole('button', { name: 'Zum nächsten Tag' }).click();
   await expect(page.getByRole('heading', { name: 'Tag 2' })).toBeVisible();

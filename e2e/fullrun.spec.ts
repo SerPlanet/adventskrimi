@@ -67,7 +67,9 @@ for (const g of GAMES) {
     for (let day = 1; day <= 24; day++) {
       // narrative, then the newspaper of this day
       await expect(page.getByRole('heading', { name: `Tag ${day}`, exact: true })).toBeVisible();
-      await page.getByRole('button', { name: 'Weiter' }).click();
+      // the opening may be several cards (day 6 tells the morning of the theft)
+      const next = page.getByRole('button', { name: 'Weiter', exact: true });
+      while (await next.isVisible()) await next.click();
       await expect(page.getByText(`Ausgabe Nr. ${day}`)).toBeVisible();
       await expect(page.locator('.front .lead')).toBeVisible();
       expect(

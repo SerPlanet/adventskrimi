@@ -238,6 +238,11 @@ export function buildView(tx: GameTx, player: PlayerRecord, ctx: GameCtx, now: D
     }),
     // what the morning looks like (02c §2), and whether the player's day is over (02c §9)
     narrative: narrativeOf(st, ctx, role),
+    // the opening as cards: the story of the day (if any), then the way into the room
+    narrative_cards: [
+      ...(c.events.events.find((e) => e.day === st.day)?.story ?? []),
+      narrativeOf(st, ctx, role),
+    ],
     role: { id: role.id, name: role.name },
     // the choice is open until the end of day 1
     roles: ctx.profile.roles.map((r) => ({ id: r.id, name: r.name })),

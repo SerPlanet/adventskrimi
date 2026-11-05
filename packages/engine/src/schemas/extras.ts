@@ -31,6 +31,8 @@ export const Event = z.object({
   weather: z.string().optional(),
   /** time of day / mood of the morning, one sentence for the narrative (02c §2) */
   morgen: z.string().optional(),
+  /** a longer opening of the day as short cards (WP22b), told before the room; e.g. the morning of the theft */
+  story: z.array(CardText).default([]),
   blocked_rooms: z.array(Id).default([]),
   bonus_rooms: z.array(Id).default([]),
 });

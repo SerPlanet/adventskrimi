@@ -633,6 +633,16 @@ describe('good night, role and the plan on guided days (WP21)', () => {
     expect(bodyOf(late).error).toBe('role_locked');
   });
 
+  test('a day with a story opens with several cards, the way into the room comes last', async () => {
+    setDay(a, 3);
+    const v = await stateOf(a, DAY3);
+    expect(v.narrative_cards).toHaveLength(3);
+    expect(v.narrative_cards[0]).toBe('Der Morgen ist hell und still.');
+    expect(v.narrative_cards[2]).toBe(v.narrative);
+    setDay(a, 2);
+    expect((await stateOf(a, DAY3)).narrative_cards).toEqual([(await stateOf(a, DAY3)).narrative]);
+  });
+
   test('on guided days the plan and the room names show only the own way', async () => {
     setDay(a, 2);
     const v = await stateOf(a, DAY3);

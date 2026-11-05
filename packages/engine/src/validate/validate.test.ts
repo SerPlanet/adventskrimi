@@ -54,7 +54,7 @@ describe('validator on the test case', () => {
 describe('broken mini cases are rejected by the expected check', () => {
   test('ambiguous: dropping the only fact on the time window leaves several tuples', () => {
     const c = broken((x) => {
-      const window = ['f_lampe_an', 'f_a1', 'f_a2', 'f_b1', 'f_b2'];
+      const window = ['f_lampe_an', 'f_a1', 'f_a2', 'f_b1', 'f_b2', 'f_h3', 'f_h4', 'f_k3', 'f_k4'];
       x.sources.sources.forEach((s) => (s.yields = s.yields.filter((y) => !window.includes(y))));
       x.sources.sources = x.sources.sources.filter((s) => s.yields.length);
     });
@@ -80,7 +80,9 @@ describe('broken mini cases are rejected by the expected check', () => {
         supports: [],
       });
       // the route fact that would refute it is not part of this broken case
-      x.sources.sources = x.sources.sources.filter((s) => !s.yields.includes('f_b2'));
+      x.sources.sources = x.sources.sources.filter(
+        (s) => !s.yields.includes('f_b2') && !s.yields.includes('f_k3'),
+      );
     });
     expect(failing(c)).toContain('refute');
   });
@@ -182,15 +184,14 @@ describe('insight checks (WP20 §4)', () => {
 
   test('1: an insight needs proofs from at least two sources', () => {
     const c = broken((x) => {
-      fact(x, 'f_cora_keller').supports = [];
-      fact(x, 'f_b2').supports = [];
+      for (const id of ['f_cora_keller', 'f_k3', 'f_k4']) fact(x, id).supports = [];
     });
     expect(errorsOf(c).join()).toMatch(/insight i_keller: 1 source/);
   });
 
   test('2: a corridor must not hang on a single source', () => {
     const c = broken((x) => {
-      fact(x, 'f_b2').supports = [];
+      for (const id of ['f_k3', 'f_k4']) fact(x, id).supports = [];
       Object.assign(source(x, 'src_lampe'), { days: [2], route: ['a'] });
     });
     expect(errorsOf(c).join()).toMatch(/corridor b: insight i_keller hangs on the single source/);
@@ -205,7 +206,7 @@ describe('insight checks (WP20 §4)', () => {
 
   test('4: corridors give the same number of insights and proofs in the guided days', () => {
     const c = broken(
-      (x) => (x.sources.sources = x.sources.sources.filter((s) => s.id !== 'src_a2')),
+      (x) => (x.sources.sources = x.sources.sources.filter((s) => s.id !== 'src_a1')),
     );
     expect(errorsOf(c).join()).toMatch(/corridors differ in the guided days/);
   });
@@ -220,7 +221,7 @@ describe('insight checks (WP20 §4)', () => {
       x.sources.sources = x.sources.sources.filter((s) => !['src_a2', 'src_b2'].includes(s.id));
     });
     expect(errorsOf(guided).join()).toMatch(
-      /corridor a day 2: 2 thing\(s\) with a proof, need >= 3/,
+      /corridor a day 2: 2 thing\(s\) with a find, need >= 3/,
     );
     const free = broken((x) => {
       // day 3 on: the hall offers the lamp only, but not enough things
@@ -280,5 +281,31 @@ describe('story finds (WP22)', () => {
     expect(failed).not.toContain('truth');
     expect(failed).not.toContain('unique');
     expect(failed).not.toContain('refute');
+  });
+});
+
+describe('what a corridor sees in the guided days (WP22b)', () => {
+  const errorsOf = (c: LoadedCase) =>
+    runChecks(c, friends, quality, 'insights' as CheckName).flatMap((r) => r.errors);
+
+  test('an insight is proven at most once on one way in days 1-2', () => {
+    const c = broken((x) => (x.facts.facts.find((f) => f.id === 'f_a2')!.supports = ['i_halle']));
+    expect(errorsOf(c).join()).toMatch(/corridor a: insight i_halle is proven 2 times/);
+  });
+
+  test('the newspaper does not repeat what the way already gave', () => {
+    const c = broken((x) =>
+      x.sources.sources.find((s) => s.id === 'src_news_a')!.yields.push('f_cora_keller'),
+    );
+    expect(errorsOf(c).join()).toMatch(
+      /newspaper src_news_a repeats insight i_keller that src_lampe gave/,
+    );
+  });
+
+  test('an answer that only repeats earlier finds is refused', () => {
+    const c = broken(
+      (x) => (x.sources.sources.find((s) => s.id === 'src_anna')!.yields = ['f_lampe_an']),
+    );
+    expect(errorsOf(c).join()).toMatch(/answer src_anna only repeats finds from before/);
   });
 });

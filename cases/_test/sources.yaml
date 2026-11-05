@@ -69,7 +69,7 @@ sources:
       days: [2, 3, 4, 5],
       yields: [f_lampe_an],
     }
-  - { id: src_news_a, kind: newspaper, days: [1, 2, 3, 4, 5], yields: [f_excl_ben, f_lampe_an] }
+  - { id: src_news_a, kind: newspaper, days: [1, 2, 3, 4, 5], yields: [f_lampe_an] }
   - {
       id: src_book_a,
       kind: hotelbook,
@@ -129,4 +129,36 @@ sources:
       days: [2, 3, 4, 5],
       route: [b],
       yields: [f_b2],
+    }
+  - {
+      id: src_h3,
+      kind: hotelbook,
+      room: halle,
+      days: [3, 4, 5],
+      unlock: { day_from: 3 },
+      yields: [f_h3],
+    }
+  - {
+      id: src_h4,
+      kind: hotelbook,
+      room: halle,
+      days: [3, 4, 5],
+      unlock: { day_from: 3 },
+      yields: [f_h4],
+    }
+  - {
+      id: src_k3,
+      kind: hotelbook,
+      room: keller,
+      days: [3, 4, 5],
+      unlock: { day_from: 3 },
+      yields: [f_k3],
+    }
+  - {
+      id: src_k4,
+      kind: hotelbook,
+      room: keller,
+      days: [3, 4, 5],
+      unlock: { day_from: 3 },
+      yields: [f_k4],
     }

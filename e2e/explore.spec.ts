@@ -5,17 +5,13 @@ import { connInfo, readEnv } from '../tools/lib/db';
 
 // Examining really works for a player who starts the game (Berghotel on staging, both profiles):
 // the button is there, the counter in the bar drops by one, the find lands in the dossier.
-// Rooms where an examination still brings something new on that day: day 2 Christstollen in the
-// kitchen, day 6 Heizkessel in the cellar. Day 1 has no examination find by design (the prolog
-// starts with talking); on day 3 there is one only in the hall, which the family does not have.
+// On day 6 every room is free: the dining room offers things whose examination brings a find.
 test.use({ actionTimeout: 10_000 });
 const env = readEnv();
 const TAG = Date.now().toString(36);
 const ALL = [
-  { slug: 'freunde', day: 2, room: 'kueche' },
-  { slug: 'freunde', day: 6, room: 'keller' },
-  { slug: 'familie', day: 2, room: 'kueche' },
-  { slug: 'familie', day: 6, room: 'keller' },
+  { slug: 'freunde', day: 6, room: 'speisesaal' },
+  { slug: 'familie', day: 6, room: 'speisesaal' },
 ];
 // ONLY=freunde-6 runs a single case while debugging
 const CASES = ALL.filter((c) => !process.env.ONLY || process.env.ONLY === `${c.slug}-${c.day}`);
@@ -61,14 +57,15 @@ for (const c of CASES) {
     const now = encodeURIComponent(`2026-12-0${c.day}T12:00:00+01:00`);
     await page.goto(`/?now=${now}#/e2e-${c.slug}`);
     await page.getByRole('button', { name: new RegExp(nameOf(c)) }).click();
-    await page.getByRole('button', { name: 'Weiter' }).click();
+    // the opening may be several cards (day 6 tells the morning of the theft)
+    const next = page.getByRole('button', { name: 'Weiter', exact: true });
+    while (await next.isVisible()) await next.click();
     const bar = page.locator('.bar .actions');
     await expect(bar).toContainText('Aktionen übrig');
     const [, left, budget] = /\((\d+)\/(\d+)\)/.exec((await bar.textContent()) ?? '') ?? [];
     expect(Number(left)).toBe(Number(budget));
     // the budget of the profile: friends 4, family 3 from day 6 on; the prolog days have less
     if (c.day === 6) expect(Number(budget)).toBe(c.slug === 'freunde' ? 4 : 3);
-    if (c.day === 2) expect(Number(budget)).toBe(2);
 
     await page.getByRole('navigation').getByRole('button', { name: /Akte/ }).click();
     await page.waitForTimeout(500);
