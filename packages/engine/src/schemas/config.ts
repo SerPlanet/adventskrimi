@@ -82,6 +82,10 @@ export const Quality = z.object({
     worst_max_candidates: z.number().int(),
   }),
   /** insight evidence checks (WP20): proofs per insight, random-sample solvability */
+  /** every room has at least this many object puzzles (locks) */
+  /** every room offers at least budget+1 things with a find on every free day (D89) */
+  rooms_need_budget_plus_one: z.boolean().default(false),
+  room_puzzles_min: z.number().int().min(0).default(0),
   insights: z.object({
     min_proofs: z.number().int().min(1),
     sample_share: z.number().min(0).max(1),

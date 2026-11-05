@@ -23,6 +23,12 @@ export function checkLocks(c: LoadedCase, quality: Quality): CheckResult {
       errors.push(`source ${s.id}: lock hint thing ${h.ding} is not in ${h.room}`);
     if (h.room !== roomOf(s)) cross++;
   }
+  // every room has at least `room_puzzles_min` object puzzles (WP24, D89)
+  for (const r of c.rooms.rooms) {
+    const n = locked.filter((s) => roomOf(s) === r.id).length;
+    if (n < quality.room_puzzles_min)
+      errors.push(`room ${r.id}: ${n} object puzzle(s), need ${quality.room_puzzles_min}`);
+  }
   // a puzzle is only ever met as a lock on a thing
   for (const p of c.puzzles.puzzles)
     if (!c.sources.sources.some((s) => s.requires === p.id))

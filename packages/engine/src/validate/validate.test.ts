@@ -227,7 +227,18 @@ describe('insight checks (WP20 §4)', () => {
       // day 3 on: the hall offers the lamp only, but not enough things
       for (const id of ['src_a1', 'src_a2', 'src_b1', 'src_b2']) source(x, id).days = [2];
     });
-    expect(errorsOf(free).join()).toMatch(/room halle day 3/);
+    const strict = { ...quality, rooms_need_budget_plus_one: true };
+    expect(errorsOf(free, strict).join()).toMatch(/room halle day 3/);
+    // off in the test case's own settings
+    expect(errorsOf(free).join()).not.toMatch(/room halle day 3/);
+  });
+
+  test('every room needs an object puzzle when the settings ask for it (D89)', () => {
+    const r = runChecks(good, friends, { ...quality, room_puzzles_min: 1 }).find(
+      (x) => x.name === 'locks',
+    )!;
+    expect(r.ok).toBe(false);
+    expect(r.errors.join()).toMatch(/room \w+: 0 object puzzle\(s\), need 1/);
   });
 
   test('6: no proof names a verdict', () => {

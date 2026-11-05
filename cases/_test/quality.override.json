@@ -1,4 +1,6 @@
 {
+  "room_puzzles_min": 0,
+  "rooms_need_budget_plus_one": false,
   "tempo": {
     "earliest_day": 1,
     "latest_day": 5

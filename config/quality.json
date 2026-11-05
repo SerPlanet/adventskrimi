@@ -27,6 +27,8 @@
     "casual_median_max_candidates": 4,
     "worst_max_candidates": 4
   },
+  "rooms_need_budget_plus_one": true,
+  "room_puzzles_min": 1,
   "insights": {
     "min_proofs": 2,
     "sample_share": 0.6,
